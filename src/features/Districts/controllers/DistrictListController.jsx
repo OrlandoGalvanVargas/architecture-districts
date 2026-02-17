@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { Input, Button, Space } from "antd";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { useNofitication } from "../../../contexts/Notification";
+import { useNofitication } from "@/contexts/Notification";
 import { useState } from "react";
 import { useDistricts } from "../hooks/useDistricts";
 import { useDistrictDelete } from "../hooks/useDistrictDelete";
-import { LoadingSpinner } from "../../../components/common/LoadingSpinner/LoadingSpinner";
-import { ErrorMessage } from "../../../components/common/ErrorMessage/ErrorMessage";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
+import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
 import { DistrictTable } from "../components/DistrictTable";
 
 const { Search } = Input;
@@ -38,6 +38,10 @@ export const DistrictListController = () => {
     navigate(`/districts/${district.id}`);
   };
 
+  const handleCreate = () => {
+    navigate("/districts/create");
+  };
+
   const handleEdit = (district) => {
     navigate(`/districts/${district.id}/edit`);
   };
@@ -48,10 +52,6 @@ export const DistrictListController = () => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleCreate = () => {
-    navigate("/districts/create");
   };
 
   if (isLoading) {

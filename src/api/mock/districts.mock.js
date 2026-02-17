@@ -1,7 +1,5 @@
-// Simular delay de red
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Datos mock
 let mockDistricts = [
   {
     id: 1,
@@ -27,8 +25,6 @@ let mockDistricts = [
   },
 ];
 
-let nextId = 3;
-
 export const mockDistrictsApi = {
   getAll: async () => {
     await delay(800);
@@ -37,7 +33,7 @@ export const mockDistrictsApi = {
 
   getById: async (id) => {
     await delay(500);
-    const district = mockDistricts.find((d) => d.id === parseInt(id));
+    const district = mockDistricts.find((d) => d.id === id);
     if (!district) {
       throw { message: "District not found", status: 404 };
     }
@@ -48,7 +44,7 @@ export const mockDistrictsApi = {
     await delay(1000);
     const newDistrict = {
       ...data,
-      id: nextId++,
+      id: mockDistricts.length + 1,
       schoolCount: 0,
     };
     mockDistricts.push(newDistrict);
@@ -57,7 +53,7 @@ export const mockDistrictsApi = {
 
   update: async (id, data) => {
     await delay(800);
-    const index = mockDistricts.findIndex((d) => d.id === parseInt(id));
+    const index = mockDistricts.findIndex((d) => d.id === id);
     if (index === -1) {
       throw { message: "District not found", status: 404 };
     }
@@ -67,11 +63,11 @@ export const mockDistrictsApi = {
 
   delete: async (id) => {
     await delay(500);
-    const index = mockDistricts.findIndex((d) => d.id === parseInt(id));
+    const index = mockDistricts.findIndex((d) => d.id === id);
     if (index === -1) {
       throw { message: "District not found", status: 404 };
     }
-    mockDistricts = mockDistricts.filter((d) => d.id !== parseInt(id));
+    mockDistricts = mockDistricts.filter((d) => d.id !== id);
     return { success: true };
   },
 };

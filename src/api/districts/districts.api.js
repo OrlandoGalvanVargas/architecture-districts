@@ -1,5 +1,5 @@
-import { apiClient } from "./client";
-import { mockDistrictsApi } from "./mock/districts.mock";
+import { apiClient } from "../client";
+import { mockDistrictsApi } from "../mock/districts.mock";
 
 const ENDPOINT = "/districts";
 const USE_MOCK = true;

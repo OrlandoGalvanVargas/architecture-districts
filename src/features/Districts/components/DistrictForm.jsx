@@ -65,10 +65,10 @@ export const DistrictForm = ({
             rules={[{ required: true, message: "Please select state" }]}
           >
             <Select placeholder="Select state">
-              <Select.Option value="CA">California</Select.Option>
-              <Select.Option value="TX">Texas</Select.Option>
-              <Select.Option value="NY">New York</Select.Option>
-              <Select.Option value="FL">Florida</Select.Option>
+              <Select value="CA">California</Select>
+              <Select value="TX">Texas</Select>
+              <Select value="NY">New York</Select>
+              <Select value="FL">Florida</Select>
             </Select>
           </Form.Item>
         </Col>

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { MainLayout } from "../components/Layout/MainLayout/MainLayout";
-import { DistrictView } from "../features/Districts/DistrictView";
+import { MainLayout } from "@/components/Layout/MainLayout/MainLayout";
+import { DistrictView } from "@/features/districts/DistrictView";
 
 export const AppRouter = () => {
   return (

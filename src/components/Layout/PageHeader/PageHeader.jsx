@@ -2,7 +2,7 @@ import { Breadcrumb } from "antd";
 import { Link } from "react-router-dom";
 import "./PageHeader.css";
 
-export const PageHader = ({ title, breadcrumbs = [], extra = null }) => {
+export const PageHader = ({ title, breadcrumbs = [] }) => {
   const breadcrumbItems = breadcrumbs.map((crumb, index) => {
     const isLast = index === breadcrumbs.length - 1;
 
@@ -18,7 +18,6 @@ export const PageHader = ({ title, breadcrumbs = [], extra = null }) => {
           <Breadcrumb items={breadcrumbItems} />
           <h1 className="page-title">{title}</h1>
         </div>
-        {extra && <div className="page-header-extra">{extra}</div>}
       </div>
     </div>
   );

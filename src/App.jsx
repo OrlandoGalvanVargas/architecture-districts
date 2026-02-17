@@ -1,4 +1,3 @@
-import "./App.css";
 import { NotificationProvider } from "./contexts/Notification";
 import { AppRouter } from "./router/AppRouter";
 

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Card } from "antd";
-import { useNofitication } from "../../../contexts/Notification";
+import { useNofitication } from "@/contexts/Notification";
 import { useDistrictCreate } from "../hooks/useDistrictCreate";
 import { DistrictForm } from "../components/DistrictForm";
 

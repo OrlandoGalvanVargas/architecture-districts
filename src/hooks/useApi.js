@@ -15,7 +15,7 @@ export const useApi = (apiFunction, options = {}) => {
         const result = await apiFunction(...params);
         setData(result);
         if (onSuccess) {
-          onSuccess(result);
+          onSuccess();
         }
         return result;
       } catch (error) {
@@ -31,12 +31,6 @@ export const useApi = (apiFunction, options = {}) => {
     [apiFunction, onSuccess, onError],
   );
 
-  const reset = useCallback(() => {
-    setData(null);
-    setIsLoading(false);
-    setError(null);
-  }, []);
-
   useEffect(() => {
     if (inmediate) {
       execute();
@@ -48,6 +42,5 @@ export const useApi = (apiFunction, options = {}) => {
     isLoading,
     error,
     execute,
-    reset,
   };
 };

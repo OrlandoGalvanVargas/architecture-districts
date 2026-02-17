@@ -26,14 +26,12 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem("auth_token");
-        const response = await apiClient.post(
+        const response = await apiClient.get(
           `${originalRequest.baseURL}/auth/refresh`,
-          { refreshToken },
         );
         const newToken = response.data.token;
         localStorage.setItem("auth_token", newToken);
@@ -47,7 +45,7 @@ apiClient.interceptors.response.use(
       }
     }
 
-    const errorMessage = error.response.message || "An error occurred";
+    const errorMessage = error.response?.message || "An error occurred";
     return Promise.reject(errorMessage);
   },
 );

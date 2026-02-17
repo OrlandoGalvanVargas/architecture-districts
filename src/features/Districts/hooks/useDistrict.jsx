@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { districtsApi } from "../../../api/districts.api";
-import { useApi } from "../../../hooks/useApi";
+import { districtsApi } from "@/api/districts/districts.api";
+import { useApi } from "@/hooks/useApi";
 
 export const useDistrict = (id, options = {}) => {
   const apiCall = useCallback(() => {
