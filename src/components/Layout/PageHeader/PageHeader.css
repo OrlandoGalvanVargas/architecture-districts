@@ -1,0 +1,27 @@
+.page-header {
+  background: #fff;
+  padding: 16px 24px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.page-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.page-header-main {
+  flex: 1;
+}
+
+.page-title {
+  margin: 8px 0 0 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+}
+
+.page-header-extra {
+  margin-left: 16px;
+}

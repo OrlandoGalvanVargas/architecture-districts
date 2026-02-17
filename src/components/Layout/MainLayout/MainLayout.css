@@ -1,0 +1,31 @@
+.main-layout {
+  min-height: 100vh;
+}
+
+.main-header {
+  display: flex;
+  align-items: center;
+  background: #001529;
+  padding: 0 24px;
+}
+
+.logo {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  margin-right: 40px;
+}
+
+.main-nav {
+  flex: 1;
+}
+
+.main-content {
+  padding: 24px;
+  background: #f0f2f5;
+}
+
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
