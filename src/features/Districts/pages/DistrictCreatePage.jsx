@@ -4,7 +4,7 @@ import { DistrictCreateController } from "../controllers/DistrictCreateControlle
 export const DistrictCreatePage = ({ baseBreadcrumbs }) => {
   const addBreadcrumbs = [
     ...baseBreadcrumbs,
-    { label: "create", path: "/districts/create" },
+    { label: "Create", path: "/districts/create" },
   ];
 
   return (
