@@ -1,16 +1,12 @@
-import { PageHader } from "@/components/Layout/PageHeader/PageHeader";
 import { DistrictCreateController } from "../controllers/DistrictCreateController";
+import withPageLayout from "@/HOC/withPageLayout";
+import {
+  DISTRICT_BREADCRUMBS,
+  DISTRICT_BREADCRUMB_CHAINS,
+} from "../utils/districtBreadcrumbs";
 
-export const DistrictCreatePage = ({ baseBreadcrumbs }) => {
-  const addBreadcrumbs = [
-    ...baseBreadcrumbs,
-    { label: "Create", path: "/districts/create" },
-  ];
-
-  return (
-    <div>
-      <PageHader title="Create New District" breadcrumbs={addBreadcrumbs} />
-      <DistrictCreateController />
-    </div>
-  );
-};
+export const DistrictCreatePage = withPageLayout(DistrictCreateController, {
+  title: "Create New District",
+  breadcrumbMap: DISTRICT_BREADCRUMBS,
+  breadcrumbChain: DISTRICT_BREADCRUMB_CHAINS.create,
+});

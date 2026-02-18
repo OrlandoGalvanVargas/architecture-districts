@@ -2,7 +2,7 @@ import { Breadcrumb } from "antd";
 import { Link } from "react-router-dom";
 import "./PageHeader.css";
 
-export const PageHader = ({ title, breadcrumbs = [] }) => {
+export const PageHeader = ({ title, breadcrumbs = [] }) => {
   const breadcrumbItems = breadcrumbs.map((crumb, index) => {
     const isLast = index === breadcrumbs.length - 1;
 
