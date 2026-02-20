@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { districtsApi } from "@/api/district/districts.api";
 import { useApi } from "@/hooks/useApi";
+import { districtService } from "../../../services/districtService";
 
 export const useDistricts = (params = {}, options = {}) => {
   const apiCall = useCallback(() => {
-    return districtsApi.getAll(params);
+    return districtService.getAll(params);
   }, [JSON.stringify(params)]);
 
   const { data, isLoading, error, execute } = useApi(apiCall, {

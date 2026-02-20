@@ -2,7 +2,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Popconfirm } from "antd";
 import { useNofitication } from "../../../contexts/Notification";
 import { useDistrict } from "../hooks/useDistrict";
-import { useDistricts } from "../hooks/useDistricts";
 import { useDistrictDelete } from "../hooks/useDistrictDelete";
 import { LoadingSpinner } from "../../../components/common/LoadingSpinner/LoadingSpinner";
 import { ErrorMessage } from "../../../components/common/ErrorMessage/ErrorMessage";
