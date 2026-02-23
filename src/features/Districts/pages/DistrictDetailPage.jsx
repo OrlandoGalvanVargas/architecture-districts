@@ -14,7 +14,7 @@ export const DistrictDetailPage = () => {
   return (
     <div>
       <PageHeader title="District Details" breadcrumbs={breadcrumbs} />
-      <DistrictDetailController />
+      <DistrictDetailController districtId={id} />
     </div>
   );
 };

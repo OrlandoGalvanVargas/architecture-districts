@@ -1,38 +1,47 @@
+import { withController } from "@/reactive/withController";
 import { useNavigate } from "react-router-dom";
 import { Card } from "antd";
-import { useNofitication } from "@/contexts/Notification";
-import { useDistrictCreate } from "../hooks/useDistrictCreate";
 import { DistrictForm } from "../components/DistrictForm";
+import { useNotification } from "@/contexts/Notification";
 
-export const DistrictCreateController = () => {
-  const navigate = useNavigate();
-  const notification = useNofitication();
+export const DistrictCreateController = withController(
+  ({ loading, actions }) => {
+    const navigate = useNavigate();
+    const notification = useNotification();
 
-  const { createDistrict, isCreating } = useDistrictCreate({
-    onSuccess: () => {
-      notification.showSuccess("District created successfully");
+    const createDistrict = actions.createDistrict;
+    const isCreating = loading.createDistrict;
+
+    const handleSubmit = async (values) => {
+      try {
+        await createDistrict(values);
+        notification.showSuccess("District created successfully");
+        navigate("/districts");
+      } catch (error) {
+        notification.showError(error.message);
+      }
+    };
+
+    const handleCancel = () => {
       navigate("/districts");
+    };
+
+    return (
+      <Card>
+        <DistrictForm
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          loading={isCreating}
+        />
+      </Card>
+    );
+  },
+  {
+    services: {
+      createDistrict: {
+        path: "districts.create",
+        immediate: false,
+      },
     },
-    onError: (error) => {
-      notification.showError(error.message);
-    },
-  });
-
-  const handleSubmit = async (values) => {
-    await createDistrict(values);
-  };
-
-  const handleCancel = () => {
-    navigate("/districts");
-  };
-
-  return (
-    <Card>
-      <DistrictForm
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-        loading={isCreating}
-      />
-    </Card>
-  );
-};
+  },
+);

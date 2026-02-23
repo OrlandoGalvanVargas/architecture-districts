@@ -1,14 +1,9 @@
-// Simular delay de red
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Función para generar errores aleatorios (testing)
 const shouldSimulateError = () => {
-  // 10% de probabilidad de error (comentar en producción)
-  // return Math.random() < 0.1;
   return false;
 };
 
-// Datos mock con más detalles
 let mockDistricts = [
   {
     id: 1,
@@ -69,7 +64,6 @@ export const mockDistrictsApi = {
 
     let result = [...mockDistricts];
 
-    // Aplicar filtros si existen
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       result = result.filter(
@@ -118,7 +112,6 @@ export const mockDistrictsApi = {
       };
     }
 
-    // Validación básica
     if (!data.name || !data.code) {
       throw {
         message: "Name and code are required",
@@ -126,7 +119,6 @@ export const mockDistrictsApi = {
       };
     }
 
-    // Verificar código duplicado
     if (mockDistricts.some((d) => d.code === data.code)) {
       throw {
         message: "District code already exists",
@@ -166,7 +158,6 @@ export const mockDistrictsApi = {
       };
     }
 
-    // Verificar código duplicado (si se está cambiando)
     if (data.code && data.code !== mockDistricts[index].code) {
       if (
         mockDistricts.some((d) => d.code === data.code && d.id !== parseInt(id))
@@ -206,7 +197,6 @@ export const mockDistrictsApi = {
       };
     }
 
-    // Verificar si tiene escuelas asignadas
     if (mockDistricts[index].schoolCount > 0) {
       throw {
         message: "Cannot delete district with assigned schools",

@@ -1,99 +1,119 @@
-import { useNavigate } from "react-router-dom";
-import { Input, Button, Space } from "antd";
-import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { useNofitication } from "@/contexts/Notification";
-import { useState } from "react";
-import { useDistricts } from "../hooks/useDistricts";
-import { useDistrictDelete } from "../hooks/useDistrictDelete";
+// features/districts/controllers/DistrictListController.jsx
+import { withController } from "@/reactive/withController";
+import { DistrictTable } from "../components/DistrictTable";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
-import { DistrictTable } from "../components/DistrictTable";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Input, Button, Space } from "antd";
+import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
+import useNotification from "antd/es/notification/useNotification";
 
-const { Search } = Input;
+export const DistrictListController = withController(
+  ({ data, loading, errors, actions }) => {
+    const navigate = useNavigate();
+    const { Search } = Input;
+    const notification = useNotification();
+    const [searchTerm, setSearchTerm] = useState("");
 
-export const DistrictListController = () => {
-  const navigate = useNavigate();
-  const notification = useNofitication();
-  const [searchTerm, setSearchTerm] = useState("");
+    const districts = data.districts || [];
 
-  const { districts, isLoading, error, refetch } = useDistricts();
+    const isLoadingDistricts = loading.districts;
+    const isDeletingDistrict = loading.deleteDistrict;
 
-  const { deleteDistrict, isDeleting } = useDistrictDelete({
-    onSuccess: () => {
-      notification.showSuccess("District deleted successfully");
-      refetch();
-    },
-    onError: (error) => {
-      notification.showError(error.message);
-    },
-  });
+    const fetchError = errors.districts;
 
-  const filteredDistricts = districts.filter(
-    (district) =>
-      district.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      district.code.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+    const refetchDistricts = actions.districts;
+    const deleteDistrict = actions.deleteDistrict;
 
-  const handleView = (district) => {
-    navigate(`/districts/${district.id}`);
-  };
+    const filteredDistricts = districts.filter(
+      (district) =>
+        district.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        district.code.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
 
-  const handleCreate = () => {
-    navigate("/districts/create");
-  };
+    const handleView = (district) => {
+      navigate(`/districts/${district.id}`);
+    };
 
-  const handleEdit = (district) => {
-    navigate(`/districts/${district.id}/edit`);
-  };
+    const handleCreate = () => {
+      navigate("/districts/create");
+    };
 
-  const handleDelete = async (district) => {
-    try {
-      await deleteDistrict(district.id);
-    } catch (error) {
-      console.log(error);
+    const handleEdit = (district) => {
+      navigate(`/districts/${district.id}/edit`);
+    };
+
+    const handleDelete = async (district) => {
+      try {
+        await deleteDistrict(district.id);
+        notification.showSuccess("District deleted successfully");
+        refetchDistricts();
+      } catch (error) {
+        notification.showError(error.message);
+      }
+    };
+
+    if (isLoadingDistricts) {
+      return <LoadingSpinner description="Loading districts..." />;
     }
-  };
 
-  if (isLoading) {
-    return <LoadingSpinner description="Loading districts..." />;
-  }
+    if (fetchError) {
+      return <ErrorMessage error={fetchError} onRetry={refetchDistricts} />;
+    }
 
-  if (error) {
-    return <ErrorMessage error={error} onRetry={refetch} />;
-  }
-
-  return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Space style={{ width: "100%", justifyContent: "space-between" }}>
-          <Search
-            placeholder="Search districts by name or code..."
-            allowClear
-            style={{ width: 400 }}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Space>
-            <Button icon={<ReloadOutlined />} onClick={refetch}>
-              Refetch
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleCreate}
-            >
-              Create District
-            </Button>
+    return (
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Space style={{ width: "100%", justifyContent: "space-between" }}>
+            <Search
+              placeholder="Search districts by name or code..."
+              allowClear
+              style={{ width: 400 }}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Space>
+              <Button icon={<ReloadOutlined />} onClick={refetchDistricts}>
+                Refresh
+              </Button>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleCreate}
+              >
+                Create District
+              </Button>
+            </Space>
           </Space>
-        </Space>
+        </div>
+        <DistrictTable
+          districts={filteredDistricts}
+          loading={isDeletingDistrict}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </div>
+    );
+  },
+  {
+    services: {
+      districts: {
+        path: "districts.getAll",
+        immediate: true,
+        params: [],
+        onSuccess: (data) => {
+          console.log("Districts loaded:", data.length);
+        },
+        onError: (error) => {
+          console.error("Failed to load districts:", error);
+        },
+      },
 
-      <DistrictTable
-        districst={filteredDistricts}
-        loading={isDeleting}
-        onView={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-    </div>
-  );
-};
+      deleteDistrict: {
+        path: "districts.delete",
+        immediate: false,
+      },
+    },
+  },
+);

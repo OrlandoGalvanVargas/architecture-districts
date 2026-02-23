@@ -2,7 +2,7 @@ import { Table, Button, Space, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 
 export const DistrictTable = ({
-  districst = [],
+  districts = [],
   loading = false,
   onView = null,
   onEdit = null,
@@ -88,7 +88,7 @@ export const DistrictTable = ({
   return (
     <Table
       columns={columns}
-      dataSource={districst}
+      dataSource={districts}
       loading={loading}
       rowKey="id"
       pagination={{
