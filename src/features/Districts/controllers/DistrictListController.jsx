@@ -1,19 +1,18 @@
-// features/districts/controllers/DistrictListController.jsx
 import { withController } from "@/reactive/withController";
 import { DistrictTable } from "../components/DistrictTable";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Input, Button, Space } from "antd";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import useNotification from "antd/es/notification/useNotification";
+import { useNotification } from "@/contexts/Notification";
+import { useAppNavigation } from "../../../hooks/useAppNavigation";
 
 export const DistrictListController = withController(
   ({ data, loading, errors, actions }) => {
-    const navigate = useNavigate();
+    const navigation = useAppNavigation;
     const { Search } = Input;
-    const notification = useNotification();
+    const notification = useNotification;
     const [searchTerm, setSearchTerm] = useState("");
 
     const districts = data.districts || [];
@@ -33,15 +32,15 @@ export const DistrictListController = withController(
     );
 
     const handleView = (district) => {
-      navigate(`/districts/${district.id}`);
+      navigation.goToDistrictDetail(district.id);
     };
 
     const handleCreate = () => {
-      navigate("/districts/create");
+      navigation.goToDistrictCreate();
     };
 
     const handleEdit = (district) => {
-      navigate(`/districts/${district.id}/edit`);
+      navigation.goToDistrictEdit(district.id);
     };
 
     const handleDelete = async (district) => {

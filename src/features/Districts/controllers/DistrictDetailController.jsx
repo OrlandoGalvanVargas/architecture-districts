@@ -1,9 +1,9 @@
-import { withController } from "../../../reactive/withController";
+import { withController } from "@/reactive/withController";
 import { useNavigate } from "react-router-dom";
-import { useNotification } from "../../../contexts/Notification";
+import { useNotification } from "@/contexts/Notification";
 import { Popconfirm } from "antd";
 import { DistrictDetail } from "../components/DistrictDetail";
-import { LoadingSpinner } from "../../../components/common/LoadingSpinner/LoadingSpinner";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
 
 export const DistrictDetailController = withController(
   ({ data, loading, errors, actions, districtId }) => {

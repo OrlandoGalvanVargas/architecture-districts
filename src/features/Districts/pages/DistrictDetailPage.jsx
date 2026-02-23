@@ -1,15 +1,11 @@
 import { useParams } from "react-router-dom";
 import { PageHeader } from "../../../components/Layout/PageHeader/PageHeader";
 import { DistrictDetailController } from "../controllers/DistrictDetailController";
+import { generateBreadcrumbs } from "@/router/breadcrumbs";
 
 export const DistrictDetailPage = () => {
   const { id } = useParams();
-
-  const breadcrumbs = [
-    { label: "Home", path: "/" },
-    { label: "Districts", path: "/districts" },
-    { label: `District #${id}`, path: `districts/${id}` },
-  ];
+  const breadcrumbs = generateBreadcrumbs("districts", "detail", { id });
 
   return (
     <div>
