@@ -1,4 +1,5 @@
 import axios from "axios";
+import { tokenManager } from "../utils/tokenManager";
 
 export const apiClient = axios.create({
   baseURL: "https://api-backend/schools",
@@ -10,7 +11,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("auth_token");
+    const token = tokenManager.getAccessToken();
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
@@ -19,6 +20,21 @@ apiClient.interceptors.request.use(
   },
 );
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 apiClient.interceptors.response.use(
   (response) => {
     return response;
@@ -26,25 +42,57 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/login") &&
+      !originalRequest.url.includes("/auth/refresh")
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiClient(originalRequest);
+          })
+          .catch((error) => {
+            return Promise.reject(error);
+          });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = tokenManager.getRefreshToken();
+
+      if (!refreshToken) {
+        tokenManager.clearTokens();
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
 
       try {
-        const response = await apiClient.get(
+        const response = await apiClient.post(
           `${originalRequest.baseURL}/auth/refresh`,
           {
-            refreshToken: localStorage.getItem("refresh_token"),
+            refreshToken,
           },
         );
-        const newToken = response.data;
-        localStorage.setItem("auth_token", newToken);
+        const { accessToken } = response.data;
+        tokenManager.setAccessToken(accessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        processQueue(null, accessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem("auth_token");
+        processQueue(refreshError, null);
+        tokenManager.clearTokens();
         window.location.href = "/login";
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
