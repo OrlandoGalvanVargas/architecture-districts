@@ -32,16 +32,19 @@ apiClient.interceptors.response.use(
       try {
         const response = await apiClient.get(
           `${originalRequest.baseURL}/auth/refresh`,
+          {
+            refreshToken: localStorage.getItem("refresh_token"),
+          },
         );
-        const newToken = response.data.token;
+        const newToken = response.data;
         localStorage.setItem("auth_token", newToken);
 
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
-      } catch (errorRefresh) {
+      } catch (refreshError) {
         localStorage.removeItem("auth_token");
         window.location.href = "/login";
-        return Promise.reject(errorRefresh);
+        return Promise.reject(refreshError);
       }
     }
 
