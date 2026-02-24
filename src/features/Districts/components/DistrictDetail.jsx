@@ -1,11 +1,25 @@
-import { Button, Card, Descriptions, Divider, Space, Tag } from "antd";
+import {
+  Button,
+  Card,
+  Descriptions,
+  Divider,
+  Space,
+  Tag,
+  Popconfirm,
+} from "antd";
 import {
   ArrowLeftOutlined,
   DeleteOutlined,
   EditOutlined,
 } from "@ant-design/icons";
 
-export const DistrictDetail = ({ district, onEdit, onDelete, onBack }) => {
+export const DistrictDetail = ({
+  district,
+  isDeleting,
+  onEdit,
+  onDelete,
+  onBack,
+}) => {
   if (!district) return null;
 
   return (
@@ -26,19 +40,37 @@ export const DistrictDetail = ({ district, onEdit, onDelete, onBack }) => {
         extra={
           <Space>
             {onBack && (
-              <Button icon={<ArrowLeftOutlined />} onClick={onBack}>
+              <Button
+                icon={<ArrowLeftOutlined />}
+                onClick={onBack}
+                disabled={isDeleting}
+              >
                 Back
               </Button>
             )}
             {onEdit && (
-              <Button type="primary" icon={<EditOutlined />} onClick={onEdit}>
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={onEdit}
+                disabled={isDeleting}
+              >
                 Edit
               </Button>
             )}
             {onDelete && (
-              <Button danger icon={<DeleteOutlined />} onClick={onDelete}>
-                Delete
-              </Button>
+              <Popconfirm
+                title="Delete district"
+                description="Are you sure you want to delete this district? This action cannot be undone."
+                onConfirm={onDelete}
+                okText="Yes, delete"
+                cancelText="Cancel"
+                okButtonProps={{ danger: true, loading: isDeleting }}
+              >
+                <Button danger icon={<DeleteOutlined />} disabled={isDeleting}>
+                  Delete
+                </Button>
+              </Popconfirm>
             )}
           </Space>
         }

@@ -18,10 +18,13 @@ export const generateBreadcrumbs = (moduleName, viewType, params = {}) => {
 
   if (viewType !== "list") {
     const viewConfig = moduleConfig.children[viewType];
+    if (!viewConfig) return breadcrumbs;
 
     if ((viewType === "detail" || viewType === "edit") && params.id) {
       breadcrumbs.push({
-        label: `${moduleConfig.title.slice(0, -1)} #${params.id}`,
+        label: params.name
+          ? params.name
+          : `${moduleConfig.singularTitle || viewConfig.singularTitle} #${params.id}`,
         path: RoutePaths[moduleName].detail(params.id),
       });
     }

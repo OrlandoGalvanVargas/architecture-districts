@@ -6,29 +6,26 @@ import { useState } from "react";
 import { Input, Button, Space } from "antd";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useNotification } from "@/contexts/Notification";
-import { useAppNavigation } from "../../../hooks/useAppNavigation";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 export const DistrictListController = withController(
   ({ data, loading, errors, actions }) => {
-    const navigation = useAppNavigation;
-    const { Search } = Input;
-    const notification = useNotification;
-    const [searchTerm, setSearchTerm] = useState("");
-
     const districts = data.districts || [];
-
     const isLoadingDistricts = loading.districts;
     const isDeletingDistrict = loading.deleteDistrict;
-
     const fetchError = errors.districts;
-
     const refetchDistricts = actions.districts;
     const deleteDistrict = actions.deleteDistrict;
 
+    const [search, setSearch] = useState("");
+    const { Search } = Input;
+    const navigation = useAppNavigation();
+    const notification = useNotification();
+
     const filteredDistricts = districts.filter(
       (district) =>
-        district.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        district.code.toLowerCase().includes(searchTerm.toLowerCase()),
+        district.name.toLowerCase().includes(search.toLowerCase()) ||
+        district.code.toLowerCase().includes(search.toLowerCase()),
     );
 
     const handleView = (district) => {
@@ -45,6 +42,7 @@ export const DistrictListController = withController(
 
     const handleDelete = async (district) => {
       try {
+        console.log(district.id);
         await deleteDistrict(district.id);
         notification.showSuccess("District deleted successfully");
         refetchDistricts();
@@ -69,7 +67,7 @@ export const DistrictListController = withController(
               placeholder="Search districts by name or code..."
               allowClear
               style={{ width: 400 }}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <Space>
               <Button icon={<ReloadOutlined />} onClick={refetchDistricts}>
@@ -100,13 +98,6 @@ export const DistrictListController = withController(
       districts: {
         path: "districts.getAll",
         immediate: true,
-        params: [],
-        onSuccess: (data) => {
-          console.log("Districts loaded:", data.length);
-        },
-        onError: (error) => {
-          console.error("Failed to load districts:", error);
-        },
       },
 
       deleteDistrict: {

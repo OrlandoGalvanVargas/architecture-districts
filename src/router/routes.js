@@ -7,51 +7,29 @@ export const ROUTES_CONFIG = {
   districts: {
     path: "/districts",
     title: "Districts",
+    singularTitle: "District",
 
     children: {
       list: {
-        path: "",
+        pattern: "",
         title: "Districts List",
+        buildPath: () => "",
       },
       create: {
-        path: "create",
+        pattern: "create",
         title: "Create District",
+        buildPath: () => "create",
       },
       detail: {
-        path: ":id",
+        pattern: ":id",
         title: "District Details",
-        param: "id",
+        singularTitle: "District",
+        buildPath: (id) => `${id}`,
       },
       edit: {
-        path: ":id/edit",
+        pattern: ":id/edit",
         title: "Edit District",
-        param: "id",
-      },
-    },
-  },
-
-  schools: {
-    path: "/schools",
-    title: "Schools",
-
-    children: {
-      list: {
-        path: "",
-        title: "Schools List",
-      },
-      create: {
-        path: "create",
-        title: "Create School",
-      },
-      detail: {
-        path: ":id",
-        title: "School Details",
-        param: "id",
-      },
-      edit: {
-        path: ":id/edit",
-        title: "Edit School",
-        param: "id",
+        buildPath: (id) => `${id}/edit`,
       },
     },
   },

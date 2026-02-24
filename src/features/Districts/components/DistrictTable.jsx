@@ -96,10 +96,6 @@ export const DistrictTable = ({
         showSizeChanger: true,
         showTotal: (total) => `Total ${total} districts`,
       }}
-      onRow={(record) => ({
-        onClick: () => onView?.(record),
-        style: { cursor: "pointer" },
-      })}
     />
   );
 };

@@ -1,29 +1,29 @@
 import { withController } from "@/reactive/withController";
-import { useNavigate } from "react-router-dom";
 import { Card } from "antd";
 import { DistrictForm } from "../components/DistrictForm";
 import { useNotification } from "@/contexts/Notification";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 export const DistrictCreateController = withController(
   ({ loading, actions }) => {
-    const navigate = useNavigate();
-    const notification = useNotification();
-
     const createDistrict = actions.createDistrict;
     const isCreating = loading.createDistrict;
+
+    const navigate = useAppNavigation();
+    const notification = useNotification();
 
     const handleSubmit = async (values) => {
       try {
         await createDistrict(values);
         notification.showSuccess("District created successfully");
-        navigate("/districts");
+        handleCancel();
       } catch (error) {
         notification.showError(error.message);
       }
     };
 
     const handleCancel = () => {
-      navigate("/districts");
+      navigate.goToDistricts();
     };
 
     return (

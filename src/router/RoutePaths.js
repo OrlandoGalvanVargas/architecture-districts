@@ -7,18 +7,12 @@ export const RoutePaths = {
     list: () => ROUTES_CONFIG.districts.path,
 
     create: () =>
-      `${ROUTES_CONFIG.districts.path}/${ROUTES_CONFIG.districts.children.create.path}`,
+      `${ROUTES_CONFIG.districts.path}/${ROUTES_CONFIG.districts.children.create.buildPath()}`,
 
-    detail: (id) => `${ROUTES_CONFIG.districts.path}/${id}`,
+    detail: (id) =>
+      `${ROUTES_CONFIG.districts.path}/${ROUTES_CONFIG.districts.children.detail.buildPath(id)}`,
 
-    edit: (id) => `${ROUTES_CONFIG.districts.path}/${id}/edit`,
-  },
-
-  schools: {
-    list: () => ROUTES_CONFIG.schools.path,
-    create: () =>
-      `${ROUTES_CONFIG.schools.path}/${ROUTES_CONFIG.schools.children.create.path}`,
-    detail: (id) => `${ROUTES_CONFIG.schools.path}/${id}`,
-    edit: (id) => `${ROUTES_CONFIG.schools.path}/${id}/edit`,
+    edit: (id) =>
+      `${ROUTES_CONFIG.districts.path}/${ROUTES_CONFIG.districts.children.edit.buildPath(id)}`,
   },
 };

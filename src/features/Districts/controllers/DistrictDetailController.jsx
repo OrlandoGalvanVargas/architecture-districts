@@ -1,39 +1,37 @@
 import { withController } from "@/reactive/withController";
-import { useNavigate } from "react-router-dom";
 import { useNotification } from "@/contexts/Notification";
-import { Popconfirm } from "antd";
 import { DistrictDetail } from "../components/DistrictDetail";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 export const DistrictDetailController = withController(
   ({ data, loading, errors, actions, districtId }) => {
-    const navigate = useNavigate();
-    const notification = useNotification();
-
     const district = data.district;
     const isLoading = loading.district;
-    const error = errors.district;
     const isDeleting = loading.deleteDistrict;
-
+    const error = errors.district;
     const refetchDistrict = actions.district;
     const deleteDistrict = actions.deleteDistrict;
 
+    const navigate = useAppNavigation();
+    const notification = useNotification();
+
     const handleEdit = () => {
-      navigate(`/districts/${districtId}/edit`);
+      navigate.goToDistrictEdit(districtId);
     };
 
     const handleDelete = async () => {
       try {
         await deleteDistrict(districtId);
         notification.showSuccess("District deleted successfully");
-        navigate("/districts");
+        handleBack();
       } catch (error) {
         notification.showError(error.message);
       }
     };
 
     const handleBack = () => {
-      navigate("/districts");
+      navigate.goToDistricts();
     };
 
     if (isLoading) {
@@ -50,23 +48,13 @@ export const DistrictDetailController = withController(
     }
 
     return (
-      <Popconfirm
-        title="Delete district"
-        description="Are you sure you want to delete this district? This action cannot be undone."
-        onConfirm={handleDelete}
-        okText="Yes, delete"
-        cancelText="Cancel"
-        okButtonProps={{ danger: true, loading: isDeleting }}
-      >
-        <div>
-          <DistrictDetail
-            district={district}
-            onDelete={() => {}}
-            onEdit={handleEdit}
-            onBack={handleBack}
-          />
-        </div>
-      </Popconfirm>
+      <DistrictDetail
+        district={district}
+        isDeleting={isDeleting}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+        onBack={handleBack}
+      />
     );
   },
   {

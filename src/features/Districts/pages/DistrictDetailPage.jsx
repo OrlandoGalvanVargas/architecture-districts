@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { PageHeader } from "../../../components/Layout/PageHeader/PageHeader";
+import { PageHeader } from "@/components/Layout/PageHeader/PageHeader";
 import { DistrictDetailController } from "../controllers/DistrictDetailController";
 import { generateBreadcrumbs } from "@/router/breadcrumbs";
 

@@ -36,7 +36,7 @@ export const DistrictForm = ({
               { min: 3, message: "Name must be at least 3 characters" },
             ]}
           >
-            <Input placeholder="Enter district name" />
+            <Input placeholder="Enter district name" disabled={loading} />
           </Form.Item>
         </Col>
 
@@ -52,7 +52,7 @@ export const DistrictForm = ({
               },
             ]}
           >
-            <Input placeholder="e.g., DIST-001" />
+            <Input placeholder="e.g., DIST-001" disabled={loading} />
           </Form.Item>
         </Col>
       </Row>
@@ -64,7 +64,7 @@ export const DistrictForm = ({
             name="state"
             rules={[{ required: true, message: "Please select state" }]}
           >
-            <Select placeholder="Select state">
+            <Select placeholder="Select state" disabled={loading}>
               <Select value="CA">California</Select>
               <Select value="TX">Texas</Select>
               <Select value="NY">New York</Select>
@@ -79,7 +79,7 @@ export const DistrictForm = ({
             name="city"
             rules={[{ required: true, message: "Please enter city" }]}
           >
-            <Input placeholder="Enter city" />
+            <Input placeholder="Enter city" disabled={loading} />
           </Form.Item>
         </Col>
 
@@ -92,7 +92,7 @@ export const DistrictForm = ({
               { pattern: /^\d{5}$/, message: "ZIP must be 5 digits" },
             ]}
           >
-            <Input placeholder="12345" />
+            <Input placeholder="12345" disabled={loading} />
           </Form.Item>
         </Col>
       </Row>
@@ -102,11 +102,15 @@ export const DistrictForm = ({
         name="address"
         rules={[{ required: true, message: "Please enter address" }]}
       >
-        <Input placeholder="Street address" />
+        <Input placeholder="Street address" disabled={loading} />
       </Form.Item>
 
       <Form.Item label="Description" name="description">
-        <TextArea rows={4} placeholder="Optional description" />
+        <TextArea
+          rows={4}
+          placeholder="Optional description"
+          disabled={loading}
+        />
       </Form.Item>
 
       <Form.Item>
