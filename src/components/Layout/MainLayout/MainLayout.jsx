@@ -5,6 +5,7 @@ import {
   BankOutlined,
   ApiOutlined,
   TeamOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import "./MainLayout.css";
 
@@ -23,6 +24,7 @@ export const MainLayout = () => {
     },
     {
       key: "/schools",
+      icon: <BookOutlined />,
       label: "Schools",
       onClick: () => navigate("/schools"),
     },
@@ -44,7 +46,7 @@ export const MainLayout = () => {
 
   return (
     <Layout className="main-layout">
-      <Header className="main-header">
+      <Header className="main-header" style={{ backgroundColor: "#003380" }}>
         <div className="logo" onClick={() => navigate("/")}>
           <HomeOutlined style={{ marginRight: 8 }} />
           LiveFree Schools
