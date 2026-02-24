@@ -26,7 +26,7 @@ export const tokenManager = {
     localStorage.setItem(KEYS.USER, JSON.stringify(user));
   },
 
-  getUserL: () => {
+  getUser: () => {
     const user = localStorage.getItem(KEYS.USER);
     return user ? JSON.parse(user) : null;
   },
