@@ -61,7 +61,7 @@ export const DistrictDetail = ({
             {onDelete && (
               <Popconfirm
                 title="Delete district"
-                description="Are you sure you want to delete this district? This action cannot be undone."
+                description="Are you sure you want to delete this district?"
                 onConfirm={onDelete}
                 okText="Yes, delete"
                 cancelText="Cancel"
