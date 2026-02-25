@@ -3,23 +3,30 @@ import { Card } from "antd";
 import { DistrictForm } from "../components/DistrictForm";
 import { useNotification } from "@/contexts/Notification";
 import { useAppNavigation } from "@/hooks/useAppNavigation";
+import { useEffect } from "react";
 
 export const DistrictCreateController = withController(
-  ({ loading, actions }) => {
+  ({ loading, actions, setCallbacks }) => {
     const createDistrict = actions.createDistrict;
     const isCreating = loading.createDistrict;
 
     const navigate = useAppNavigation();
     const notification = useNotification();
 
-    const handleSubmit = async (values) => {
-      try {
-        await createDistrict(values);
-        notification.showSuccess("District created successfully");
-        handleCancel();
-      } catch (error) {
-        notification.showError(error.message);
-      }
+    useEffect(() => {
+      setCallbacks("createDistrict", {
+        onSuccess: () => {
+          notification.showSuccess("District created successfully");
+          navigate.goToDistricts();
+        },
+        onError: (error) => {
+          notification.showError(error.message);
+        },
+      });
+    }, [setCallbacks]);
+
+    const handleSubmit = (values) => {
+      createDistrict(values);
     };
 
     const handleCancel = () => {

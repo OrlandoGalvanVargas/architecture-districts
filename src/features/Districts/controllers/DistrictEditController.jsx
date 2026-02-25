@@ -5,9 +5,10 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinne
 import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
 import { DistrictForm } from "../components/DistrictForm";
 import { useAppNavigation } from "@/hooks/useAppNavigation";
+import { useEffect } from "react";
 
 export const DistrictEditController = withController(
-  ({ data, loading, errors, actions, districtId }) => {
+  ({ data, loading, errors, actions, districtId, setCallbacks }) => {
     const district = data.district;
     const isLoadingDistrict = loading.district;
     const isUpdating = loading.updateDistrict;
@@ -17,14 +18,20 @@ export const DistrictEditController = withController(
     const navigate = useAppNavigation();
     const notification = useNotification();
 
-    const handleSubmit = async (values) => {
-      try {
-        await updateDistrict(districtId, values);
-        notification.showSuccess("District updated successfully");
-        navigate.goToDistrictDetail(districtId);
-      } catch (error) {
-        notification.showError(error.message);
-      }
+    useEffect(() => {
+      setCallbacks("updateDistrict", {
+        onSuccess: () => {
+          notification.showSuccess("District update successfully");
+          navigate.goToDistrictDetail(districtId);
+        },
+        onError: (error) => {
+          notification.showError(error.message);
+        },
+      });
+    }, [districtId, setCallbacks]);
+
+    const handleSubmit = (values) => {
+      updateDistrict(districtId, values);
     };
 
     const handleCancel = () => {

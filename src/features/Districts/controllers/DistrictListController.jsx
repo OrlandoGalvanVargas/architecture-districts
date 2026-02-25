@@ -2,14 +2,14 @@ import { withController } from "@/reactive/withController";
 import { DistrictTable } from "../components/DistrictTable";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Button, Space } from "antd";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useNotification } from "@/contexts/Notification";
 import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 export const DistrictListController = withController(
-  ({ data, loading, errors, actions }) => {
+  ({ data, loading, errors, actions, setCallbacks }) => {
     const districts = data.districts || [];
     const isLoadingDistricts = loading.districts;
     const isDeletingDistrict = loading.deleteDistrict;
@@ -21,6 +21,18 @@ export const DistrictListController = withController(
     const { Search } = Input;
     const navigation = useAppNavigation();
     const notification = useNotification();
+
+    useEffect(() => {
+      setCallbacks("deleteDistrict", {
+        onSuccess: () => {
+          notification.showSuccess("District deleted successfully");
+          refetchDistricts();
+        },
+        onError: (error) => {
+          notification.showError(error.message);
+        },
+      });
+    }, [refetchDistricts, setCallbacks]);
 
     const filteredDistricts = districts.filter(
       (district) =>
@@ -40,15 +52,8 @@ export const DistrictListController = withController(
       navigation.goToDistrictEdit(district.id);
     };
 
-    const handleDelete = async (district) => {
-      try {
-        console.log(district.id);
-        await deleteDistrict(district.id);
-        notification.showSuccess("District deleted successfully");
-        refetchDistricts();
-      } catch (error) {
-        notification.showError(error.message);
-      }
+    const handleDelete = (district) => {
+      deleteDistrict(district.id);
     };
 
     if (isLoadingDistricts) {
@@ -68,15 +73,21 @@ export const DistrictListController = withController(
               allowClear
               style={{ width: 400 }}
               onChange={(e) => setSearch(e.target.value)}
+              disabled={isDeletingDistrict}
             />
             <Space>
-              <Button icon={<ReloadOutlined />} onClick={refetchDistricts}>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={refetchDistricts}
+                disabled={isDeletingDistrict}
+              >
                 Refresh
               </Button>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={handleCreate}
+                disabled={isDeletingDistrict}
               >
                 Create District
               </Button>

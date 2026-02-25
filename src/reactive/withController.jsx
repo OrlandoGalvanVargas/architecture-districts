@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import services from "@/services";
 
 export const withController = (Component, config) => {
@@ -7,6 +7,10 @@ export const withController = (Component, config) => {
     const [loadingStates, setLoadingStates] = useState({});
     const [errors, setErrors] = useState({});
     const [actions, setActions] = useState({});
+
+    const callbacksRef = useRef({});
+    const propsRef = useRef(props);
+    propsRef.current = props;
 
     const executeService = useCallback(async (servicePath, options = {}) => {
       const { params = [], onSuccess, onError, immediate = false } = options;
@@ -26,7 +30,9 @@ export const withController = (Component, config) => {
 
           setState((prev) => ({ ...prev, [stateKey]: result }));
 
-          if (onSuccess) {
+          if (callbacksRef.current[stateKey]?.onSuccess) {
+            callbacksRef.current[stateKey].onSuccess(result);
+          } else if (onSuccess) {
             onSuccess(result);
           }
 
@@ -34,11 +40,11 @@ export const withController = (Component, config) => {
         } catch (error) {
           setErrors((prev) => ({ ...prev, [stateKey]: error }));
 
-          if (onError) {
+          if (callbacksRef.current[stateKey]?.onError) {
+            callbacksRef.current[stateKey].onError(error);
+          } else if (onError) {
             onError(error);
           }
-
-          throw error;
         } finally {
           setLoadingStates((prev) => ({ ...prev, [stateKey]: false }));
         }
@@ -67,12 +73,20 @@ export const withController = (Component, config) => {
         setActions(executors);
 
         if (config.init) {
-          config.init({ services, props, actions: executors });
+          config.init({
+            services,
+            props: propsRef.current,
+            actions: executors,
+          });
         }
       };
 
       initServices();
-    }, [executeService, props]);
+    }, [executeService]);
+
+    const setCallbacks = useCallback((key, callbacks) => {
+      callbacksRef.current[key] = callbacks;
+    }, []);
 
     const controllerProps = {
       data: state,
@@ -80,6 +94,7 @@ export const withController = (Component, config) => {
       errors,
       actions: actions || {},
       services,
+      setCallbacks,
       ...props,
     };
 

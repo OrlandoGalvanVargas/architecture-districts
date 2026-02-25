@@ -3,9 +3,11 @@ import { useNotification } from "@/contexts/Notification";
 import { DistrictDetail } from "../components/DistrictDetail";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
 import { useAppNavigation } from "@/hooks/useAppNavigation";
+import { useEffect } from "react";
+import { ErrorMessage } from "../../../components/common/ErrorMessage/ErrorMessage";
 
 export const DistrictDetailController = withController(
-  ({ data, loading, errors, actions, districtId }) => {
+  ({ data, loading, errors, actions, districtId, setCallbacks }) => {
     const district = data.district;
     const isLoading = loading.district;
     const isDeleting = loading.deleteDistrict;
@@ -16,18 +18,24 @@ export const DistrictDetailController = withController(
     const navigate = useAppNavigation();
     const notification = useNotification();
 
+    useEffect(() => {
+      setCallbacks("deleteDistrict", {
+        onSuccess: () => {
+          notification.showSuccess("District deleted successfully");
+          navigate.goToDistricts();
+        },
+        onError: (error) => {
+          notification.showError(error.message);
+        },
+      });
+    }, [setCallbacks]);
+
     const handleEdit = () => {
       navigate.goToDistrictEdit(districtId);
     };
 
-    const handleDelete = async () => {
-      try {
-        await deleteDistrict(districtId);
-        notification.showSuccess("District deleted successfully");
-        handleBack();
-      } catch (error) {
-        notification.showError(error.message);
-      }
+    const handleDelete = () => {
+      deleteDistrict(districtId);
     };
 
     const handleBack = () => {
