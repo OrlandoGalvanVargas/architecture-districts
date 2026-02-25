@@ -1,19 +1,22 @@
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Dropdown, Button } from "antd";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
-  HomeOutlined,
   BankOutlined,
   ApiOutlined,
   TeamOutlined,
   BookOutlined,
+  LogoutOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import "./MainLayout.css";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const { Header, Content, Sider } = Layout;
 
 export const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const menuItems = [
     {
@@ -44,12 +47,39 @@ export const MainLayout = () => {
 
   const selectedKey = "/" + location.pathname.split("/")[1];
 
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth/login");
+  };
+
+  const userMenuItems = [
+    {
+      key: "profile",
+      icon: <UserOutlined />,
+      label: "Profile",
+      onClick: () => console.log("Go to profile"),
+    },
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: handleLogout,
+      danger: true,
+    },
+  ];
+
   return (
     <Layout className="main-layout">
       <Header className="main-header" style={{ backgroundColor: "#003380" }}>
         <div className="logo" onClick={() => navigate("/")}>
-          <HomeOutlined style={{ marginRight: 8 }} />
           LiveFree Schools
+        </div>
+        <div style={{ marginLeft: "auto" }}>
+          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+            <Button type="text" style={{ color: "#fff" }}>
+              <UserOutlined /> {user?.name || user?.email}
+            </Button>
+          </Dropdown>
         </div>
       </Header>
       <Layout>
