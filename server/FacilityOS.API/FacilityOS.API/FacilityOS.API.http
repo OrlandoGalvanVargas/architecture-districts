@@ -1,0 +1,6 @@
+@FacilityOS.API_HostAddress = http://localhost:5278
+
+GET {{FacilityOS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
