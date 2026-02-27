@@ -34,12 +34,6 @@ export const DistrictListController = withController(
       });
     }, [refetchDistricts, setCallbacks]);
 
-    const filteredDistricts = districts.filter(
-      (district) =>
-        district.name.toLowerCase().includes(search.toLowerCase()) ||
-        district.code.toLowerCase().includes(search.toLowerCase()),
-    );
-
     const handleView = (district) => {
       navigation.goToDistrictDetail(district.id);
     };
@@ -55,6 +49,12 @@ export const DistrictListController = withController(
     const handleDelete = (district) => {
       deleteDistrict(district.id);
     };
+
+    const filteredDistricts = districts.filter(
+      (district) =>
+        district.name.toLowerCase().includes(search.toLowerCase()) ||
+        district.code.toLowerCase().includes(search.toLowerCase()),
+    );
 
     if (isLoadingDistricts) {
       return <LoadingSpinner description="Loading districts..." />;
