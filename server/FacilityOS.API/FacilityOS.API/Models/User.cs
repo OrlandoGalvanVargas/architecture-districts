@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace FacilityOS.API.Models
 {
@@ -16,6 +17,7 @@ namespace FacilityOS.API.Models
         public string Email { get; set; } = string.Empty;
 
         [Required]
+        [PasswordPropertyText]
         public string PasswordHash { get; set; } = string.Empty;
 
         [MaxLength(50)]
