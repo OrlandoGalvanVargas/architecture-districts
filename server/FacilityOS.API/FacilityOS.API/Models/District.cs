@@ -4,7 +4,7 @@ namespace FacilityOS.API.Models
 {
     public class District
     {
-        public int Id { get; set; }
+       public int Id { get; set; }
 
         [Required]
         [MaxLength(200)]
@@ -38,4 +38,5 @@ namespace FacilityOS.API.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }
+
 }
