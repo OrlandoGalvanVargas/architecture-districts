@@ -17,7 +17,6 @@ namespace FacilityOS.API.Models
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [PasswordPropertyText]
         public string PasswordHash { get; set; } = string.Empty;
 
         [MaxLength(50)]
