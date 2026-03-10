@@ -8,5 +8,6 @@
         bool ValidateToken(string token);
 
         string? GetUserIdFromToken(string token);
+        string? GetUserNameFromToken(string token);
     }
 }
