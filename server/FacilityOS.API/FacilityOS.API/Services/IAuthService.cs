@@ -9,5 +9,6 @@
 
         string? GetUserIdFromToken(string token);
         string? GetUserNameFromToken(string token);
+        string? GetUserEmailFromToken(string token);
     }
 }
