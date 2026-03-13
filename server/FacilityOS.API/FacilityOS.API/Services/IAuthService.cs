@@ -7,6 +7,8 @@
 
         bool ValidateToken(string token);
 
+        bool IsTokenExpired(string token);
+
         string? GetUserIdFromToken(string token);
         string? GetUserNameFromToken(string token);
         string? GetUserEmailFromToken(string token);
