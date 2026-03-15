@@ -9,6 +9,7 @@
 
         bool IsTokenExpired(string token);
         bool IsTokenRevoked(string token);
+        bool IsTokenBlacklisted(string token);
 
         string? GetUserIdFromToken(string token);
         string? GetUserNameFromToken(string token);
