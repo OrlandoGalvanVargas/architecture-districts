@@ -12,6 +12,7 @@ namespace FacilityOS.API.Models
         public DateTime ExpiresAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsRevoked { get; set; } = false;
+        public bool IsExpired { get; set; }
 
         public int UserId { get; set; }
         public User User { get; set; } = null!;
