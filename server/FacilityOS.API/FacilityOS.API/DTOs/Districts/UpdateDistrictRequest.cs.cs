@@ -30,5 +30,6 @@ namespace FacilityOS.API.DTOs.Districts
 
         [MaxLength(1000)]
         public string? Description { get; set; }
+        public DateTime? LastUpdatedAt { get; set; }
     }
 }
