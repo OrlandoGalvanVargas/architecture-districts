@@ -26,5 +26,6 @@ namespace FacilityOS.API.Models
         public DateTime? UpdatedAt { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        public ICollection<User> Users { get; set; } = new List<User>();
     }
 }
