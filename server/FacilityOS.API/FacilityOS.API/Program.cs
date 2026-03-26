@@ -16,6 +16,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseMvc();
 app.UseRouting();
 
 var summaries = new[]
