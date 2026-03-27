@@ -17,6 +17,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseMvc();
+
+// UseRouting must be called before MapGet, MapPost, etc.
 app.UseRouting();
 
 var summaries = new[]
