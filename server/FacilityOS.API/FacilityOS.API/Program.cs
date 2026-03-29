@@ -23,7 +23,7 @@ app.UseRouting();
 
 var summaries = new[]
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching", "Blazing", "Sizzling", "Torrid", "Boiling", "Broiling", "Burning", "Fiery", "Scalding", "Searing", "Blistering"
 };
 
 app.MapGet("/weatherforecast", () =>
@@ -32,7 +32,7 @@ app.MapGet("/weatherforecast", () =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
+            Random.Shared.Next(-20, 50),
             summaries[Random.Shared.Next(summaries.Length)]
         ))
         .ToArray();
