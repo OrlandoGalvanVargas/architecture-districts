@@ -23,7 +23,7 @@ app.UseRouting();
 
 var summaries = new[]
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching", "Blazing", "Sizzling", "Torrid", "Boiling", "Broiling", "Burning", "Fiery", "Scalding", "Searing", "Blistering"
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching", "Blazing", "Sizzling", "Torrid", "Boiling", "Broiling", "Burning", "Fiery", "Scalding", "Searing", "Blistering", "Incendiary", "Flaming", "Roasting", "Searing", "Sizzling", "Scorching", "Sweltering", "Torrid", "Broiling", "Boiling", "Blazing", "Burning", "Fiery", "Scalding", "Searing", "Blistering"
 };
 
 app.MapGet("/weatherforecast", () =>
