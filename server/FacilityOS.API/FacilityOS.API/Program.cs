@@ -43,6 +43,8 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapFallback(() => Results.Redirect("/index.html"));
 
+app.MapPost("/echo", (string message) => Results.Ok(message));
+
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
