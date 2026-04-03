@@ -45,6 +45,8 @@ app.MapFallback(() => Results.Redirect("/index.html"));
 
 app.MapPost("/echo", (string message) => Results.Ok(message));
 
+app.MapPatch("/update", (string message) => Results.Ok($"Updated: {message}"));
+
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
