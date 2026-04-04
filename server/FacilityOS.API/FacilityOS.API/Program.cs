@@ -47,6 +47,8 @@ app.MapPost("/echo", (string message) => Results.Ok(message));
 
 app.MapPatch("/update", (string message) => Results.Ok($"Updated: {message}"));
 
+app.MapDelete("/delete", (string id) => Results.Ok($"Deleted item with ID: {id}"));
+
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
