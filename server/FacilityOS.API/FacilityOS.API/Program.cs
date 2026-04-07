@@ -45,12 +45,11 @@ app.MapFallback(() => Results.Redirect("/index.html"));
 
 app.MapPost("/echo", (string message) => Results.Ok(message));
 
-app.MapPatch("/update", (string message) => Results.Ok($"Updated: {message}"));
-
 app.MapDelete("/delete", (string id) => Results.Ok($"Deleted item with ID: {id}"));
 
 app.MapGet("/items/{id}", (int id) => Results.Ok($"Item with ID: {id}"));
 app.MapPut("/items/{id}", (int id, string value) => Results.Ok($"Updated item with ID: {id} to value: {value}"));
+
 
 app.Run();
 
