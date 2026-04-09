@@ -42,7 +42,7 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.MapFallback(() => Results.Redirect("/index.html"));
-
+app.MapGet("/items", () => Results.Ok("List of items"));
 app.MapPost("/create", (string value) => Results.Ok($"Created item with value: {value}"));
 app.MapDelete("/items/{id}", (int id) => Results.Ok($"Deleted item with ID: {id}"));
 app.MapGet("/items/{id}", (int id) => Results.Ok($"Item with ID: {id}"));
