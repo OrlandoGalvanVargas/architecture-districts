@@ -26,6 +26,8 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering",
 };
 
+app.MapGet("/", () => "Hello World!").WithName("HelloWorld").WithOpenApi(); 
+
 app.MapGet("/weatherforecast", () =>
 {
     var forecast = Enumerable.Range(1, 5).Select(index =>
