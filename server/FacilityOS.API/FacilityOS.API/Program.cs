@@ -26,7 +26,8 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering",
 };
 
-app.MapGet("/", () => "Hello World!").WithName("HelloWorld").WithOpenApi(); 
+app.MapGet("/users", () => Results.Ok("List of users"));       
+app.MapGet("/users/{id}", (int id) => Results.Ok($"User with ID: {id}"));   
 
 app.MapGet("/weatherforecast", () =>
 {
