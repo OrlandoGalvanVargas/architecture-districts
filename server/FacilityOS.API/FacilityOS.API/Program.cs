@@ -53,6 +53,7 @@ app.MapDelete("/items/{id}", (int id) => Results.Ok($"Deleted item with ID: {id}
 app.MapGet("/items/{id}", (int id) => Results.Ok($"Item with ID: {id}"));
 app.MapPut("", (int id, string value) => Results.Ok($"Updated item with ID: {id} to value: {value}"));
 app.MapGet("/users/{userId}/orders/{orderId}"   , (int userId, int orderId) => Results.Ok($"User ID: {userId}, Order ID: {orderId}"));
+app.MapPost("/users/{userId}/orders", (int userId, string orderDetails) => Results.Ok($"Created order for User ID: {userId} with details: {orderDetails}"));    
 
 app.Run();
 
