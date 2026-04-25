@@ -62,6 +62,8 @@ app.MapPost("/products/{productId}/reviews", (int productId, string reviewDetail
 app.MapDelete("/product/{productId}/reviews/{reviewId}" , (int productId, int reviewId) => Results.Ok($"Deleted review with ID: {reviewId} for Product ID: {productId}"));
 app.MapGet("/search", (string query) => Results.Ok($"Search results for query: {query}"));       
 app.MapPut("/products/{productId}"  , (int productId, string productDetails) => Results.Ok($"Updated product with ID: {productId} with details: {productDetails}"));
+app.MapGet("/categories/{categoryId}/products", (int categoryId) => Results.Ok($"Products in Category ID: {categoryId}"));          
+
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
