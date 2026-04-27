@@ -44,14 +44,6 @@ app.MapGet("/weatherforecast", () =>
 .WithOpenApi();
 
 app.MapFallback(() => Results.Redirect("/index.html"));
-app.MapGet("/items", () => Results.Ok("List of items"));
-app.MapGet("/items/search", (string query) => Results.Ok($"Search results for query: {query}"));    
-app.MapGet("/items/filter", (string filter) => Results.Ok($"Filtered items with filter: {filter}"));
-app.MapPost("/create", (string value) => Results.Ok($"Created item with value: {value}"));
-app.MapPost("/items/batch", (string[] values) => Results.Ok($"Created batch of items with values: {string.Join(", ", values)}"));   
-app.MapDelete("/items/{id}", (int id) => Results.Ok($"Deleted item with ID: {id}"));
-app.MapGet("/items/{id}", (int id) => Results.Ok($"Item with ID: {id}"));
-app.MapPut("", (int id, string value) => Results.Ok($"Updated item with ID: {id} to value: {value}"));
 app.MapGet("/users/{userId}/orders/{orderId}"   , (int userId, int orderId) => Results.Ok($"User ID: {userId}, Order ID: {orderId}"));
 app.MapPost("/users/{userId}/orders", (int userId, string orderDetails) => Results.Ok($"Created order for User ID: {userId} with details: {orderDetails}"));    
 app.MapPut("/users/{userId}/orders/{orderId}", (int userId, int orderId, string orderDetails) => Results.Ok($"Updated order with ID: {orderId} for User ID: {userId} with details: {orderDetails}"));
