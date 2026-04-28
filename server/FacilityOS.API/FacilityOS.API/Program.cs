@@ -49,13 +49,6 @@ app.MapPost("/users/{userId}/orders", (int userId, string orderDetails) => Resul
 app.MapPut("/users/{userId}/orders/{orderId}", (int userId, int orderId, string orderDetails) => Results.Ok($"Updated order with ID: {orderId} for User ID: {userId} with details: {orderDetails}"));
 app.MapDelete("/users/{userId}/orders/{orderId}", (int userId, int orderId) => Results.Ok($"Deleted order with ID: {orderId} for User ID: {userId}"));  
 app.MapPatch("/users/{userId}/orders/{orderId}", (int userId, int orderId, string orderDetails) => Results.Ok($"Partially updated order with ID: {orderId} for User ID: {userId} with details: {orderDetails}"));   
-app.MapGet("/products/{productId}/reviews", (int productId) => Results.Ok($"Reviews for Product ID: {productId}"));     
-app.MapPost("/products/{productId}/reviews", (int productId, string reviewDetails) => Results.Ok($"Created review for Product ID: {productId} with details: {reviewDetails}"));     
-app.MapDelete("/product/{productId}/reviews/{reviewId}" , (int productId, int reviewId) => Results.Ok($"Deleted review with ID: {reviewId} for Product ID: {productId}"));
-app.MapGet("/search", (string query) => Results.Ok($"Search results for query: {query}"));       
-app.MapPut("/products/{productId}"  , (int productId, string productDetails) => Results.Ok($"Updated product with ID: {productId} with details: {productDetails}"));
-app.MapGet("/categories/{categoryId}/products", (int categoryId) => Results.Ok($"Products in Category ID: {categoryId}"));
-app.MapGet("/products/{productId}/details"  , (int productId) => Results.Ok($"Details for Product ID: {productId}"));
 
 app.Run();
 
