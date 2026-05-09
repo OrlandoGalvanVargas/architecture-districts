@@ -58,6 +58,7 @@ app.MapGet("/districts/{districtId}/users", (int districtId) => Results.Ok($"Lis
 app.MapPost("/districts/{districtId}/users", (int districtId, string userDetails) => Results.Ok($"Added user to district with ID: {districtId} with details: {userDetails}")).WithName("AddUserToDistrict").WithOpenApi();
 app.MapGet("/districts/{districtId}/orders", (int districtId) => Results.Ok($"List of orders in district with ID: {districtId}")).WithName("GetDistrictOrders").WithOpenApi();
 app.MapGet("/orders", () => Results.Ok("List of orders")).WithName("GetOrders").WithOpenApi();
+app.MapPost("/orders", (string orderDetails) => Results.Ok($"Created order with details: {orderDetails}")).WithName("CreateOrder").WithOpenApi();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
