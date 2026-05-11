@@ -60,6 +60,7 @@ app.MapGet("/districts/{districtId}/orders", (int districtId) => Results.Ok($"Li
 app.MapGet("/orders", () => Results.Ok("List of orders")).WithName("GetOrders").WithOpenApi();
 app.MapPost("/orders", (string orderDetails) => Results.Ok($"Created order with details: {orderDetails}")).WithName("CreateOrder").WithOpenApi();
 app.MapPut("/orders/{orderId}", (int orderId, string orderDetails) => Results.Ok($"Updated order with ID: {orderId} with details: {orderDetails}")).WithName("UpdateOrder").WithOpenApi();
+app.MapDelete("/orders/{orderId}", (int orderId) => Results.Ok($"Deleted order with ID: {orderId}")).WithName("DeleteOrder").WithOpenApi(); 
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
