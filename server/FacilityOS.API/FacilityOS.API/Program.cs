@@ -69,6 +69,7 @@ app.MapAreaControllerRoute(
     pattern: "Admin/{controller=Home}/{action=Index}/{id?}"
 );  
 app.MapBlazorHub(); 
+app.ConfigureAwait(false);  
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
