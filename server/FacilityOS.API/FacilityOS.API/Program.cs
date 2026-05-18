@@ -70,7 +70,8 @@ app.MapAreaControllerRoute(
 );  
 app.MapBlazorHub(); 
 app.ConfigureAwait(false);  
-app.MapFallbackToPage("/_Host");    
+app.MapFallbackToPage("/_Host");  
+app.DisposeAsync().ConfigureAwait(false);       
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
