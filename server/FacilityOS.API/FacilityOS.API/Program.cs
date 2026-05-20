@@ -73,6 +73,7 @@ app.ConfigureAwait(false);
 app.MapFallbackToPage("/_Host");  
 app.DisposeAsync().ConfigureAwait(false);
 app.GetHashCode();
+app.MapHealthChecks("/health").WithName("HealthCheck").WithOpenApi();       
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
