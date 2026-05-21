@@ -74,6 +74,15 @@ app.MapFallbackToPage("/_Host");
 app.DisposeAsync().ConfigureAwait(false);
 app.GetHashCode();
 app.MapHealthChecks("/health").WithName("HealthCheck").WithOpenApi();       
+app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+{
+    appBuilder.Use(async (context, next) =>
+    {
+        // Custom middleware logic for API requests
+        Console.WriteLine($"API Request: {context.Request.Method} {context.Request.Path}");
+        await next.Invoke();
+    });
+});
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
