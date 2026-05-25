@@ -86,6 +86,7 @@ app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuild
 app.StartAsync().ConfigureAwait(false); 
 app.UseAntiforgery();
 app.UseHttpLogging();
+app.UseHttpsRedirection();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
