@@ -72,7 +72,7 @@ app.MapBlazorHub();
 app.ConfigureAwait(false);  
 app.MapFallbackToPage("/_Host");  
 app.DisposeAsync().ConfigureAwait(false);
-app.GetHashCode();b 
+app.GetHashCode();
 app.MapHealthChecks("/health").WithName("HealthCheck").WithOpenApi();       
 app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
 {
@@ -87,6 +87,7 @@ app.StartAsync().ConfigureAwait(false);
 app.UseAntiforgery();
 app.UseHttpLogging();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
