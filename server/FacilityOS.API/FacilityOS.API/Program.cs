@@ -91,6 +91,7 @@ app.UseStaticFiles();
 app.UseForwardedHeaders();
 app.UseHttpMethodOverride();
 app.UseResponseCompression();
+app.UseResponseCaching();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
