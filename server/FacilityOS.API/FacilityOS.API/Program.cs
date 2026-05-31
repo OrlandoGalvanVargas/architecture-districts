@@ -92,6 +92,7 @@ app.UseForwardedHeaders();
 app.UseHttpMethodOverride();
 app.UseResponseCompression();
 app.UseResponseCaching();
+app.UseWebSockets();
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
