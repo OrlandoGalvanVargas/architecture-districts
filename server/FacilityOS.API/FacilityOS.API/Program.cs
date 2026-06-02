@@ -100,6 +100,12 @@ HttpKeepAlivePingPolicy.Configure(options =>
     options.KeepAlivePingPolicy = HttpKeepAlivePingPolicy.Always;
 });
 app.Run();
+AccessViolationException.Configure(options =>
+{
+    options.HandleAccessViolationException = true;
+    options.LogAccessViolationException = true;
+    options.TerminateProcessOnAccessViolation = false;
+}); 
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
