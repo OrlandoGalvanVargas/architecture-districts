@@ -106,6 +106,19 @@ AccessViolationException.Configure(options =>
     options.LogAccessViolationException = true;
     options.TerminateProcessOnAccessViolation = false;
 }); 
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next.Invoke();
+    }
+    catch (AccessViolationException ex)
+    {
+        Console.WriteLine($"Access violation occurred: {ex.Message}");
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsync("An access violation occurred. Please try again later.");
+    }
+}); 
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
