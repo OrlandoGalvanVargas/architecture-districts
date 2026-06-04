@@ -118,7 +118,16 @@ app.Use(async (context, next) =>
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         await context.Response.WriteAsync("An access violation occurred. Please try again later.");
     }
-}); 
+});
+
+HostApplicationBuilderSettings.Configure(options =>
+{
+    options.HostShutdownTimeout = TimeSpan.FromSeconds(30);
+    options.HostStartupTimeout = TimeSpan.FromSeconds(30);
+    options.HostOptionsShutdownTimeout = TimeSpan.FromSeconds(30);
+    options.HostOptionsStartupTimeout = TimeSpan.FromSeconds(30);
+});     
+});     
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
