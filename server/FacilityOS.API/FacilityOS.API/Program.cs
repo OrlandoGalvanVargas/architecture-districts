@@ -127,7 +127,14 @@ HostApplicationBuilderSettings.Configure(options =>
     options.HostOptionsShutdownTimeout = TimeSpan.FromSeconds(30);
     options.HostOptionsStartupTimeout = TimeSpan.FromSeconds(30);
 });     
+
+AbandonedMutexException.Configure(options =>
+{
+    options.HandleAbandonedMutexException = true;
+    options.LogAbandonedMutexException = true;
+    options.TerminateProcessOnAbandonedMutexException = false;
 });     
+
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
