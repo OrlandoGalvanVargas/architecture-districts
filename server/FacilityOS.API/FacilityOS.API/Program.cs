@@ -133,6 +133,14 @@ AbandonedMutexException.Configure(options =>
     options.HandleAbandonedMutexException = true;
     options.LogAbandonedMutexException = true;
     options.TerminateProcessOnAbandonedMutexException = false;
+});
+
+CascadingValueServiceCollectionExtensions.Configure(options =>
+{
+    options.DefaultCascadingValue = "Default Value";
+    options.LogCascadingValueChanges = true;
+    options.HandleCascadingValueExceptions = true;
+    options.TerminateProcessOnCascadingValueException = false;
 });     
 
 
