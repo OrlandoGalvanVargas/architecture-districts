@@ -141,7 +141,14 @@ CascadingValueServiceCollectionExtensions.Configure(options =>
     options.LogCascadingValueChanges = true;
     options.HandleCascadingValueExceptions = true;
     options.TerminateProcessOnCascadingValueException = false;
-});     
+});
+
+ContextStaticAttribute.Configure(options =>
+{
+    options.HandleContextStaticAttribute = true;
+    options.LogContextStaticAttributeUsage = true;
+    options.TerminateProcessOnContextStaticAttributeException = false;
+}); 
 
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
