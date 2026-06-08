@@ -143,12 +143,16 @@ CascadingValueServiceCollectionExtensions.Configure(options =>
     options.TerminateProcessOnCascadingValueException = false;
 });
 
+HttpValidationProblemDetails validationProblemDetails = new HttpValidationProblemDetails();     
+
 ContextStaticAttribute.Configure(options =>
 {
     options.HandleContextStaticAttribute = true;
     options.LogContextStaticAttributeUsage = true;
     options.TerminateProcessOnContextStaticAttributeException = false;
 }); 
+
+ 
 
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
