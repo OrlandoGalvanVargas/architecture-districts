@@ -145,6 +145,18 @@ CascadingValueServiceCollectionExtensions.Configure(options =>
 
 HttpValidationProblemDetails validationProblemDetails = new HttpValidationProblemDetails();     
 
+HttpResponseJsonExtensions.Configure(options =>
+{
+    options.DefaultJsonSerializerOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
+    };
+    options.LogJsonSerializationErrors = true;
+    options.HandleJsonSerializationExceptions = true;
+    options.TerminateProcessOnJsonSerializationException = false;
+});
+
 ContextStaticAttribute.Configure(options =>
 {
     options.HandleContextStaticAttribute = true;
