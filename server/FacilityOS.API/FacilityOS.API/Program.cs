@@ -7,6 +7,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddHealthChecks();
+builder.Services.AddMvc(options =>
+{
+    options.EnableEndpointRouting = false;
+}); 
 
 var app = builder.Build();
 
