@@ -18,6 +18,15 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
           .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
           .AddEnvironmentVariables();
 }); 
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = HttpLoggingFields.All;
+    logging.RequestHeaders.Add("Authorization");
+    logging.ResponseHeaders.Add("X-Custom-Header");
+    logging.MediaTypeOptions.AddText("application/json");
+    logging.RequestBodyLogLimit = 4096;
+    logging.ResponseBodyLogLimit = 4096;
+});
 
 var app = builder.Build();
 
