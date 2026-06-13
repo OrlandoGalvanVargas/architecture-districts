@@ -41,6 +41,8 @@ builder.Services.AddAntiforgery(options =>
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
