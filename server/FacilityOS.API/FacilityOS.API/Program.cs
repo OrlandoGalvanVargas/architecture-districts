@@ -11,7 +11,13 @@ builder.Services.AddMvc(options =>
 {
     options.EnableEndpointRouting = false;
 });
-builder.Services.AddResponseCompression();  
+builder.Services.AddResponseCompression();
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
+    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+          .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+          .AddEnvironmentVariables();
+}); 
 
 var app = builder.Build();
 
