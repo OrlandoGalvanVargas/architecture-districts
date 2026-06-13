@@ -41,7 +41,9 @@ builder.Services.AddAntiforgery(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Equals(builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>());
 
 var app = builder.Build();
 
