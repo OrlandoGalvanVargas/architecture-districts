@@ -10,7 +10,8 @@ builder.Services.AddHealthChecks();
 builder.Services.AddMvc(options =>
 {
     options.EnableEndpointRouting = false;
-}); 
+});
+builder.Services.AddResponseCompression();  
 
 var app = builder.Build();
 
