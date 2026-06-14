@@ -54,6 +54,8 @@ builder.Metrics.Configure(options =>
     options.TerminateProcessOnMetricsException = false;
 }); 
 
+builder.Environment.ApplicationName = "FacilityOS.API"; 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
