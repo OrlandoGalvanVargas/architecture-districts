@@ -56,6 +56,12 @@ builder.Metrics.Configure(options =>
 
 builder.Environment.ApplicationName = "FacilityOS.API"; 
 
+builder.Host.ConfigureHostConfiguration(config =>
+{
+    config.AddJsonFile("hostsettings.json", optional: true, reloadOnChange: true)
+          .AddEnvironmentVariables();
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
