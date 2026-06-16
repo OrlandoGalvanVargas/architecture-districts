@@ -62,6 +62,15 @@ builder.Host.ConfigureHostConfiguration(config =>
           .AddEnvironmentVariables();
 });
 
+builder.Metrics.Configure(options =>
+{
+    options.EnableRequestMetrics = true;
+    options.EnableResponseMetrics = true;
+    options.LogMetrics = true;
+    options.HandleMetricsExceptions = true;
+    options.TerminateProcessOnMetricsException = false;
+});     
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
