@@ -69,7 +69,15 @@ builder.Metrics.Configure(options =>
     options.LogMetrics = true;
     options.HandleMetricsExceptions = true;
     options.TerminateProcessOnMetricsException = false;
-});     
+});
+
+ComponentEndpointConventionBuilder.Configure(options =>
+{
+    options.DefaultEndpointName = "DefaultEndpoint";
+    options.LogEndpointCreation = true;
+    options.HandleEndpointCreationExceptions = true;
+    options.TerminateProcessOnEndpointCreationException = false;
+});
 
 var app = builder.Build();
 
