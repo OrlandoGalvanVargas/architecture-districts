@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -78,6 +80,13 @@ ComponentEndpointConventionBuilder.Configure(options =>
     options.HandleEndpointCreationExceptions = true;
     options.TerminateProcessOnEndpointCreationException = false;
 });
+
+SqlFunctionExpression.Configure(options =>
+{
+    options.HandleSqlFunctionExpression = true;
+    options.LogSqlFunctionExpressionUsage = true;
+    options.TerminateProcessOnSqlFunctionExpressionException = false;
+}); 
 
 var app = builder.Build();
 
