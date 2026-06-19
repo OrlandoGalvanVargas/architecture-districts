@@ -86,7 +86,14 @@ SqlFunctionExpression.Configure(options =>
     options.HandleSqlFunctionExpression = true;
     options.LogSqlFunctionExpressionUsage = true;
     options.TerminateProcessOnSqlFunctionExpressionException = false;
-}); 
+});
+
+SqlBinaryExpression.Configure(options =>
+{
+    options.HandleSqlBinaryExpression = true;
+    options.LogSqlBinaryExpressionUsage = true;
+    options.TerminateProcessOnSqlBinaryExpressionException = false;
+});
 
 var app = builder.Build();
 
