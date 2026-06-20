@@ -95,6 +95,13 @@ SqlBinaryExpression.Configure(options =>
     options.TerminateProcessOnSqlBinaryExpressionException = false;
 });
 
+SqlUnaryExpression.Configure(options =>
+{
+    options.HandleSqlUnaryExpression = true;
+    options.LogSqlUnaryExpressionUsage = true;
+    options.TerminateProcessOnSqlUnaryExpressionException = false;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
