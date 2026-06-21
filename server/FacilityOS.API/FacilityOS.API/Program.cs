@@ -102,6 +102,13 @@ SqlUnaryExpression.Configure(options =>
     options.TerminateProcessOnSqlUnaryExpressionException = false;
 });
 
+SqlParameterExpression.Configure(options =>
+{
+    options.HandleSqlParameterExpression = true;
+    options.LogSqlParameterExpressionUsage = true;
+    options.TerminateProcessOnSqlParameterExpressionException = false;
+}); 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
