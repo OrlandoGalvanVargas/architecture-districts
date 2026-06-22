@@ -109,6 +109,14 @@ SqlParameterExpression.Configure(options =>
     options.TerminateProcessOnSqlParameterExpressionException = false;
 }); 
 
+JsonProtocolDependencyInjectionExtensions.Configure(options =>
+{
+    options.DefaultJsonProtocol = "application/json";
+    options.LogJsonProtocolUsage = true;
+    options.HandleJsonProtocolExceptions = true;
+    options.TerminateProcessOnJsonProtocolException = false;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
