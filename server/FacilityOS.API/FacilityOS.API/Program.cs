@@ -117,6 +117,18 @@ JsonProtocolDependencyInjectionExtensions.Configure(options =>
     options.TerminateProcessOnJsonProtocolException = false;
 });
 
+HttpRequestJsonExtensions.Configure(options =>
+{
+    options.DefaultJsonSerializerOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
+    };
+    options.LogJsonSerializationErrors = true;
+    options.HandleJsonSerializationExceptions = true;
+    options.TerminateProcessOnJsonSerializationException = false;
+}); 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
