@@ -129,6 +129,13 @@ HttpRequestJsonExtensions.Configure(options =>
     options.TerminateProcessOnJsonSerializationException = false;
 }); 
 
+SqlUnaryExpression.Configure(options =>
+{
+    options.HandleSqlUnaryExpression = true;
+    options.LogSqlUnaryExpressionUsage = true;
+    options.TerminateProcessOnSqlUnaryExpressionException = false;
+}); 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
