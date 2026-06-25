@@ -31,25 +31,7 @@ app.MapDelete("/districts/{districtId}", (int districtId) => Results.Ok($"Delete
 app.MapGet("/districts/{districtId}/users", (int districtId) => Results.Ok($"List of users in district with ID: {districtId}")).WithName("GetDistrictUsers").WithOpenApi();     
 app.MapPost("/districts/{districtId}/users", (int districtId, string userDetails) => Results.Ok($"Added user to district with ID: {districtId} with details: {userDetails}")).WithName("AddUserToDistrict").WithOpenApi();
 app.MapGet("/districts/{districtId}/orders", (int districtId) => Results.Ok($"List of orders in district with ID: {districtId}")).WithName("GetDistrictOrders").WithOpenApi();
-app.MapGet("/orders", () => Results.Ok("List of orders")).WithName("GetOrders").WithOpenApi();
-app.MapPost("/orders", (string orderDetails) => Results.Ok($"Created order with details: {orderDetails}")).WithName("CreateOrder").WithOpenApi();
-app.MapPut("/orders/{orderId}", (int orderId, string orderDetails) => Results.Ok($"Updated order with ID: {orderId} with details: {orderDetails}")).WithName("UpdateOrder").WithOpenApi();
-app.MapDelete("/orders/{orderId}", (int orderId) => Results.Ok($"Deleted order with ID: {orderId}")).WithName("DeleteOrder").WithOpenApi(); 
-app.MapGet("/orders/{orderId}/users", (int orderId) => Results.Ok($"List of users associated with order ID: {orderId}")).WithName("GetOrderUsers").WithOpenApi();       
-app.MapPost("/orders/{orderId}/users", (int orderId, string userDetails) => Results.Ok($"Added user to order with ID: {orderId} with details: {userDetails}")).WithName("AddUserToOrder").WithOpenApi();    
- 
-app.ConfigureAwait(false);  
-app.GetHashCode();
-app.MapHealthChecks("/health").WithName("HealthCheck").WithOpenApi();       
-app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
-{
-    appBuilder.Use(async (context, next) =>
-    {
-        // Custom middleware logic for API requests
-        Console.WriteLine($"API Request: {context.Request.Method} {context.Request.Path}");
-        await next.Invoke();
-    });
-});
+
 app.UseAntiforgery();
 app.UseHttpLogging();
 app.UseHttpsRedirection();
