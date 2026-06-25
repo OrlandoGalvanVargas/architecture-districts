@@ -41,12 +41,7 @@ app.UseHttpMethodOverride();
 app.UseResponseCompression();
 app.UseResponseCaching();
 app.UseWebSockets();
-HttpKeepAlivePingPolicy.Configure(options =>
-{
-    options.PingInterval = TimeSpan.FromSeconds(30);
-    options.PingTimeout = TimeSpan.FromSeconds(10);
-    options.KeepAlivePingPolicy = HttpKeepAlivePingPolicy.Always;
-});
+
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
