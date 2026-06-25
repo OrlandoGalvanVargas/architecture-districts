@@ -7,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
@@ -21,7 +20,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseMvc();
 
 // UseRouting must be called before MapGet, MapPost, etc.
 app.UseRouting();
@@ -48,7 +46,6 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapFallback(() => Results.Redirect("/index.html"));
 app.MapGet("/users/{userId}/orders/{orderId}"   , (int userId, int orderId) => Results.Ok($"User ID: {userId}, Order ID: {orderId}"));
 app.MapPost("/users/{userId}/orders", (int userId, string orderDetails) => Results.Ok($"Created order for User ID: {userId} with details: {orderDetails}"));    
 app.MapPut("/users/{userId}/orders/{orderId}", (int userId, int orderId, string orderDetails) => Results.Ok($"Updated order with ID: {orderId} for User ID: {userId} with details: {orderDetails}"));
@@ -68,15 +65,8 @@ app.MapPut("/orders/{orderId}", (int orderId, string orderDetails) => Results.Ok
 app.MapDelete("/orders/{orderId}", (int orderId) => Results.Ok($"Deleted order with ID: {orderId}")).WithName("DeleteOrder").WithOpenApi(); 
 app.MapGet("/orders/{orderId}/users", (int orderId) => Results.Ok($"List of users associated with order ID: {orderId}")).WithName("GetOrderUsers").WithOpenApi();       
 app.MapPost("/orders/{orderId}/users", (int orderId, string userDetails) => Results.Ok($"Added user to order with ID: {orderId} with details: {userDetails}")).WithName("AddUserToOrder").WithOpenApi();    
-app.MapAreaControllerRoute(
-    name: "Admin",
-    areaName: "Admin",
-    pattern: "Admin/{controller=Home}/{action=Index}/{id?}"
-);  
-app.MapBlazorHub(); 
+ 
 app.ConfigureAwait(false);  
-app.MapFallbackToPage("/_Host");  
-app.DisposeAsync().ConfigureAwait(false);
 app.GetHashCode();
 app.MapHealthChecks("/health").WithName("HealthCheck").WithOpenApi();       
 app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
@@ -88,7 +78,6 @@ app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuild
         await next.Invoke();
     });
 });
-app.StartAsync().ConfigureAwait(false); 
 app.UseAntiforgery();
 app.UseHttpLogging();
 app.UseHttpsRedirection();
