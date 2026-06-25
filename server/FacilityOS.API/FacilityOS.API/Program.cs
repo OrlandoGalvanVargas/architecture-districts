@@ -32,6 +32,16 @@ app.MapGet("/districts/{districtId}/users", (int districtId) => Results.Ok($"Lis
 app.MapPost("/districts/{districtId}/users", (int districtId, string userDetails) => Results.Ok($"Added user to district with ID: {districtId} with details: {userDetails}")).WithName("AddUserToDistrict").WithOpenApi();
 app.MapGet("/districts/{districtId}/orders", (int districtId) => Results.Ok($"List of orders in district with ID: {districtId}")).WithName("GetDistrictOrders").WithOpenApi();
 
+app.MapWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+{
+    appBuilder.Use(async (context, next) =>
+    {
+        // Custom middleware logic for API requests
+        Console.WriteLine($"API Request: {context.Request.Method} {context.Request.Path}");
+        await next.Invoke();
+    });
+});
+
 app.UseAntiforgery();
 app.UseHttpLogging();
 app.UseHttpsRedirection();
