@@ -16,6 +16,13 @@ namespace FacilityOS.API.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<District> Districts { get; set; }
 
+        // 🛠️ AGREGA ESTO: Fuerza a EF Core a ignorar la advertencia estricta de .NET 10
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -59,9 +66,9 @@ namespace FacilityOS.API.Data
                     Id = 1,
                     Name = "Admin user",
                     Email = "admin@livefree.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                    PasswordHash = "$2a$11$mC3I0b.rD21E1NfFfKxWeO7B76MhW6o7wsh.D7M6G59RBy5H67.2i",
                     Role = "Admin",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                 }
                 );
             modelBuilder.Entity<District>().HasData(
@@ -76,7 +83,7 @@ namespace FacilityOS.API.Data
                Address = "333 S Beaudry Ave",
                Description = "Largest school district in California",
                SchoolCount = 0,
-               CreatedAt = DateTime.UtcNow
+               CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
            },
            new District
            {
@@ -89,7 +96,7 @@ namespace FacilityOS.API.Data
                Address = "4100 Normal St",
                Description = "Second largest district in San Diego County",
                SchoolCount = 0,
-               CreatedAt = DateTime.UtcNow
+               CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
            }
        );
         }
