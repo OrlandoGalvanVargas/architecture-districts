@@ -9,15 +9,30 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.27" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Endpoints\" />
+    <Folder Include="Features\Auth\Login\" />
+    <Folder Include="Features\Auth\Logout\" />
+    <Folder Include="Features\Auth\Me\" />
+    <Folder Include="Features\Auth\RefreshToken\" />
+    <Folder Include="Common\Behaviors\" />
+    <Folder Include="Common\Exceptions\" />
+    <Folder Include="Features\Districts\GetDistricts\" />
+    <Folder Include="Features\Districts\GetDistrictById\" />
+    <Folder Include="Features\Districts\CreateDistrict\" />
+    <Folder Include="Features\Districts\DeleteDistrict\" />
+    <Folder Include="Features\Districts\UpdateDistrict\" />
     <Folder Include="Middleware\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
