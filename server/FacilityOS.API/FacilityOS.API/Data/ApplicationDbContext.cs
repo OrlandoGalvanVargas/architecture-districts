@@ -16,7 +16,6 @@ namespace FacilityOS.API.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<District> Districts { get; set; }
 
-        // 🛠️ AGREGA ESTO: Fuerza a EF Core a ignorar la advertencia estricta de .NET 10
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
