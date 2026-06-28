@@ -1,15 +1,14 @@
-﻿namespace FacilityOS.API.Services
+﻿using FacilityOS.API.Models;
+
+namespace FacilityOS.API.Services
 {
     public interface IAuthService
     {
-
-        string GenerateToken(string userId);
+        string GenerateAccessToken(User user);
+        string GenerateRefreshToken();
 
         bool ValidateToken(string token);
-
         bool IsTokenExpired(string token);
-        bool IsTokenRevoked(string token);
-        bool IsTokenBlacklisted(string token);
 
         string? GetUserIdFromToken(string token);
         string? GetUserNameFromToken(string token);
