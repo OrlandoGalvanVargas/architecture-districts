@@ -30,9 +30,6 @@
     <Folder Include="Features\Auth\RefreshToken\" />
     <Folder Include="Common\Behaviors\" />
     <Folder Include="Common\Exceptions\" />
-    <Folder Include="Features\Districts\GetDistrictById\" />
-    <Folder Include="Features\Districts\DeleteDistrict\" />
-    <Folder Include="Features\Districts\UpdateDistrict\" />
     <Folder Include="Middleware\" />
   </ItemGroup>
 
