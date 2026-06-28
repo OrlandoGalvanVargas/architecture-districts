@@ -17,7 +17,10 @@ function createAction(client, action, service) {
           return result;
         }
       })
-      .catch((error) => service.onError(action, error, ...params));
+      .catch((error) => {
+        service.onError({ action, error, params });
+        throw error;
+      });
   };
 }
 
