@@ -2,7 +2,7 @@ import { apiClient } from "../client";
 import { mockDistrictsApi } from "../mock/districts.mock";
 
 const ENDPOINT = "/districts";
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const districtsApi = USE_MOCK
   ? mockDistrictsApi

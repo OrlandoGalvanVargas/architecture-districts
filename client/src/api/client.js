@@ -2,7 +2,7 @@ import axios from "axios";
 import { tokenManager } from "../utils/tokenManager";
 
 export const apiClient = axios.create({
-  baseURL: "https://api-backend/schools",
+  baseURL: "https://localhost:7206/api",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
