@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FacilityOS.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // 3. MediatR — escanea automáticamente todos los Handlers en el ensamblado
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// 3.5 Servicios de la aplicacion (Injeccion de Dependencias)
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // 4. Autenticación JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
