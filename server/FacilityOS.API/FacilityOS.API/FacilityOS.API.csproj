@@ -28,7 +28,6 @@
     <Folder Include="Features\Auth\Me\" />
     <Folder Include="Features\Auth\RefreshToken\" />
     <Folder Include="Common\Behaviors\" />
-    <Folder Include="Common\Exceptions\" />
     <Folder Include="Middleware\" />
   </ItemGroup>
 
