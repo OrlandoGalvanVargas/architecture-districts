@@ -2,7 +2,8 @@
     using FacilityOS.API.Features.Auth.Login;
     using FacilityOS.API.Features.Auth.Logout;
     using FacilityOS.API.Features.Auth.Me;
-    using MediatR;
+using FacilityOS.API.Features.Auth.RefreshToken;
+using MediatR;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using System.Security.Claims;
@@ -21,9 +22,16 @@
             }
 
             [HttpPost("login")]
-            public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest Request)
+            public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
             {
-                var result = await _mediator.Send(new LoginCommand(Request));
+                var result = await _mediator.Send(new LoginCommand(request));
+                return Ok(result);
+            }
+
+            [HttpPost("refresh")]
+            public async Task<ActionResult<LoginResponse>> Refresh([FromBody] RefreshTokenRequest request)
+            {
+                var result = await _mediator.Send(new RefreshTokenCommand(request.RefreshToken));
                 return Ok(result);
             }
 
