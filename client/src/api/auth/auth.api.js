@@ -12,8 +12,10 @@ export const authApi = USE_MOCK
         return response.data;
       },
 
-      logout: async () => {
-        const response = await apiClient.post(`${ENDPOINT}/logout`);
+      logout: async (refreshToken) => {
+        const response = await apiClient.post(`${ENDPOINT}/logout`, {
+          refreshToken,
+        });
         return response.data;
       },
 

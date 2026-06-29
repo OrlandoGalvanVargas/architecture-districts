@@ -37,7 +37,11 @@ export const AuthProvider = ({ children }) => {
 
   const logout = useCallback(async () => {
     try {
-      await authApi.logout();
+      const currentRefreshToken = tokenManager.getRefreshToken();
+
+      if (currentRefreshToken) {
+        await authApi.logout(currentRefreshToken);
+      }
     } catch (error) {
       console.log("Logout error: ", error);
     } finally {
