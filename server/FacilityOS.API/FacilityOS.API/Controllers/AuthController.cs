@@ -1,7 +1,11 @@
 ﻿using FacilityOS.API.DTOs.Auth;
 using FacilityOS.API.Features.Auth.Login;
+using FacilityOS.API.Features.Auth.Logout;
+using FacilityOS.API.Features.Auth.Me;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FacilityOS.API.Controllers
 {
@@ -23,5 +27,27 @@ namespace FacilityOS.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<ActionResult<UserDto>> Me()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _mediator.Send(new MeQuery(userId));
+
+            if (result is null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<ActionResult> Logout([FromBody] LogoutRequestBoyd body)
+        {
+            await _mediator.Send(new LogoutCommand(body.RefreshToken));
+            return NoContent();
+        }
     }
+
+    public record LogoutRequestBoyd(string RefreshToken);
 }
