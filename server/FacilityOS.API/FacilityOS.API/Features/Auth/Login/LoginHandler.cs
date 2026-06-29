@@ -30,7 +30,7 @@ namespace FacilityOS.API.Features.Auth.Login
             var accessToken = _authService.GenerateAccessToken(user);
             var refreshTokenValue = _authService.GenerateRefreshToken();
 
-            _context.RefreshTokens.Add(new RefreshToken
+            _context.RefreshTokens.Add(new Models.RefreshToken
             {
                 Token = refreshTokenValue,
                 UserId = user.Id,
