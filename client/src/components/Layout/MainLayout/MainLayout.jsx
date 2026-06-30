@@ -72,7 +72,7 @@ export const MainLayout = () => {
     <Layout className="main-layout">
       <Header className="main-header" style={{ backgroundColor: "#003380" }}>
         <div className="logo" onClick={() => navigate("/")}>
-          LiveFree Schools
+          FacilityOS
         </div>
         <div style={{ marginLeft: "auto" }}>
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">

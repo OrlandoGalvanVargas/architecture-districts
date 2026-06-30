@@ -10,8 +10,9 @@ export const LoginForm = ({ onSubmit, loading = false, error = null }) => {
 
   return (
     <Card
-      title="Login to LiveFree Schools"
+      title="Sign in to FacilityOS"
       style={{ maxWidth: 400, margin: "0 auto" }}
+      headStyle={{ textAlign: "center" }}
     >
       {error && (
         <Alert
