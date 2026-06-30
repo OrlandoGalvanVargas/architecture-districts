@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\" />
     <Folder Include="Common\Behaviors\" />
-    <Folder Include="Middleware\" />
   </ItemGroup>
 
 </Project>
