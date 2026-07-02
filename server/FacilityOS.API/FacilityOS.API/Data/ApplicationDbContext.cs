@@ -15,6 +15,7 @@ namespace FacilityOS.API.Data
         public DbSet<User> Users { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<District> Districts { get; set; }
+        public DbSet<School> Schools { get; set; }  
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -52,6 +53,18 @@ namespace FacilityOS.API.Data
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.Code).IsUnique();
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<School>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+                entity.HasIndex(s => s.SchoolCode).IsUnique();
+                entity.Property(s => s.Level).HasConversion<string>();
+                entity.Property(s => s.Type).HasConversion<string>();
+                entity.HasOne(s => s.District)
+                .WithMany(s => s.Schools)
+                .HasForeignKey(s => s.DistrictId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
             SeedData(modelBuilder);
