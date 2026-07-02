@@ -14,7 +14,7 @@ namespace FacilityOS.API.Features.Schools.GetSchoolById
             _context = context;
         }
 
-        public async Task<SchoolResponse> Handle(GetSchoolByIdQuery request, CancellationToken cancellationToken)
+        public async Task<SchoolResponse?> Handle(GetSchoolByIdQuery request, CancellationToken cancellationToken)
         {
             var school = await _context.Schools
                 .Include(s => s.District)
