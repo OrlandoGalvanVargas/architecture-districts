@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FacilityOS.API.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace FacilityOS.API.DTOs.Schools
 {
@@ -11,9 +12,9 @@ namespace FacilityOS.API.DTOs.Schools
         [MaxLength(50)]
         public string SchoolCode { get; set; } = string.Empty;
         [Required(ErrorMessage = "Level is required")]
-        public string Level { get; set; } = string.Empty;
+        public SchoolLevel Level { get; set; } = string.Empty;
         [Required(ErrorMessage = "Type is required")]
-        public string Type { get; set; } = string.Empty;
+        public SchoolType Type { get; set; } = string.Empty;
         [Required(ErrorMessage = "Address is required")]
         [MaxLength(500)]
         public string Address { get; set; } = string.Empty;
