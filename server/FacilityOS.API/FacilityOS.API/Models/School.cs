@@ -10,7 +10,7 @@ namespace FacilityOS.API.Models
         public string Name { get; set; } = string.Empty;
         [Required]
         [MaxLength(50)]
-        public string SchoolCode { get; set} = string.Empty;
+        public string SchoolCode { get; set;  } = string.Empty;
         [Required]
         public SchoolLevel Level { get; set; }
         [Required]
