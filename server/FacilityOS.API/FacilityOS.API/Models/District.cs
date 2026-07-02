@@ -37,6 +37,7 @@ namespace FacilityOS.API.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public ICollection<School> Schools { get; set; } = new List<School>();
     }
 
 }
