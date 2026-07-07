@@ -33,4 +33,33 @@ export const ROUTES_CONFIG = {
       },
     },
   },
+
+  schools: {
+    path: "/schools",
+    title: "Schools",
+    singularTitle: "School",
+    children: {
+      list: {
+        pattern: "",
+        title: "Schools List",
+        buildPath: () => "",
+      },
+      create: {
+        pattern: "create",
+        title: "Create School",
+        buildPath: () => "create",
+      },
+      detail: {
+        pattern: ":id",
+        title: "School Details",
+        singularTitle: "School",
+        buildPath: (id) => `${id}`,
+      },
+      edit: {
+        pattern: ":id/edit",
+        title: "Edit School",
+        buildPath: (id) => `${id}/edit`,
+      },
+    },
+  },
 };
