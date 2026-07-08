@@ -12,4 +12,26 @@ const SchoolListController = ({ navigate }) => {
     total: 0,
   });
   const [filters, setFilters] = useState({ isActive: true });
+
+  const fetchSchools = async (params = {}) => {
+    setLoading(true);
+    try {
+      const result = await services.schools.getAll({
+        ...filters,
+        ...params,
+        page: params.Page || pagination.page,
+        pageSize: pagination.pageSize,
+      });
+      setSchools(result.items);
+      setPagination((prev) => ({
+        ...prev,
+        total: result.totalCount,
+        page: result.page,
+      }));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 };
