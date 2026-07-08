@@ -1,1 +1,3 @@
-import { Alert } from "antd";
+import SchoolListController from "../controllers/SchoolListController";
+
+export const SchoolsPage = () => <SchoolListController />;
