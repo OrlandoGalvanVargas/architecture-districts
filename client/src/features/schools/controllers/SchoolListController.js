@@ -7,7 +7,7 @@ const SchoolListController = ({ navigate }) => {
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
-    page: 0,
+    page: 1,
     pageSize: 10,
     total: 0,
   });
