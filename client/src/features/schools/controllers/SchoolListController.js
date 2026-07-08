@@ -44,4 +44,18 @@ const SchoolListController = ({ navigate }) => {
     setFilter(newFilters);
     fetchSchools({ ...newFilters, page: 1 });
   };
+
+  return (
+    <SchoolTable
+      schools={schools}
+      loading={loading}
+      pagination={pagination}
+      onPageChange={handlePageChange}
+      onFilterChange={handleFilterChange}
+      onView={(id) => navigate(`/schools/${id}`)}
+      onCreate={() => navigate("/schools/create")}
+    />
+  );
 };
+
+export default withController(SchoolListController);
