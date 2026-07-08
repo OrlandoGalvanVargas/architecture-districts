@@ -1,1 +1,3 @@
-import { Form } from "antd";
+import SchoolCreateController from "../controllers/SchoolCreateController";
+
+export const SchoolCreatePage = () => <SchoolCreateController />;
