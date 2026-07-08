@@ -34,4 +34,14 @@ const SchoolListController = ({ navigate }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSchools();
+  }, []);
+
+  const handlePageChange = (page) => fetchSchools({ page });
+  const handleFilterChange = (newFilters) => {
+    setFilter(newFilters);
+    fetchSchools({ ...newFilters, page: 1 });
+  };
 };
