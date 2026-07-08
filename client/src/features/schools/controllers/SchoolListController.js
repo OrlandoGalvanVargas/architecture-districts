@@ -41,7 +41,7 @@ const SchoolListController = ({ navigate }) => {
 
   const handlePageChange = (page) => fetchSchools({ page });
   const handleFilterChange = (newFilters) => {
-    setFilter(newFilters);
+    setFilters(newFilters);
     fetchSchools({ ...newFilters, page: 1 });
   };
 
