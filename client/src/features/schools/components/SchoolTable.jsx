@@ -48,15 +48,15 @@ export const SchoolTable = ({
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => {
+      render: (_, record) => (
         <Button
-          icon={<EyeOutlinedt />}
+          icon={<EyeOutlined />}
           onClick={() => onView(record.id)}
           size="small"
         >
           View
-        </Button>;
-      },
+        </Button>
+      ),
     },
   ];
 
