@@ -20,7 +20,7 @@ export const SchoolDetail = ({
       loading={loading}
       title={
         <Space>
-          <span>{school.Name}</span>
+          <span>{school.name}</span>
           <Tag color="blue">{school.schoolCode}</Tag>
           <Tag color={school.isActive ? "green" : "red"}>
             {school.isActive ? "Active" : "Inactive"}
@@ -49,6 +49,32 @@ export const SchoolDetail = ({
           </Popconfirm>
         </Space>
       }
-    ></Card>
+    >
+      <Descriptions bordered column={2}>
+        <Descriptions.Item label="Name" span={2}>
+          {school.name}
+        </Descriptions.Item>
+        <Descriptions.Item label="Code">{school.schoolCode}</Descriptions.Item>
+        <Descriptions.Item label="District">
+          {school.districtName}
+        </Descriptions.Item>
+        <Descriptions.Item label="Level">{school.level}</Descriptions.Item>
+        <Descriptions.Item label="Type">{school.type}</Descriptions.Item>
+        <Descriptions.Item label="State">{school.state}</Descriptions.Item>
+        <Descriptions.Item lable="City">{school.city}</Descriptions.Item>
+        <Descriptions.Item label="ZIP">{school.zipCode}</Descriptions.Item>
+        <Descriptions.Item label="Capacity">
+          {school.studentCapacity}
+        </Descriptions.Item>
+        {school.phone && (
+          <Descriptions.Item label="Phone">{school.phone}</Descriptions.Item>
+        )}
+        {school.contactEmail && (
+          <Descriptions.Item label="Contact Email">
+            {school.contactEmail}
+          </Descriptions.Item>
+        )}
+      </Descriptions>
+    </Card>
   );
 };
