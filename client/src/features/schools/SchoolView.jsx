@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { SchoolsPage } from "./pages/SchoolsPage";
 import { SchoolCreatePage } from "./pages/SchoolCreatePage";
-import { SchoolDetailPage } from "./pages/SchoolDetailPag";
+import { SchoolDetailPage } from "./pages/SchoolDetailPage";
 import { SchoolEditPage } from "./pages/SchoolEditPage";
 
 export const SchoolView = () => {
