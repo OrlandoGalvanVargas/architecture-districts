@@ -1,5 +1,5 @@
 import { Table, Button, Tag, Space, Select, Switch } from "antd";
-import { PlusOutlined, EyeOutlinedt } from "@ant-design/icons";
+import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import { PageHeader } from "@/components/Layout/PageHeader/PageHeader";
 
 const { Option } = Select;
