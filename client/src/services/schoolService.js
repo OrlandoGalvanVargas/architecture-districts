@@ -20,4 +20,4 @@ const schoolReactor = {
   },
 };
 
-export const schoolService = createService(schoolsApi, schoolService);
+export const schoolService = createService(schoolsApi, schoolReactor);
