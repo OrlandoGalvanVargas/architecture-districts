@@ -25,6 +25,11 @@ export const useAppNavigation = () => {
     [navigate],
   );
 
+  const goToSchools = useCallback(
+    () => navigate(RoutePaths.schools.list()),
+    [navigate],
+  );
+
   return useMemo(
     () => ({
       navigate,
