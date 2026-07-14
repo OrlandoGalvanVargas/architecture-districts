@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { withController } from "@/reactive/withController";
 import { SchoolTable } from "../components/SchoolTable";
 import services from "@/services";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 const SchoolListController = ({ navigate }) => {
   const [schools, setSchools] = useState([]);
@@ -12,6 +13,8 @@ const SchoolListController = ({ navigate }) => {
     total: 0,
   });
   const [filters, setFilters] = useState({ isActive: true });
+
+  const navigation = useAppNavigation();
 
   const fetchSchools = async (params = {}) => {
     setLoading(true);
