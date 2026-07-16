@@ -29,6 +29,10 @@ export const useAppNavigation = () => {
     () => navigate(RoutePaths.schools.list()),
     [navigate],
   );
+  const goToSchoolCreate = useCallback(
+    () => navigate(RoutePaths.schools.create()),
+    [navigate],
+  );
   const goToSchoolDetail = useCallback(
     (id) => navigate(RoutePaths.schools.detail(id)),
     [navigate],
@@ -47,6 +51,10 @@ export const useAppNavigation = () => {
       goToDistrictDetail,
       goToDistrictEdit,
       goToDistrictCreate,
+      goToSchools,
+      goToSchoolCreate,
+      goToSchoolDetail,
+      goToSchoolEdit,
     }),
     [
       navigate,
@@ -56,6 +64,10 @@ export const useAppNavigation = () => {
       goToDistrictDetail,
       goToDistrictEdit,
       goToDistrictCreate,
+      goToSchools,
+      goToSchoolCreate,
+      goToSchoolDetail,
+      goToSchoolEdit,
     ],
   );
 };
