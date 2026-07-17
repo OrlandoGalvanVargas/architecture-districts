@@ -55,8 +55,8 @@ const SchoolListController = ({ navigate }) => {
       pagination={pagination}
       onPageChange={handlePageChange}
       onFilterChange={handleFilterChange}
-      onView={(id) => navigate(`/schools/${id}`)}
-      onCreate={() => navigate("/schools/create")}
+      onView={(id) => navigation.goToSchoolDetail(id)}
+      onCreate={() => navigation.goToSchoolCreate()}
     />
   );
 };
