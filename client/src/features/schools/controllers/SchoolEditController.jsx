@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { withController } from "@/reactive/withController";
 import { SchoolForm } from "../components/SchoolForm";
 import services from "@/services";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 const SchoolEditController = ({ navigate, params }) => {
   const [school, setSchool] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigation = useAppNavigation();
 
   useEffect(() => {
     const fetch = async () => {
