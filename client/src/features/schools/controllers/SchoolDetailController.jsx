@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { withController } from "@/reactive/withController";
 import { SchoolDetail } from "../components/SchoolDetail";
 import services from "@/services";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 const SchoolDetailController = ({ navigate, params }) => {
   const [school, setSchool] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const navigation = useAppNavigation();
 
   useEffect(() => {
     const fetch = async () => {
