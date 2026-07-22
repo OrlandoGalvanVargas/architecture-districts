@@ -9,7 +9,6 @@ export const SchoolTable = ({
   loading,
   pagination,
   onPageChange,
-  onFilterChange,
   onView,
   onCreate,
 }) => {
