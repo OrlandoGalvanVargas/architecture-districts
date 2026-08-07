@@ -1,17 +1,20 @@
-import { Table, Button, Tag, Space, Select, Switch } from "antd";
-import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
+import { Table, Button, Tag, Space, Select, Switch, Popconfirm } from "antd";
+import {
+  PlusOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { PageHeader } from "@/components/Layout/PageHeader/PageHeader";
 
 const { Option } = Select;
 
 export const SchoolTable = ({
-  schools,
-  loading,
-  pagination,
-  onPageChange,
-  onFilterChange,
-  onView,
-  onCreate,
+  schools = [],
+  loading = false,
+  onView = null,
+  onEdit = null,
+  onDelete = null,
 }) => {
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -49,73 +52,56 @@ export const SchoolTable = ({
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <Button
-          icon={<EyeOutlined />}
-          onClick={() => onView(record.id)}
-          size="small"
-        >
-          View
-        </Button>
+        <Space size="small">
+          {onView && (
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              onClick={() => onView(record)}
+              size="small"
+            >
+              View
+            </Button>
+          )}
+          {onEdit && (
+            <Button
+              type="link"
+              icon={<EditOutlined />}
+              onClick={() => onEdit(record)}
+              size="small"
+            >
+              Edit
+            </Button>
+          )}
+          {onDelete && (
+            <Popconfirm
+              title="Delete school"
+              description="Are you sure you want to delete this school?"
+              onConfirm={() => onDelete(record)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="link" danger icon={<DeleteOutlined />} size="small">
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
+        </Space>
       ),
     },
   ];
 
   return (
-    <div>
-      <PageHeader
-        title="Schools"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-            New School
-          </Button>
-        }
-      />
-      <Space style={{ marginBottom: 16 }}>
-        <Select
-          placeholder="Level"
-          allowClear
-          style={{ width: 140 }}
-          onChange={(val) => onFilterChange({ level: val })}
-        >
-          {["Elementary", "Middle", "High", "K12", "Prek"].map((l) => (
-            <Option key={l} value={l}>
-              {l}
-            </Option>
-          ))}
-        </Select>
-        <Select
-          placeholder="Type"
-          allowClear
-          style={{ width: 140 }}
-          onChange={(val) => onFilterChange({ type: val })}
-        >
-          {["Public", "Charter", "Magnet", "Alternative"].map((t) => (
-            <Option key={t} value={t}>
-              {t}
-            </Option>
-          ))}
-        </Select>
-        <Switch
-          checkedChildren="Active"
-          unCheckedChildren="All"
-          defaultChecked
-          onChange={(checked) =>
-            onFilterChange({ isActive: checked || undefined })
-          }
-        />
-      </Space>
-      <Table
-        dataSource={schools}
-        columns={columns}
-        rowKey="id"
-        loading={loading}
-        pagination={{
-          current: pagination.page,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          onChange: onPageChange,
-        }}
-      />
-    </div>
+    <Table
+      dataSource={schools}
+      columns={columns}
+      rowKey="id"
+      loading={loading}
+      pagination={{
+        pageSize: 10,
+        showSizeChanger: true,
+        showTotal: (total) => `Total ${total} schools`,
+      }}
+    />
   );
 };
