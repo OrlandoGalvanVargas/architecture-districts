@@ -1,4 +1,4 @@
-import SchoolCreateController from "../controllers/SchoolCreateController";
+import { SchoolCreateController } from "../controllers/SchoolCreateController";
 import { PageHeader } from "@/components/Layout/PageHeader/PageHeader";
 import { generateBreadcrumbs } from "@/router/breadcrumbs";
 
