@@ -1,30 +1,16 @@
-import { useState } from "react";
 import { withController } from "@/reactive/withController";
+import { Card } from "antd";
+import { useEffect } from "react";
 import { SchoolForm } from "../components/SchoolForm";
-import services from "@/services";
+import { useNotification } from "@/contexts/Notification";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
-const SchoolCreateController = ({ navigate }) => {
-  const [loading, setLoading] = useState(false);
+export const SchoolCreateController = withController(
+  ({ loading, actions, setCallback }) => {
+    const createSchool = actions.createSchool;
+    const isCreating = loading.createSchool;
 
-  const handleSubmit = async (values) => {
-    setLoading(true);
-    try {
-      const result = await services.schools.create(values);
-      navigate(`/schools/${result.id}`);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <SchoolForm
-      onSubmit={handleSubmit}
-      onCancel={navigate("/schools")}
-      loading={loading}
-    />
-  );
-};
-
-export default withController(SchoolCreateController);
+    const navigate = useAppNavigation();
+    const notification = useNotification();
+  },
+);
