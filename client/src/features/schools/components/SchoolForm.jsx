@@ -7,6 +7,7 @@ import {
   Col,
   InputNumber,
   Switch,
+  Space,
 } from "antd";
 
 const { Option } = Select;
@@ -64,10 +65,25 @@ const US_STATES = [
   "WY",
 ];
 
+const SCHOOL_LEVELS = [
+  { label: "Elementary", value: 0 },
+  { label: "Middle", value: 1 },
+  { label: "High", value: 2 },
+  { label: "K12", value: 3 },
+  { label: "Prek", value: 4 },
+];
+
+const SCHOOL_TYPES = [
+  { label: "Public", value: 0 },
+  { label: "Charter", value: 1 },
+  { label: "Magnet", value: 2 },
+  { label: "Alternative", value: 3 },
+];
+
 export const SchoolForm = ({
-  initialValues = {},
+  initialValues = null,
   onSubmit,
-  onCancel,
+  onCancel = null,
   loading = false,
 }) => {
   const [form] = Form.useForm();
@@ -111,22 +127,30 @@ export const SchoolForm = ({
 
       <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item label="Level" name="level" rules={[{ required: true }]}>
-            <Select placeHolder="Select level" disabled={loading}>
-              {["Elementary", "Middle", "High", "K12", "Prek"].map((l) => (
-                <Option key={l} value={l}>
-                  {l}
+          <Form.Item
+            label="Level"
+            name="level"
+            rules={[{ required: true, message: "Please select level" }]}
+          >
+            <Select placeholder="Select level" disabled={loading}>
+              {SCHOOL_LEVELS.map((item) => (
+                <Option key={item.value} value={item.value}>
+                  {item.label}
                 </Option>
               ))}
             </Select>
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item label="Type" name="type" rules={[{ required: true }]}>
-            <Select placeHolder="Select type" disabled={loading}>
-              {["Public", "Charter", "Magnet", "Alternative"].map((t) => (
-                <Option key={t} value={t}>
-                  {t}
+          <Form.Item
+            label="Type"
+            name="type"
+            rules={[{ required: true, message: "Please select type" }]}
+          >
+            <Select placeholder="Select type" disabled={loading}>
+              {SCHOOL_TYPES.map((item) => (
+                <Option key={item.value} value={item.value}>
+                  {item.label}
                 </Option>
               ))}
             </Select>
@@ -147,7 +171,7 @@ export const SchoolForm = ({
           </Form.Item>
         </Col>
         <Col xs={24} md={8}>
-          <Form.Item label="City" name="City" rules={[{ required: true }]}>
+          <Form.Item label="City" name="city" rules={[{ required: true }]}>
             <Input placeholder="Select city" disabled={loading} />
           </Form.Item>
         </Col>
