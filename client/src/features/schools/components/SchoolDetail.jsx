@@ -7,7 +7,6 @@ import {
 
 export const SchoolDetail = ({
   school,
-  loading,
   isDeleting,
   onEdit,
   onDelete,
@@ -17,7 +16,7 @@ export const SchoolDetail = ({
 
   return (
     <Card
-      loading={loading}
+      loading={isDeleting}
       title={
         <Space>
           <span>{school.name}</span>
@@ -61,7 +60,7 @@ export const SchoolDetail = ({
         <Descriptions.Item label="Level">{school.level}</Descriptions.Item>
         <Descriptions.Item label="Type">{school.type}</Descriptions.Item>
         <Descriptions.Item label="State">{school.state}</Descriptions.Item>
-        <Descriptions.Item lable="City">{school.city}</Descriptions.Item>
+        <Descriptions.Item label="City">{school.city}</Descriptions.Item>
         <Descriptions.Item label="ZIP">{school.zipCode}</Descriptions.Item>
         <Descriptions.Item label="Capacity">
           {school.studentCapacity}
