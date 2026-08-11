@@ -1,46 +1,83 @@
-import { useState, useEffect } from "react";
 import { withController } from "@/reactive/withController";
+import { useNotification } from "@/contexts/Notification";
 import { SchoolDetail } from "../components/SchoolDetail";
-import services from "@/services";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
+import { useEffect } from "react";
+import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
 
-const SchoolDetailController = ({ navigate, params }) => {
-  const [school, setSchool] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+export const SchoolDetailController = withController(
+  ({ data, loading, errors, actions, schoolId, setCallbacks }) => {
+    const school = data.school;
+    const isLoading = loading.school;
+    const isDeleting = loading.deleteSchool;
+    const error = errors.school;
+    const refetchSchool = actions.school;
+    const deleteSchool = actions.deleteSchool;
 
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      try {
-        const result = await services.schools.getById(params.id);
-        setSchool(result);
-      } finally {
-        setLoading(false);
-      }
+    const navigate = useAppNavigation();
+    const notification = useNotification();
+
+    useEffect(() => {
+      setCallbacks("deleteSchool", {
+        onSuccess: () => {
+          notification.showSuccess("School deleted successfully");
+          navigate.goToSchools();
+        },
+        onError: (error) => {
+          notification.showError(error.message);
+        },
+      });
+    }, [setCallbacks]);
+
+    const handleEdit = () => {
+      navigate.goToSchoolEdit(schoolId);
     };
-    fetch();
-  }, [params.id]);
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      await services.schools.delete(params.id);
-      navigate("/schools");
-    } finally {
-      setIsDeleting(false);
+    const handleDelete = () => {
+      deleteSchool(schoolId);
+    };
+
+    const handleBack = () => {
+      navigate.goToSchools();
+    };
+
+    if (isLoading) {
+      return <LoadingSpinner description="Loading school details..." />;
     }
-  };
 
-  return (
-    <SchoolDetail
-      school={school}
-      loading={loading}
-      isDeleting={isDeleting}
-      onEdit={() => navigate(`/schools/${params.id}/edit`)}
-      onDelete={handleDelete}
-      onBack={() => navigate("/schools")}
-    />
-  );
-};
+    if (error) {
+      return (
+        <ErrorMessage error={error} onRetry={() => refetchSchool(schoolId)} />
+      );
+    }
 
-export default withController(SchoolDetailController);
+    return (
+      <SchoolDetail
+        school={school}
+        isDeleting={isDeleting}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onBack={handleBack}
+      />
+    );
+  },
+  {
+    services: {
+      school: {
+        path: "schools.getById",
+        immediate: false,
+      },
+      deleteSchool: {
+        path: "schools.delete",
+        immediate: false,
+      },
+    },
+
+    init: ({ actions, props }) => {
+      if (props.schoolId && actions.school) {
+        actions.school(props.schoolId);
+      }
+    },
+  },
+);
