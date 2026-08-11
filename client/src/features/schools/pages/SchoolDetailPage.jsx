@@ -1,4 +1,4 @@
-import SchoolDetailController from "../controllers/SchoolDetailController";
+import { SchoolDetailController } from "../controllers/SchoolDetailController";
 import { PageHeader } from "@/components/Layout/PageHeader/PageHeader";
 import { generateBreadcrumbs } from "@/router/breadcrumbs";
 import { useParams } from "react-router-dom";
