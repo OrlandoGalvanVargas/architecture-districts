@@ -1,20 +1,35 @@
-import { Table, Button, Tag, Space, Select, Switch, Popconfirm } from "antd";
+import {
+  Table,
+  Button,
+  Tag,
+  Space,
+  Select,
+  Switch,
+  Popconfirm,
+  Input,
+} from "antd";
 import {
   PlusOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
-import { PageHeader } from "@/components/Layout/PageHeader/PageHeader";
 
 const { Option } = Select;
+const { Search } = Input;
 
 export const SchoolTable = ({
   schools = [],
   loading = false,
-  onView = null,
-  onEdit = null,
-  onDelete = null,
+  pagination,
+  onPageChange,
+  onFilterChange,
+  onView,
+  onEdit,
+  onDelete,
+  onCreate,
+  onRefresh,
 }) => {
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -92,16 +107,90 @@ export const SchoolTable = ({
   ];
 
   return (
-    <Table
-      dataSource={schools}
-      columns={columns}
-      rowKey="id"
-      loading={loading}
-      pagination={{
-        pageSize: 10,
-        showSizeChanger: true,
-        showTotal: (total) => `Total ${total} schools`,
-      }}
-    />
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <Space style={{ width: "100%", justifyContent: "space-between" }} wrap>
+          <Space wrap>
+            <Search
+              placeholder="Search by name or code..."
+              allowClear
+              style={{ width: 260 }}
+              onSearch={(value) =>
+                onFilterChange({ search: value || undefined })
+              }
+              disabled={loading}
+            />
+            <Select
+              placeholder="Level"
+              allowClear
+              style={{ width: 130 }}
+              onChange={(val) => onFilterChange({ level: val })}
+              disabled={loading}
+            >
+              {["Elementary", "Middle", "High", "K12", "Prek"].map((l) => (
+                <Option key={l} value={l}>
+                  {l}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="Type"
+              allowClear
+              style={{ width: 130 }}
+              onChange={(val) => onFilterChange({ type: val })}
+              disabled={loading}
+            >
+              {["Public", "Charter", "Magnet", "Alternative"].map((t) => (
+                <Option key={t} value={t}>
+                  {t}
+                </Option>
+              ))}
+            </Select>
+            <Switch
+              checkedChildren="Active"
+              unCheckedChildren="All"
+              defaultChecked
+              onChange={(checked) =>
+                onFilterChange({ isActive: checked || undefined })
+              }
+              disabled={loading}
+            />
+          </Space>
+
+          <Space>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={onRefresh}
+              disabled={loading}
+            >
+              Refresh
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={onCreate}
+              disabled={loading}
+            >
+              Create School
+            </Button>
+          </Space>
+        </Space>
+      </div>
+
+      <Table
+        dataSource={schools}
+        columns={columns}
+        rowKey="id"
+        loading={loading}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          onChange: onPageChange,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} schools`,
+        }}
+      />
+    </div>
   );
 };
