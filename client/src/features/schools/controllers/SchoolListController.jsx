@@ -3,22 +3,32 @@ import { SchoolTable } from "../components/SchoolTable";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner/LoadingSpinner";
 import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
 import { useEffect, useState } from "react";
-import { Input, Button, Space } from "antd";
-import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useNotification } from "@/contexts/Notification";
-import { useAppNavigation } from "../../../hooks/useAppNavigation";
+import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 export const SchoolListController = withController(
   ({ data, loading, errors, actions, setCallbacks }) => {
-    const schools = data.schools || [];
+    // PagedResult de C#
+    const responseData = data.schools || {
+      items: [],
+      totalCount: 0,
+      page: 1,
+      pageSize: 10,
+    };
+    const schools = responseData.items || [];
+
     const isLoadingSchools = loading.schools;
     const isDeletingSchool = loading.deleteSchool;
     const fetchError = errors.schools;
     const refetchSchools = actions.schools;
     const deleteSchool = actions.deleteSchool;
 
-    const [search, setSearch] = useState("");
-    const { Search } = Input;
+    // Estado inicial alineado con la Query de C#
+    const [filters, setFilters] = useState({
+      page: 1,
+      pageSize: 10,
+      isActive: true,
+    });
     const navigation = useAppNavigation();
     const notification = useNotification();
 
@@ -26,82 +36,61 @@ export const SchoolListController = withController(
       setCallbacks("deleteSchool", {
         onSuccess: () => {
           notification.showSuccess("School deleted successfully");
-          refetchSchools();
+          refetchSchools(filters);
         },
         onError: (error) => {
-          notification.showError(error);
+          notification.showError(error.message || "Error deleting school");
         },
       });
-    }, [setCallbacks, refetchSchools, notification]);
+    }, [setCallbacks, refetchSchools, notification, filters]);
 
-    const handleCreate = () => {
-      navigation.goToSchoolCreate();
+    const handleFilterChange = (newFilters) => {
+      const updatedFilters = { ...filters, ...newFilters, page: 1 };
+      setFilters(updatedFilters);
+      refetchSchools(updatedFilters);
     };
 
-    const handleView = (school) => {
-      navigation.goToSchoolDetail(school.id);
+    const handlePageChange = (page, pageSize) => {
+      const updatedFilters = { ...filters, page, pageSize };
+      setFilters(updatedFilters);
+      refetchSchools(updatedFilters);
     };
 
-    const handleEdit = (school) => {
-      navigation.goToSchoolEdit(school.id);
-    };
+    const handleCreate = () => navigation.goToSchoolCreate();
+    const handleView = (school) => navigation.goToSchoolDetail(school.id);
+    const handleEdit = (school) => navigation.goToSchoolEdit(school.id);
+    const handleDelete = (school) => deleteSchool(school.id);
 
-    const handleDelete = (school) => {
-      deleteSchool(school.id);
-    };
-
-    const filteredSchools = schools.filter(
-      (school) =>
-        school.name.toLowerCase().includes(search.toLowerCase()) ||
-        school.schoolCode.toLowerCase().includes(search.toLowerCase()),
-    );
-
-    if (isLoadingSchools) {
+    if (isLoadingSchools && !schools.length) {
       return <LoadingSpinner description="Loading schools..." />;
     }
 
     if (fetchError) {
-      return <ErrorMessage error={fetchError} onRetry={refetchSchools} />;
+      return (
+        <ErrorMessage
+          error={fetchError}
+          onRetry={() => refetchSchools(filters)}
+        />
+      );
     }
 
     return (
-      <div>
-        <div style={{ marginBottom: 16 }}>
-          <Space style={{ width: "100%", justifyContent: "space-between" }}>
-            <Search
-              placeholder="Search schools by name or code..."
-              allowClear
-              style={{ width: 400 }}
-              onChange={(e) => setSearch(e.target.value)}
-              disabled={isDeletingSchool}
-            />
-            <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={refetchSchools}
-                disabled={isDeletingSchool}
-              >
-                Refresh
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleCreate}
-                disabled={isDeletingSchool}
-              >
-                Create School
-              </Button>
-            </Space>
-          </Space>
-        </div>
-        <SchoolTable
-          schools={filteredSchools}
-          loading={isLoadingSchools}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      </div>
+      <SchoolTable
+        schools={schools}
+        loading={isLoadingSchools || isDeletingSchool}
+        pagination={{
+          current: responseData.page || filters.page,
+          pageSize: responseData.pageSize || filters.pageSize,
+          total: responseData.totalCount || 0,
+        }}
+        onPageChange={handlePageChange}
+        onFilterChange={handleFilterChange}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onCreate={handleCreate}
+        onRefresh={() => refetchSchools(filters)}
+      />
     );
   },
   {
