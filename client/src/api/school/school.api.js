@@ -5,7 +5,7 @@ const ENDPOINT = "/schools";
 export const schoolsApi = {
   getAll: async (params = {}) => {
     const response = await apiClient.get(ENDPOINT, { params });
-    return response.data.items;
+    return response.data;
   },
   getById: async (id) => {
     const response = await apiClient.get(`${ENDPOINT}/${id}`);
