@@ -24,6 +24,9 @@ using MediatR;
             [HttpPost("login")]
             public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
             {
+                if (!ModelState.IsValid)
+                    return ValidationProblem(ModelState);
+
                 var result = await _mediator.Send(new LoginCommand(request));
                 return Ok(result);
             }
@@ -50,12 +53,12 @@ using MediatR;
 
             [HttpPost("logout")]
             [Authorize]
-            public async Task<ActionResult> Logout([FromBody] LogoutRequestBoyd body)
+            public async Task<ActionResult> Logout([FromBody] LogoutRequestBody body)
             {
                 await _mediator.Send(new LogoutCommand(body.RefreshToken));
                 return NoContent();
             }
         }
 
-        public record LogoutRequestBoyd(string RefreshToken);
+        public record LogoutRequestBody(string RefreshToken);
     }

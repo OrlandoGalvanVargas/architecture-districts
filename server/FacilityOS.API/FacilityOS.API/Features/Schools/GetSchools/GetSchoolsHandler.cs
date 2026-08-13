@@ -22,11 +22,21 @@ namespace FacilityOS.API.Features.Schools.GetSchools
             if (request.DistrictId.HasValue)
                 query = query.Where(s => s.DistrictId == request.DistrictId.Value);
 
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var searchTerm = request.Search.Trim().ToLower();
+                query = query.Where(s => s.Name.ToLower().Contains(searchTerm) ||
+                                         s.SchoolCode.ToLower().Contains(searchTerm));
+            }
+
             if (!string.IsNullOrEmpty(request.Level) && Enum.TryParse<SchoolLevel>(request.Level, true, out var level))
                 query = query.Where(s => s.Level == level);
 
+            if (!string.IsNullOrEmpty(request.Type) && Enum.TryParse<SchoolType>(request.Type, true, out var type))
+                query = query.Where(s => s.Type == type);
+                
             if (request.IsActive.HasValue)
-                query = query.Where(s => s.isActive == request.IsActive.Value);
+                query = query.Where(s => s.IsActive == request.IsActive.Value);
 
             var totalCount = await query.CountAsync(cancellationToken);
 
@@ -47,8 +57,8 @@ namespace FacilityOS.API.Features.Schools.GetSchools
                     ZipCode = s.ZipCode,
                     Phone = s.Phone,
                     ContactEmail = s.ContactEmail,
-                    StudentCapacity = s.StudenCapacity,
-                    IsActive = s.isActive,
+                    StudentCapacity = s.StudentCapacity,
+                    IsActive = s.IsActive,
                     DistrictId = s.DistrictId,
                     DistrictName = s.District.Name,
                     CreatedAt = s.CreatedAt,

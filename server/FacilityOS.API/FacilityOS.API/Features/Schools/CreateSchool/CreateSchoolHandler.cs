@@ -41,13 +41,20 @@ namespace FacilityOS.API.Features.Schools.CreateSchool
                 ZipCode = req.ZipCode,
                 Phone = req.Phone,
                 ContactEmail = req.ContactEmail,
-                StudenCapacity = req.StudentCapacity,
+                StudentCapacity = req.StudentCapacity,
                 DistrictId = req.DistrictId,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Schools.Add(school);
             await _context.SaveChangesAsync(cancellationToken);
+
+            var district = await _context.Districts.FirstOrDefaultAsync(d => d.Id == req.DistrictId, cancellationToken);
+            if (district is not null)
+            {
+                district.SchoolCount = await _context.Schools.CountAsync(s => s.DistrictId == req.DistrictId, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
 
             await _context.Entry(school).Reference(s => s.District).LoadAsync(cancellationToken);
 
@@ -64,8 +71,8 @@ namespace FacilityOS.API.Features.Schools.CreateSchool
                 ZipCode = school.ZipCode,
                 Phone = school.Phone,
                 ContactEmail = school.ContactEmail,
-                StudentCapacity = school.StudenCapacity,
-                IsActive = school.isActive,
+                StudentCapacity = school.StudentCapacity,
+                IsActive = school.IsActive,
                 DistrictId = school.DistrictId,
                 DistrictName = school.District.Name,
                 CreatedAt = school.CreatedAt,

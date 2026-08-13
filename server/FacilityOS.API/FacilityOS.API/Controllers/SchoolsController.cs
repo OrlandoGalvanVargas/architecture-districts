@@ -7,12 +7,14 @@ using FacilityOS.API.Features.Schools.UpdateSchool;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FacilityOS.API.Controllers
 {
     [ApiController]
     [Route("/api/schools")]
     [Authorize]
+    [EnableRateLimiting("global")]
     public class SchoolsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -25,6 +27,7 @@ namespace FacilityOS.API.Controllers
         [HttpGet]
         public async Task<ActionResult<PagedResult<SchoolResponse>>> GetSchools(
             [FromQuery] int? districtId,
+            [FromQuery] string? search,
             [FromQuery] string? level,
             [FromQuery] string? type,
             [FromQuery] bool? isActive,
@@ -34,7 +37,7 @@ namespace FacilityOS.API.Controllers
             if (pageSize > 50) pageSize = 50;
 
             var result = await _mediator.Send(new GetSchoolsQuery(
-                districtId, level, type, isActive, page, pageSize));
+                districtId, search, level, type, isActive, page, pageSize));
             return Ok(result);
         }
 
@@ -49,15 +52,23 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<SchoolResponse>> Create([FromBody] CreateSchoolRequest request)
         {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
             var result = await _mediator.Send(new CreateSchoolCommand(request));
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<SchoolResponse>> Update(int id, [FromBody] UpdateSchoolRequest request)
         {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
             var result = await _mediator.Send(new UpdateSchoolCommand(id, request));
             if (result is null)
                 return NotFound();
@@ -66,7 +77,8 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delelete(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> Delete(int id)
         {
             var deleted = await _mediator.Send(new DeleteSchoolCommand(id));
             if (!deleted)

@@ -21,8 +21,17 @@ namespace FacilityOS.API.Features.Schools.DeleteSchool
             if (school is null)
                 return false;
 
+            var districtId = school.DistrictId;
             _context.Remove(school);
             await _context.SaveChangesAsync(cancellationToken);
+
+            var district = await _context.Districts.FirstOrDefaultAsync(d => d.Id == districtId, cancellationToken);
+            if (district is not null)
+            {
+                district.SchoolCount = await _context.Schools.CountAsync(s => s.DistrictId == districtId, cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+
             return true;
         }
     }

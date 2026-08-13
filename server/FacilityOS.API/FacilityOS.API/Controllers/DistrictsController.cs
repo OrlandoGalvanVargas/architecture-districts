@@ -5,13 +5,17 @@ using FacilityOS.API.Features.Districts.GetDistrictById;
 using FacilityOS.API.Features.Districts.GetDistricts;
 using FacilityOS.API.Features.Districts.UpdateDistrict;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace FacilityOS.API.Controllers
 {
 
     [ApiController]
     [Route("api/districts")]
+    [Authorize]
+    [EnableRateLimiting("global")]
     public class DistrictsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -40,6 +44,7 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<DistrictResponse>> Create([FromBody] CreateDistrictRequest request)
         {
             var result = await _mediator.Send(new CreateDistrictCommand(request));
@@ -48,6 +53,7 @@ namespace FacilityOS.API.Controllers
 
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<DistrictResponse>> Update(int id, [FromBody] UpdateDistrictRequest request)
         {
             var result = await _mediator.Send(new UpdateDistrictCommand(id, request));
@@ -59,6 +65,7 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             var deleted = await _mediator.Send(new DeleteDistrictCommand(id));

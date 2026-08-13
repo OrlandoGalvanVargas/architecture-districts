@@ -32,8 +32,8 @@ namespace FacilityOS.API.Models
         [MaxLength(100)]
         [EmailAddress]
         public string? ContactEmail { get; set; }
-        public int StudenCapacity { get; set; }
-        public bool isActive { get; set; } = true;
+        public int StudentCapacity { get; set; }
+        public bool IsActive { get; set; } = true;
         public int DistrictId { get; set; }
         public District District { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -30,19 +30,38 @@ namespace FacilityOS.API.Features.Schools.UpdateSchool
             if (codeToken)
                 throw new InvalidOperationException($"A school with the code '{req.SchoolCode}' already exists");
 
+            var previousDistrictId = school.DistrictId;
+
             school.Name = req.Name;
             school.SchoolCode = req.SchoolCode;
+            school.Level = req.Level;
+            school.Type = req.Type;
             school.Address = req.Address;
             school.City = req.City;
             school.State = req.State;
             school.ZipCode = req.ZipCode;
             school.Phone = req.Phone;
             school.ContactEmail = req.ContactEmail;
-            school.StudenCapacity = req.StudentCapacity;
-            school.isActive = req.IsActive;
+            school.StudentCapacity = req.StudentCapacity;
+            school.IsActive = req.IsActive;
+            school.DistrictId = req.DistrictId;
             school.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            if (previousDistrictId != req.DistrictId)
+            {
+                var previousDistrict = await _context.Districts.FirstOrDefaultAsync(d => d.Id == previousDistrictId, cancellationToken);
+                var newDistrict = await _context.Districts.FirstOrDefaultAsync(d => d.Id == req.DistrictId, cancellationToken);
+
+                if (previousDistrict is not null)
+                    previousDistrict.SchoolCount = await _context.Schools.CountAsync(s => s.DistrictId == previousDistrictId && s.Id != school.Id, cancellationToken);
+
+                if (newDistrict is not null)
+                    newDistrict.SchoolCount = await _context.Schools.CountAsync(s => s.DistrictId == req.DistrictId, cancellationToken);
+
+                await _context.SaveChangesAsync(cancellationToken);
+            }
 
             return new SchoolResponse
             {
@@ -57,8 +76,8 @@ namespace FacilityOS.API.Features.Schools.UpdateSchool
                 ZipCode = school.ZipCode,
                 Phone = school.Phone,
                 ContactEmail = school.ContactEmail,
-                StudentCapacity = school.StudenCapacity,
-                IsActive = school.isActive,
+                StudentCapacity = school.StudentCapacity,
+                IsActive = school.IsActive,
                 DistrictId = school.DistrictId,
                 DistrictName = school.District.Name,
                 CreatedAt = school.CreatedAt,

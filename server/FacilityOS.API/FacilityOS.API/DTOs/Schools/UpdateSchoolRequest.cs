@@ -34,6 +34,8 @@ namespace FacilityOS.API.DTOs.Schools
         public string? ContactEmail { get; set; }
         [Range(1, 10000)]
         public int StudentCapacity { get; set; }
+        [Required(ErrorMessage = "DistrictId is required")]
+        public int DistrictId { get; set; }
         public bool IsActive { get; set; }
     }
 }
