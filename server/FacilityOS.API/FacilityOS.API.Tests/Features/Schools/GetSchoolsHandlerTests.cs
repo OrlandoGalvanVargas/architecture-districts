@@ -26,9 +26,9 @@ namespace FacilityOS.API.Tests.Features.Schools
             await context.SaveChangesAsync();
 
             context.Schools.AddRange(
-                new School { Name = "Alpha Elementary", SchoolCode = "AE001", Level = SchoolLevel.Elementary, Type = SchoolType.Public, Address = "1 St", City = "LA", State = "CA", ZipCode = "90001", StudenCapacity = 300, DistrictId = d1.Id, isActive = true },
-                new School { Name = "Beta High", SchoolCode = "BH001", Level = SchoolLevel.High, Type = SchoolType.Charter, Address = "2 St", City = "LA", State = "CA", ZipCode = "90002", StudenCapacity = 800, DistrictId = d1.Id, isActive = true },
-                new School { Name = "Gamma Middle", SchoolCode = "GM001", Level = SchoolLevel.Middle, Type = SchoolType.Public, Address = "3 St", City = "NYC", State = "NY", ZipCode = "10001", StudenCapacity = 500, DistrictId = d2.Id, isActive = false }
+                new School { Name = "Alpha Elementary", SchoolCode = "AE001", Level = SchoolLevel.Elementary, Type = SchoolType.Public, Address = "1 St", City = "LA", State = "CA", ZipCode = "90001", StudentCapacity = 300, DistrictId = d1.Id, IsActive = true },
+                new School { Name = "Beta High", SchoolCode = "BH001", Level = SchoolLevel.High, Type = SchoolType.Charter, Address = "2 St", City = "LA", State = "CA", ZipCode = "90002", StudentCapacity = 800, DistrictId = d1.Id, IsActive = true },
+                new School { Name = "Gamma Middle", SchoolCode = "GM001", Level = SchoolLevel.Middle, Type = SchoolType.Public, Address = "3 St", City = "NYC", State = "NY", ZipCode = "10001", StudentCapacity = 500, DistrictId = d2.Id, IsActive = false }
             );
             await context.SaveChangesAsync();
             return (d1, d2);

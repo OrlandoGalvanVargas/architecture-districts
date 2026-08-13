@@ -110,7 +110,7 @@ namespace FacilityOS.API.Tests.Features.Schools
                 City = "Los Angeles",
                 State = "CA",
                 ZipCode = "90014",
-                StudenCapacity = 800,
+                StudentCapacity = 800,
                 DistrictId = district.Id
             });
             await context.SaveChangesAsync();
