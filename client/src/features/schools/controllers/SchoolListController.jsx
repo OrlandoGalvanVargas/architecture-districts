@@ -8,7 +8,6 @@ import { useAppNavigation } from "@/hooks/useAppNavigation";
 
 export const SchoolListController = withController(
   ({ data, loading, errors, actions, setCallbacks }) => {
-    // PagedResult de C#
     const responseData = data.schools || {
       items: [],
       totalCount: 0,
@@ -23,12 +22,15 @@ export const SchoolListController = withController(
     const refetchSchools = actions.schools;
     const deleteSchool = actions.deleteSchool;
 
-    // Estado inicial alineado con la Query de C#
     const [filters, setFilters] = useState({
       page: 1,
       pageSize: 10,
       isActive: true,
+      search: undefined,
+      level: undefined,
+      type: undefined,
     });
+
     const navigation = useAppNavigation();
     const notification = useNotification();
 
@@ -78,6 +80,7 @@ export const SchoolListController = withController(
       <SchoolTable
         schools={schools}
         loading={isLoadingSchools || isDeletingSchool}
+        filters={filters}
         pagination={{
           current: responseData.page || filters.page,
           pageSize: responseData.pageSize || filters.pageSize,
