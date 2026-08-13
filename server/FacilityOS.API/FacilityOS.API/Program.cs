@@ -5,11 +5,21 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FacilityOS.API.Services;
 using FacilityOS.API.Common.Exceptions;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FacilityOS.API.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Servicios base
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateSchoolRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateSchoolRequestValidator>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -23,6 +33,17 @@ builder.Services.AddMediatR(cfg =>
 
 // 3.5 Servicios de la aplicacion (Injeccion de Dependencias)
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHealthChecks();
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("global", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 100;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+});
 
 // 4. Autenticación JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -63,10 +84,12 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
+app.UseRateLimiter();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();
