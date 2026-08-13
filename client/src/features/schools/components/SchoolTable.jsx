@@ -22,6 +22,7 @@ const { Search } = Input;
 export const SchoolTable = ({
   schools = [],
   loading = false,
+  filters = {},
   pagination,
   onPageChange,
   onFilterChange,
@@ -57,6 +58,7 @@ export const SchoolTable = ({
       title: "Status",
       dataIndex: "isActive",
       key: "isActive",
+      sorter: (a, b) => (a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1),
       render: (active) => (
         <Tag color={active ? "green" : "red"}>
           {active ? "Active" : "Inactive"}
@@ -115,8 +117,12 @@ export const SchoolTable = ({
               placeholder="Search by name or code..."
               allowClear
               style={{ width: 260 }}
+              value={filters.search}
+              onChange={(e) => {
+                if (!e.target.value) onFilterChange({ search: undefined });
+              }}
               onSearch={(value) =>
-                onFilterChange({ search: value || undefined })
+                onFilterChange({ search: value.trim() || undefined })
               }
               disabled={loading}
             />
@@ -124,7 +130,8 @@ export const SchoolTable = ({
               placeholder="Level"
               allowClear
               style={{ width: 130 }}
-              onChange={(val) => onFilterChange({ level: val })}
+              value={filters.level}
+              onChange={(val) => onFilterChange({ level: val || undefined })}
               disabled={loading}
             >
               {["Elementary", "Middle", "High", "K12", "Prek"].map((l) => (
@@ -137,7 +144,8 @@ export const SchoolTable = ({
               placeholder="Type"
               allowClear
               style={{ width: 130 }}
-              onChange={(val) => onFilterChange({ type: val })}
+              value={filters.type}
+              onChange={(val) => onFilterChange({ type: val || undefined })}
               disabled={loading}
             >
               {["Public", "Charter", "Magnet", "Alternative"].map((t) => (
@@ -149,9 +157,9 @@ export const SchoolTable = ({
             <Switch
               checkedChildren="Active"
               unCheckedChildren="All"
-              defaultChecked
+              checked={filters.isActive === true}
               onChange={(checked) =>
-                onFilterChange({ isActive: checked || undefined })
+                onFilterChange({ isActive: checked ? true : undefined })
               }
               disabled={loading}
             />
