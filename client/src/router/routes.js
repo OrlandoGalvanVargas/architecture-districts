@@ -4,6 +4,23 @@ export const ROUTES_CONFIG = {
     title: "Home",
   },
 
+  auth: {
+    path: "/auth",
+    title: "Auth",
+
+    children: {
+      login: {
+        pattern: "login",
+        buildPath: () => "login",
+      },
+
+      register: {
+        pattern: "register",
+        buildPath: () => "register",
+      },
+    },
+  },
+
   districts: {
     path: "/districts",
     title: "Districts",
