@@ -3,6 +3,11 @@ import { ROUTES_CONFIG } from "./routes";
 export const RoutePaths = {
   home: () => ROUTES_CONFIG.home.path,
 
+  auth: {
+    login: () =>
+      `${ROUTES_CONFIG.auth.path}/${ROUTES_CONFIG.auth.children.login.buildPath()}`,
+  },
+
   districts: {
     list: () => ROUTES_CONFIG.districts.path,
 
