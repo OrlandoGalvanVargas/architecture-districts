@@ -36,13 +36,17 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHealthChecks();
 
-// 5. Rate Limiting
+// 5. Rate Limiting - desde configuración
+var rateLimitConfig = builder.Configuration.GetSection("RateLimiting");
+int permitLimit = rateLimitConfig.GetValue<int>("PermitLimit", 100);
+int windowMinutes = rateLimitConfig.GetValue<int>("WindowMinutes", 1);
+
 builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter("global", limiterOptions =>
     {
-        limiterOptions.PermitLimit = 100;
-        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.PermitLimit = permitLimit;
+        limiterOptions.Window = TimeSpan.FromMinutes(windowMinutes);
         limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         limiterOptions.QueueLimit = 0;
     });
@@ -58,6 +62,35 @@ if (string.IsNullOrWhiteSpace(jwtSettings.Key))
 
 if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("DefaultConnection")))
     throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
+
+// Validación ambiente-specific
+if (builder.Environment.IsProduction())
+{
+    // Producción: EXIGIR todas las variables críticas
+    if (string.IsNullOrWhiteSpace(jwtSettings.Issuer))
+        throw new InvalidOperationException("Jwt:Issuer is required in Production. Set via environment variables.");
+    
+    if (string.IsNullOrWhiteSpace(jwtSettings.Audience))
+        throw new InvalidOperationException("Jwt:Audience is required in Production. Set via environment variables.");
+    
+    // Verificar que CORS esté bien configurado en producción
+    var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+    if (corsOrigins == null || corsOrigins.Length == 0)
+        throw new InvalidOperationException("Cors:AllowedOrigins is required in Production.");
+    
+    // Verificar que el RateLimiting esté configurado
+    if (permitLimit <= 0)
+        throw new InvalidOperationException("RateLimiting:PermitLimit must be greater than 0 in Production.");
+}
+else if (builder.Environment.IsDevelopment())
+{
+    // Desarrollo: alertar pero no fallar (más permisivo para desarrollo local)
+    if (string.IsNullOrWhiteSpace(jwtSettings.Issuer))
+        Console.WriteLine("⚠️  WARNING (DEV): Jwt:Issuer is empty. Set via user-secrets for proper JWT generation.");
+    
+    if (string.IsNullOrWhiteSpace(jwtSettings.Audience))
+        Console.WriteLine("⚠️  WARNING (DEV): Jwt:Audience is empty. Set via user-secrets for proper JWT generation.");
+}
 
 // 7. Autenticacion JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -77,11 +110,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     }   );
 builder.Services.AddAuthorization();
 
-// 8. CORS
+// 8. CORS - desde configuración
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:3000" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+        policy.WithOrigins(corsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
@@ -89,7 +125,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// 6. Pipeline HTTP
+// 9. Pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
