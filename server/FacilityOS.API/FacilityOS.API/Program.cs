@@ -10,6 +10,7 @@ using System.Threading.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using FacilityOS.API.Validators;
+using FacilityOS.API.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,13 +28,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 3. MediatR — escanea automáticamente todos los Handlers en el ensamblado
+// 3. MediatR 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-// 3.5 Servicios de la aplicacion (Injeccion de Dependencias)
+// 4. Servicios de la aplicacion
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHealthChecks();
+
+// 5. Rate Limiting
 builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter("global", limiterOptions =>
@@ -45,8 +48,18 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-// 4. Autenticación JWT
-var jwtSettings = builder.Configuration.GetSection("Jwt");
+// 6. JWT Settings - binding tipado
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
+
+// Validacion de startup - falla rapido si falta una variable critica
+if (string.IsNullOrWhiteSpace(jwtSettings.Key))
+    throw new InvalidOperationException("Jwt:Key is not configured. Set it via user-secrets (dev) or environment variables (prod).");
+
+if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("DefaultConnection")))
+    throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
+
+// 7. Autenticacion JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -56,15 +69,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+                Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
     }   );
 builder.Services.AddAuthorization();
 
-// 5. CORS — necesario para que React (puerto distinto) pueda llamar a la API
+// 8. CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>

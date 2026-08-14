@@ -1,4 +1,6 @@
 ﻿using FacilityOS.API.Models;
+using FacilityOS.API.Settings;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -9,18 +11,19 @@ namespace FacilityOS.API.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IConfiguration _config;
+        private readonly JwtSettings _jwtSettings;
+        private readonly int _bcryptWorkFactor;
 
-        public AuthService(IConfiguration config)
+        public AuthService(IOptions<JwtSettings> jwtSettings, IConfiguration config)
         {
-            _config = config;
+            _jwtSettings = jwtSettings.Value;
+            _bcryptWorkFactor = config.GetValue<int>("BCrypt:WorkFactor", 12);
         }
 
         public string GenerateAccessToken(User user)
         {
-            var jwtSettings = _config.GetSection("Jwt");
             var key = new
-                SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
+                SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
             var credentials = new SigningCredentials(key,
                 SecurityAlgorithms.HmacSha256);
@@ -34,10 +37,10 @@ namespace FacilityOS.API.Services
             };
 
             var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes),
                 signingCredentials: credentials
                 );
 
@@ -54,9 +57,8 @@ namespace FacilityOS.API.Services
 
         public bool ValidateToken(string token)
         {
-            var jwtSettings = _config.GetSection("Jwt");
             var key = new
-                SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
+                SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
             try
             {
@@ -66,8 +68,8 @@ namespace FacilityOS.API.Services
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["Issuer"],
-                    ValidAudience = jwtSettings["Audience"],
+                    ValidIssuer = _jwtSettings.Issuer,
+                    ValidAudience = _jwtSettings.Audience,
                     IssuerSigningKey = key
                 }, out _);
 
