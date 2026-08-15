@@ -72,17 +72,6 @@ namespace FacilityOS.API.Data
 
         public void SeedData(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Name = "Admin user",
-                    Email = "admin@livefree.com",
-                    PasswordHash = "$2a$11$mC3I0b.rD21E1NfFfKxWeO7B76MhW6o7wsh.D7M6G59RBy5H67.2i",
-                    Role = "Admin",
-                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-                }
-                );
             modelBuilder.Entity<District>().HasData(
            new District
            {
