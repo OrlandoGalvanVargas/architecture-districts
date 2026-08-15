@@ -36,25 +36,16 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHealthChecks();
 
-// 5. Rate Limiting - desde configuración
+// 5. Carga de configuraciones tipadas
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>() ?? new JwtSettings();
+
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? Array.Empty<string>();
+
 var rateLimitConfig = builder.Configuration.GetSection("RateLimiting");
 int permitLimit = rateLimitConfig.GetValue<int>("PermitLimit", 100);
 int windowMinutes = rateLimitConfig.GetValue<int>("WindowMinutes", 1);
-
-builder.Services.AddRateLimiter(options =>
-{
-    options.AddFixedWindowLimiter("global", limiterOptions =>
-    {
-        limiterOptions.PermitLimit = permitLimit;
-        limiterOptions.Window = TimeSpan.FromMinutes(windowMinutes);
-        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        limiterOptions.QueueLimit = 0;
-    });
-});
-
-// 6. JWT Settings - binding tipado
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
 
 // Validacion de startup - falla rapido si falta una variable critica
 if (string.IsNullOrWhiteSpace(jwtSettings.Key))
@@ -74,8 +65,7 @@ if (builder.Environment.IsProduction())
         throw new InvalidOperationException("Jwt:Audience is required in Production. Set via environment variables.");
     
     // Verificar que CORS esté bien configurado en producción
-    var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-    if (corsOrigins == null || corsOrigins.Length == 0)
+    if (corsOrigins.Length == 0)
         throw new InvalidOperationException("Cors:AllowedOrigins is required in Production.");
     
     // Verificar que el RateLimiting esté configurado
@@ -92,7 +82,19 @@ else if (builder.Environment.IsDevelopment())
         Console.WriteLine("⚠️  WARNING (DEV): Jwt:Audience is empty. Set via user-secrets for proper JWT generation.");
 }
 
-// 7. Autenticacion JWT
+// 7. Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("global", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = permitLimit;
+        limiterOptions.Window = TimeSpan.FromMinutes(windowMinutes);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+});
+
+// 8. Autenticación JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -110,10 +112,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     }   );
 builder.Services.AddAuthorization();
 
-// 8. CORS - desde configuración
-var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? new[] { "http://localhost:3000" };
-
+// 9. CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -125,7 +124,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// 9. Pipeline HTTP
+// 10. Pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -140,5 +139,22 @@ app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        await DbInitializer.SeedAsync(context, config, logger);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred during database initialization.");
+        throw;
+    }
+}
 
 app.Run();
