@@ -21,6 +21,11 @@ namespace FacilityOS.API.Models
 
         [MaxLength(50)]
         public string Role { get; set; } = "User"; 
+        
+        public int? EntityId { get; set; }
+
+        [MaxLength(20)]
+        public string? EntityType { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
