@@ -1,6 +1,7 @@
 ﻿using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Schools;
 using FacilityOS.API.Models;
+using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,18 +10,34 @@ namespace FacilityOS.API.Features.Schools.GetSchools
     public class GetSchoolsHandler : IRequestHandler<GetSchoolsQuery, PagedResult<SchoolResponse>>
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public GetSchoolsHandler(ApplicationDbContext context)
+        public GetSchoolsHandler(ApplicationDbContext context, ICurrentUserService currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public async Task<PagedResult<SchoolResponse>> Handle(GetSchoolsQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Schools.Include(s => s.District).AsQueryable();
 
-            if (request.DistrictId.HasValue)
+            // Regla Multitenant / Contextual
+            if (_currentUser.IsDistrictAdmin)
+            {
+                // Forzar a filtrar solo por el distrito asignado al usuario
+                query = query.Where(s => s.DistrictId == _currentUser.EntityId);
+            }
+            else if (_currentUser.IsSchoolAdmin)
+            {
+                // Forzar a filtrar solo por su escuela asignada
+                query = query.Where(s => s.Id == _currentUser.EntityId);
+            }
+            else if (request.DistrictId.HasValue && _currentUser.IsAdmin)
+            {
+                // Admin global filtrando voluntariamente por un distrito
                 query = query.Where(s => s.DistrictId == request.DistrictId.Value);
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Search))
             {

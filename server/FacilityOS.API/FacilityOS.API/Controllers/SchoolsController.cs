@@ -25,6 +25,7 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "SchoolAdminOrAbove")]
         public async Task<ActionResult<PagedResult<SchoolResponse>>> GetSchools(
             [FromQuery] int? districtId,
             [FromQuery] string? search,
@@ -42,6 +43,7 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "SchoolAdminOrAbove")]
         public async Task<ActionResult<SchoolResponse>> GetById(int id)
         {
             var result = await _mediator.Send(new GetSchoolByIdQuery(id));
@@ -52,7 +54,7 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "DistrictAdminOrAbove")]
         public async Task<ActionResult<SchoolResponse>> Create([FromBody] CreateSchoolRequest request)
         {
             if (!ModelState.IsValid)
@@ -63,7 +65,7 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "DistrictAdminOrAbove")]
         public async Task<ActionResult<SchoolResponse>> Update(int id, [FromBody] UpdateSchoolRequest request)
         {
             if (!ModelState.IsValid)
@@ -77,7 +79,7 @@ namespace FacilityOS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult> Delete(int id)
         {
             var deleted = await _mediator.Send(new DeleteSchoolCommand(id));
