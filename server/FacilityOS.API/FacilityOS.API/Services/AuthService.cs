@@ -33,8 +33,12 @@ namespace FacilityOS.API.Services
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Name, user.Name),
                 new(ClaimTypes.Email, user.Email),
-                new(ClaimTypes.Role, user.Role)
+                new(ClaimTypes.Role, user.Role),
+                new("entity_type", user.EntityType.ToString()),
             };
+
+            if (user.EntityId.HasValue)
+                claims.Add(new Claim("entity_id", user.EntityId.Value.ToString()));
 
             var token = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,

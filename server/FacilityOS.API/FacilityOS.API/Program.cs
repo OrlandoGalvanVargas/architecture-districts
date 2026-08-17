@@ -110,8 +110,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
     }   );
-builder.Services.AddAuthorization();
+// Registrar contexto HTTP y Servicio del Usuario Actual
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+// Políticas de Autorización
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+
+    options.AddPolicy("DistrictAdminOrAbove", policy =>
+        policy.RequireRole("Admin", "DistrictAdmin"));
+
+    options.AddPolicy("SchoolAdminOrAbove", policy =>
+        policy.RequireRole("Admin", "DistrictAdmin", "SchoolAdmin"));
+});
 // 9. CORS
 builder.Services.AddCors(options =>
 {
