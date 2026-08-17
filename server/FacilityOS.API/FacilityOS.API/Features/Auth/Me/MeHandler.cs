@@ -26,7 +26,9 @@ namespace FacilityOS.API.Features.Auth.Me
                 Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
-                Role = user.Role
+                Role = user.Role,
+                EntityId = user.EntityId,
+                EntityType = user.EntityType    
             };
         }
     }
