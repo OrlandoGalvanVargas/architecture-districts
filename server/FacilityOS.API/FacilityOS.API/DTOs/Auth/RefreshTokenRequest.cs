@@ -1,12 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace FacilityOS.API.DTOs.Auth;
 
-namespace FacilityOS.API.DTOs.Auth
+public class RefreshTokenRequest
 {
-    public class RefreshTokenRequest
-    {
-        [Required]
-        public string Token { get; set; } = string.Empty;
-        [Required]
-        public string RefreshToken { get; set; } = string.Empty;
-    }
+    public string Token { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
 }

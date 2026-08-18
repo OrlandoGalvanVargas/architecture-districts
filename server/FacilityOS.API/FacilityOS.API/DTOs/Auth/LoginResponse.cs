@@ -1,22 +1,18 @@
-﻿using FacilityOS.API.Models;
+﻿namespace FacilityOS.API.DTOs.Auth;
 
-namespace FacilityOS.API.DTOs.Auth
+public class LoginResponse
 {
-    public class LoginResponse
-    {
-        public string AccessToken { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
-        public UserDto User { get; set; } = null!;
-    }
+    public string AccessToken { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
+    public UserDto User { get; set; } = null!;
+}
 
-    public class UserDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
-        public int? EntityId { get; set; }
-        public UserEntityType EntityType { get; set; }
-    }
-
+public class UserDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
+    public int? EntityId { get; set; }
+    public string EntityType { get; set; } = string.Empty;
 }
