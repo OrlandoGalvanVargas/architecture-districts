@@ -2,6 +2,7 @@
 using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Schools;
 using FacilityOS.API.Models;
+using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,15 +11,20 @@ namespace FacilityOS.API.Features.Schools.CreateSchool;
 public class CreateSchoolHandler : IRequestHandler<CreateSchoolCommand, SchoolResponse>
 {
     private readonly ApplicationDbContext _context;
+    private readonly IResourceAuthorizationService _authService;
 
-    public CreateSchoolHandler(ApplicationDbContext context)
+    public CreateSchoolHandler(ApplicationDbContext context, IResourceAuthorizationService authService)
     {
         _context = context;
+        _authService = authService;
     }
 
     public async Task<SchoolResponse> Handle(CreateSchoolCommand command, CancellationToken cancellationToken)
     {
         var req = command.Request;
+
+        if (!_authService.CanCreateSchoolInDistrict(req.DistrictId))
+            throw new ForbiddenException("You do not have permission to create a school in this district.");
 
         var districtExists = await _context.Districts.AnyAsync(d => d.Id == req.DistrictId, cancellationToken);
         if (!districtExists)

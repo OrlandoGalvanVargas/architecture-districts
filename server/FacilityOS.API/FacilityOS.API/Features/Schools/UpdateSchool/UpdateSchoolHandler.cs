@@ -2,6 +2,7 @@
 using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Schools;
 using FacilityOS.API.Models;
+using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,12 @@ namespace FacilityOS.API.Features.Schools.UpdateSchool;
 public class UpdateSchoolHandler : IRequestHandler<UpdateSchoolCommand, SchoolResponse>
 {
     private readonly ApplicationDbContext _context;
+    private readonly IResourceAuthorizationService _authService;
 
-    public UpdateSchoolHandler(ApplicationDbContext context)
+    public UpdateSchoolHandler(ApplicationDbContext context, IResourceAuthorizationService authService)
     {
         _context = context;
+        _authService = authService;
     }
 
     public async Task<SchoolResponse> Handle(UpdateSchoolCommand command, CancellationToken cancellationToken)
@@ -25,18 +28,25 @@ public class UpdateSchoolHandler : IRequestHandler<UpdateSchoolCommand, SchoolRe
         if (school is null)
             throw new NotFoundException(nameof(School), command.Id);
 
-        var req = command.Request;
+        var canManage = await _authService.CanManageSchoolAsync(command.Id, cancellationToken);
+        if (!canManage)
+            throw new ForbiddenException("You do not have permission to modify this school.");
 
-        var codeTaken = await _context.Schools.AnyAsync(s => s.SchoolCode == req.SchoolCode && s.Id != command.Id, cancellationToken);
-        if (codeTaken)
-            throw new InvalidOperationException($"A school with the code '{req.SchoolCode}' already exists.");
+        var req = command.Request;
 
         if (school.DistrictId != req.DistrictId)
         {
+            if (!_authService.CanCreateSchoolInDistrict(req.DistrictId))
+                throw new ForbiddenException("You do not have permission to move a school to the target district.");
+
             var targetDistrictExists = await _context.Districts.AnyAsync(d => d.Id == req.DistrictId, cancellationToken);
             if (!targetDistrictExists)
                 throw new NotFoundException(nameof(District), req.DistrictId);
         }
+
+        var codeTaken = await _context.Schools.AnyAsync(s => s.SchoolCode == req.SchoolCode && s.Id != command.Id, cancellationToken);
+        if (codeTaken)
+            throw new InvalidOperationException($"A school with the code '{req.SchoolCode}' already exists.");
 
         school.Name = req.Name;
         school.SchoolCode = req.SchoolCode;
