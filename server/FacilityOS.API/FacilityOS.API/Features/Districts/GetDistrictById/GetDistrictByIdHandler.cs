@@ -21,30 +21,32 @@ public class GetDistrictByIdHandler : IRequestHandler<GetDistrictByIdQuery, Dist
 
     public async Task<DistrictResponse> Handle(GetDistrictByIdQuery request, CancellationToken cancellationToken)
     {
-        var district = await _context.Districts
-            .AsNoTracking()
-            .FirstOrDefaultAsync(d => d.Id == request.Id, cancellationToken);
-
-        if (district is null)
-            throw new NotFoundException(nameof(District), request.Id);
-
         var canAccess = await _authService.CanAccessDistrictAsync(request.Id, cancellationToken);
         if (!canAccess)
             throw new ForbiddenException("You do not have access to view this district.");
 
-        return new DistrictResponse
-        {
-            Id = district.Id,
-            Name = district.Name,
-            Code = district.Code,
-            State = district.State,
-            City = district.City,
-            ZipCode = district.ZipCode,
-            Address = district.Address,
-            Description = district.Description,
-            SchoolCount = district.Schools.Count(),
-            CreatedAt = district.CreatedAt,
-            UpdatedAt = district.UpdatedAt
-        };
+        var response = await _context.Districts
+                    .AsNoTracking()
+                    .Where(d => d.Id == request.Id)
+                    .Select(d => new DistrictResponse
+                    {
+                        Id = d.Id,
+                        Name = d.Name,
+                        Code = d.Code,
+                        State = d.State,
+                        City = d.City,
+                        ZipCode = d.ZipCode,
+                        Address = d.Address,
+                        Description = d.Description,
+                        SchoolCount = d.Schools.Count(),
+                        CreatedAt = d.CreatedAt,
+                        UpdatedAt = d.UpdatedAt
+                    })
+                    .FirstOrDefaultAsync(cancellationToken);
+
+        if (response is null)
+            throw new NotFoundException(nameof(District), request.Id);
+
+        return response;
     }
 }

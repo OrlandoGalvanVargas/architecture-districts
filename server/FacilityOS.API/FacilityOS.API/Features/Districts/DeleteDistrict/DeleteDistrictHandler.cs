@@ -1,6 +1,7 @@
 ﻿using FacilityOS.API.Common.Exceptions;
 using FacilityOS.API.Data;
 using FacilityOS.API.Models;
+using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,14 +10,19 @@ namespace FacilityOS.API.Features.Districts.DeleteDistrict;
 public class DeleteDistrictHandler : IRequestHandler<DeleteDistrictCommand, bool>
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
-    public DeleteDistrictHandler(ApplicationDbContext context)
+    public DeleteDistrictHandler(ApplicationDbContext context, ICurrentUserService currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<bool> Handle(DeleteDistrictCommand command, CancellationToken cancellationToken)
     {
+        if (!_currentUser.IsAdmin)
+            throw new ForbiddenException("Only global administrators can delete districts.");
+
         var district = await _context.Districts.FirstOrDefaultAsync(d => d.Id == command.Id, cancellationToken);
 
         if (district is null)

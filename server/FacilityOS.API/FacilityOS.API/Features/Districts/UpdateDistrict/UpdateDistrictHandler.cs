@@ -47,6 +47,8 @@ public class UpdateDistrictHandler : IRequestHandler<UpdateDistrictCommand, Dist
 
         await _context.SaveChangesAsync(cancellationToken);
 
+        var schoolCount = await _context.Schools.CountAsync(s => s.DistrictId == command.Id, cancellationToken);
+
         return new DistrictResponse
         {
             Id = district.Id,
@@ -57,7 +59,7 @@ public class UpdateDistrictHandler : IRequestHandler<UpdateDistrictCommand, Dist
             ZipCode = district.ZipCode,
             Address = district.Address,
             Description = district.Description,
-            SchoolCount = district.Schools.Count,
+            SchoolCount = schoolCount,
             CreatedAt = district.CreatedAt,
             UpdatedAt = district.UpdatedAt
         };

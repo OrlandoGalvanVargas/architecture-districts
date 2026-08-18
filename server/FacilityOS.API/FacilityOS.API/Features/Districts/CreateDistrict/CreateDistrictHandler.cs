@@ -1,6 +1,8 @@
-﻿using FacilityOS.API.Data;
+﻿using FacilityOS.API.Common.Exceptions;
+using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Districts;
 using FacilityOS.API.Models;
+using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,14 +11,19 @@ namespace FacilityOS.API.Features.Districts.CreateDistrict;
 public class CreateDistrictHandler : IRequestHandler<CreateDistrictCommand, DistrictResponse>
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
-    public CreateDistrictHandler(ApplicationDbContext context)
+    public CreateDistrictHandler(ApplicationDbContext context, ICurrentUserService currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<DistrictResponse> Handle(CreateDistrictCommand command, CancellationToken cancellationToken)
     {
+        if (!_currentUser.IsAdmin)
+            throw new ForbiddenException("Only global administrators can create new districts.");
+
         var req = command.Request;
 
         var exists = await _context.Districts
