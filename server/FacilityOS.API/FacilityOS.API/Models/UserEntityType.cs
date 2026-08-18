@@ -2,8 +2,8 @@
 {
     public enum UserEntityType
     {
-        Global = 0,   // Súper Administrador o roles globales
-        District = 1, // DistrictAdmin (EntityId = DistrictId)
-        School = 2    // SchoolAdmin (EntityId = SchoolId)
+        Global = 0,   
+        District = 1,
+        School = 2 
     }
 }
