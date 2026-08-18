@@ -6,10 +6,12 @@ namespace FacilityOS.API.Common.Exceptions
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next)
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -18,18 +20,35 @@ namespace FacilityOS.API.Common.Exceptions
             {
                 await _next(context);
             }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning("Resource not found: {Message}", ex.Message);
+                await WriteError(context, HttpStatusCode.NotFound, ex.Message);
+            }
+            catch (ForbiddenException ex)
+            {
+                _logger.LogWarning("Forbidden access attempt: {Message}", ex.Message);
+                await WriteError(context, HttpStatusCode.Forbidden, ex.Message);
+            }
+            catch (ConflictException ex)
+            {
+                _logger.LogWarning("Conflict occurred: {Message}", ex.Message);
+                await WriteError(context, HttpStatusCode.Conflict, ex.Message);
+            }
             catch (UnauthorizedAccessException ex)
             {
+                _logger.LogWarning("Unauthorized access attempt: {Message}", ex.Message);
                 await WriteError(context, HttpStatusCode.Unauthorized, ex.Message);
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogWarning("Business rule conflict: {Message}", ex.Message);
                 await WriteError(context, HttpStatusCode.Conflict, ex.Message);
             }
             catch (Exception ex)
             {
-                await WriteError(context, HttpStatusCode.InternalServerError, "An unexpected error ocurred.");
-                Console.WriteLine(ex);
+                _logger.LogError(ex, "An unhandled exception occurred.");
+                await WriteError(context, HttpStatusCode.InternalServerError, "An unexpected error occurred.");
             }
         }
 
