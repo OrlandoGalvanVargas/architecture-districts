@@ -11,6 +11,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using FacilityOS.API.Validators;
 using FacilityOS.API.Settings;
+using FacilityOS.API.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,20 +30,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 3. MediatR 
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg => { 
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.AddBehavior(typeof(MediatR.IPipelineBehavior<,>), typeof(FacilityOS.API.Common.Behaviors.ValidationBehavior<,>));
+});
 
 // 4. Servicios de la aplicacion
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHealthChecks();
 
 // 5. Carga de configuraciones tipadas
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>() ?? new JwtSettings();
-
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? Array.Empty<string>();
-
 var rateLimitConfig = builder.Configuration.GetSection("RateLimiting");
 int permitLimit = rateLimitConfig.GetValue<int>("PermitLimit", 100);
 int windowMinutes = rateLimitConfig.GetValue<int>("WindowMinutes", 1);
@@ -57,24 +58,20 @@ if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Default
 // Validación ambiente-specific
 if (builder.Environment.IsProduction())
 {
-    // Producción: EXIGIR todas las variables críticas
     if (string.IsNullOrWhiteSpace(jwtSettings.Issuer))
         throw new InvalidOperationException("Jwt:Issuer is required in Production. Set via environment variables.");
     
     if (string.IsNullOrWhiteSpace(jwtSettings.Audience))
         throw new InvalidOperationException("Jwt:Audience is required in Production. Set via environment variables.");
     
-    // Verificar que CORS esté bien configurado en producción
     if (corsOrigins.Length == 0)
         throw new InvalidOperationException("Cors:AllowedOrigins is required in Production.");
     
-    // Verificar que el RateLimiting esté configurado
     if (permitLimit <= 0)
         throw new InvalidOperationException("RateLimiting:PermitLimit must be greater than 0 in Production.");
 }
 else if (builder.Environment.IsDevelopment())
 {
-    // Desarrollo: alertar pero no fallar (más permisivo para desarrollo local)
     if (string.IsNullOrWhiteSpace(jwtSettings.Issuer))
         Console.WriteLine("⚠️  WARNING (DEV): Jwt:Issuer is empty. Set via user-secrets for proper JWT generation.");
     
@@ -109,23 +106,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
-    }   );
-// Registrar contexto HTTP y Servicio del Usuario Actual
+    });
+
+// Contexto HTTP y Servicios de Contexto/Autorización
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IResourceAuthorizationService, ResourceAuthorizationService>();
 
 // Políticas de Autorización
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Admin"));
+        policy.RequireRole(AppRoles.Admin));
 
     options.AddPolicy("DistrictAdminOrAbove", policy =>
-        policy.RequireRole("Admin", "DistrictAdmin"));
+        policy.RequireRole(AppRoles.Admin, AppRoles.DistrictAdmin));
 
     options.AddPolicy("SchoolAdminOrAbove", policy =>
-        policy.RequireRole("Admin", "DistrictAdmin", "SchoolAdmin"));
+        policy.RequireRole(AppRoles.Admin, AppRoles.DistrictAdmin, AppRoles.SchoolAdmin));
 });
+
 // 9. CORS
 builder.Services.AddCors(options =>
 {
@@ -150,7 +150,6 @@ app.UseRateLimiter();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapHealthChecks("/health");
 app.MapControllers();
 
