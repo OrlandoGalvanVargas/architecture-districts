@@ -25,8 +25,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\Behaviors\" />
-  </ItemGroup>
-
 </Project>
