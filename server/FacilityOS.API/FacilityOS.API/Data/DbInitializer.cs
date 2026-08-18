@@ -1,4 +1,5 @@
-﻿using FacilityOS.API.Models;
+﻿using FacilityOS.API.Common;
+using FacilityOS.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FacilityOS.API.Data
@@ -15,7 +16,7 @@ namespace FacilityOS.API.Data
         private static async Task SeedAdminUserAsync(ApplicationDbContext context, IConfiguration configuration, ILogger logger)
         {
             var adminExists = await context.Users
-                .AnyAsync(u => u.Role == "Admin");
+                .AnyAsync(u => u.Role == AppRoles.Admin);
 
             if (adminExists)
             {
@@ -41,7 +42,8 @@ namespace FacilityOS.API.Data
                 Name = adminName,
                 Email = adminEmail,
                 PasswordHash = passwordHash,
-                Role = "Admin",
+                Role = AppRoles.Admin,
+                EntityType = UserEntityType.Global,
                 CreatedAt = DateTime.UtcNow
             };
 
