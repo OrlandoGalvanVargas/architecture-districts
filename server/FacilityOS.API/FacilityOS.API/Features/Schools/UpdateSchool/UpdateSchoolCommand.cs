@@ -3,5 +3,5 @@ using MediatR;
 
 namespace FacilityOS.API.Features.Schools.UpdateSchool
 {
-    public record UpdateSchoolCommand(int Id, UpdateSchoolRequest Request) : IRequest<SchoolResponse?>;
+    public record UpdateSchoolCommand(int Id, UpdateSchoolRequest Request) : IRequest<SchoolResponse>;
 }
