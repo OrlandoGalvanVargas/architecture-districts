@@ -1,37 +1,51 @@
 ﻿using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Districts;
+using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace FacilityOS.API.Features.Districts.GetDistricts
+namespace FacilityOS.API.Features.Districts.GetDistricts;
+
+public class GetDistrictsHandler : IRequestHandler<GetDistrictsQuery, List<DistrictResponse>>
 {
-    public class GetDistrictsHandler : IRequestHandler<GetDistrictsQuery, List<DistrictResponse>>
+    private readonly ApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
+
+    public GetDistrictsHandler(ApplicationDbContext context, ICurrentUserService currentUser)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+        _currentUser = currentUser;
+    }
 
-        public GetDistrictsHandler(ApplicationDbContext context)
+    public async Task<List<DistrictResponse>> Handle(GetDistrictsQuery request, CancellationToken cancellationToken)
+    {
+        var query = _context.Districts.AsNoTracking().AsQueryable();
+
+        if (_currentUser.IsDistrictAdmin)
         {
-            _context = context;
+            query = query.Where(d => d.Id == _currentUser.EntityId);
+        }
+        else if (_currentUser.IsSchoolAdmin)
+        {
+            query = query.Where(d => d.Schools.Any(s => s.Id == _currentUser.EntityId));
         }
 
-        public async Task<List<DistrictResponse>> Handle(GetDistrictsQuery request, CancellationToken cancellationToken)
-        {
-            return await _context.Districts
-                .Select(d => new DistrictResponse
-                {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Code = d.Code,
-                    State = d.State,
-                    City = d.City,
-                    ZipCode = d.ZipCode,
-                    Address = d.Address,
-                    Description = d.Description,
-                    SchoolCount = d.SchoolCount,
-                    CreatedAt = d.CreatedAt,
-                    UpdatedAt = d.UpdatedAt
-                })
-                .ToListAsync(cancellationToken);
-        }
+        return await query
+            .OrderBy(d => d.Name)
+            .Select(d => new DistrictResponse
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Code = d.Code,
+                State = d.State,
+                City = d.City,
+                ZipCode = d.ZipCode,
+                Address = d.Address,
+                Description = d.Description,
+                SchoolCount = d.Schools.Count(),
+                CreatedAt = d.CreatedAt,
+                UpdatedAt = d.UpdatedAt
+            })
+            .ToListAsync(cancellationToken);
     }
 }
