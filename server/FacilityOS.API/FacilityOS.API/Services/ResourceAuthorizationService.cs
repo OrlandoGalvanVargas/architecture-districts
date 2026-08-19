@@ -148,4 +148,35 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
 
         return false;
     }
+
+    public async Task<bool> CanManageUserAsync(User targetUser, CancellationToken cancellationToken = default)
+    {
+        if (_currentUser.IsAdmin) return true;
+
+        if (targetUser.Role == AppRoles.Admin) return false;
+
+        if (_currentUser.IsDistrictAdmin)
+        {
+            if (targetUser.EntityType == UserEntityType.District && targetUser.EntityId == _currentUser.EntityId)
+                return true;
+
+            if (targetUser.EntityType == UserEntityType.School && targetUser.EntityId.HasValue)
+            {
+                return await _context.Schools
+                    .AsNoTracking()
+                    .AnyAsync(s => s.Id == targetUser.EntityId.Value && s.DistrictId == _currentUser.EntityId, cancellationToken);
+            }
+        }
+
+        if (_currentUser.IsSchoolAdmin)
+        {
+            if (targetUser.Role == AppRoles.SchoolAdmin || targetUser.Role == AppRoles.DistrictAdmin)
+                return false;
+
+            if (targetUser.EntityType == UserEntityType.School && targetUser.EntityId == _currentUser.EntityId)
+                return true;
+        }
+
+        return false;
+    }
 }

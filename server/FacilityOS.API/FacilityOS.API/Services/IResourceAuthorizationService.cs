@@ -11,4 +11,6 @@ public interface IResourceAuthorizationService
 
     Task<bool> CanCreateUserRoleAsync(string targetRole, UserEntityType targetEntityType, int? targetEntityId, CancellationToken cancellationToken = default);
     Task<bool> ValidateEntityExistsAsync(UserEntityType entityType, int? entityId, CancellationToken cancellationToken = default);
+
+    Task<bool> CanManageUserAsync(User targetUser, CancellationToken cancellationToken = default);
 }
