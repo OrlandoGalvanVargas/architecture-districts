@@ -10,6 +10,7 @@ public class UserResponse
     public string Role { get; set; } = string.Empty;
     public int? EntityId { get; set; }
     public UserEntityType EntityType { get; set; }
+    public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
