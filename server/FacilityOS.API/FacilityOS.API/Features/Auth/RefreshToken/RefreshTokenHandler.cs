@@ -27,6 +27,14 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, LoginRes
         if (storedToken is null || storedToken.IsRevoked || storedToken.IsExpired)
             throw new UnauthorizedAccessException("Invalid or expired refresh token");
 
+        // Validar estado de la cuenta del usuario
+        if (storedToken.User.IsDeleted || !storedToken.User.IsActive)
+        {
+            storedToken.IsRevoked = true;
+            await _context.SaveChangesAsync(cancellationToken);
+            throw new UnauthorizedAccessException("User account is inactive or deleted.");
+        }
+
         storedToken.IsRevoked = true;
 
         var newAccessToken = _authService.GenerateAccessToken(storedToken.User);

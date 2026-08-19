@@ -21,10 +21,11 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
     {
         var req = command.Request;
 
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == req.Email, cancellationToken);
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == req.Email.ToLower().Trim() && !u.IsDeleted, cancellationToken);
 
-        if (user is null || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
-            throw new UnauthorizedAccessException("Invalid email or password");
+        if (user is null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid email or password, or account is disabled.");
 
         var accessToken = _authService.GenerateAccessToken(user);
         var refreshTokenValue = _authService.GenerateRefreshToken();

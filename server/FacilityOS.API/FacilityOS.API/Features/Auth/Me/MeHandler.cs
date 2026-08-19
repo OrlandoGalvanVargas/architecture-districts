@@ -20,7 +20,7 @@ public class MeHandler : IRequestHandler<MeQuery, UserDto>
     {
         var user = await _context.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == request.UserId && !u.IsDeleted && u.IsActive, cancellationToken);
 
         if (user is null)
             throw new NotFoundException(nameof(User), request.UserId);
