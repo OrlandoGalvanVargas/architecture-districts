@@ -1,5 +1,12 @@
-﻿using FacilityOS.API.DTOs.Users;
+﻿using FacilityOS.API.DTOs.Schools;
+using FacilityOS.API.DTOs.Users;
+using FacilityOS.API.Features.Schools.GetSchools;
 using FacilityOS.API.Features.Users.CreateUser;
+using FacilityOS.API.Features.Users.DeleteUser;
+using FacilityOS.API.Features.Users.GetUserById;
+using FacilityOS.API.Features.Users.GetUsers;
+using FacilityOS.API.Features.Users.UpdateUser;
+using FacilityOS.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +27,33 @@ public class UsersController : ControllerBase
         _mediator = mediator;
     }
 
+    [HttpGet]
+    [Authorize(Policy = "SchoolAdminOrAbove")]
+    public async Task<ActionResult<PagedResult<UserResponse>>> GetUsers(
+        [FromQuery] string? search,
+        [FromQuery] string? role,
+        [FromQuery] UserEntityType? entityType,
+        [FromQuery] int? entityId,
+        [FromQuery] bool? isActive,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        if (pageSize > 50) pageSize = 50;
+
+        var result = await _mediator.Send(new GetUsersQuery(
+            search, role, entityType, entityId, isActive, page, pageSize));
+
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    [Authorize(Policy = "SchoolAdminOrAbove")]
+    public async Task<ActionResult<UserResponse>> GetById(int id)
+    {
+        var result = await _mediator.Send(new GetUserByIdQuery(id));
+        return Ok(result);
+    }
+
     [HttpPost]
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<UserResponse>> Create([FromBody] CreateUserRequest request)
@@ -28,11 +62,19 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    [HttpGet("{id}")]
+    [HttpPut("{id}")]
     [Authorize(Policy = "SchoolAdminOrAbove")]
-    public async Task<ActionResult<UserResponse>> GetById(int id)
+    public async Task<ActionResult<UserResponse>> Update(int id, [FromBody] UpdateUserRequest request)
     {
-        // Implementaremos GetUserByIdCommand
-        return Ok();
+        var result = await _mediator.Send(new UpdateUserCommand(id, request));
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Policy = "SchoolAdminOrAbove")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        await _mediator.Send(new DeleteUserCommand(id));
+        return NoContent();
     }
 }
