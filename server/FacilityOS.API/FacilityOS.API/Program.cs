@@ -1,6 +1,8 @@
 using FacilityOS.API.Common;
+using FacilityOS.API.Common.Behaviors;
 using FacilityOS.API.Common.Exceptions;
 using FacilityOS.API.Data;
+using FacilityOS.API.Data.Interceptors;
 using FacilityOS.API.Services;
 using FacilityOS.API.Settings;
 using FacilityOS.API.Validators;
@@ -11,6 +13,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using System.Reflection;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -20,9 +23,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateSchoolRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<UpdateSchoolRequestValidator>();
+
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -40,36 +43,44 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // 2. Base de datos
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton<UpdateAuditableEntitiesInterceptor>();
 
-// 3. MediatR 
-builder.Services.AddMediatR(cfg => { 
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-    cfg.AddBehavior(typeof(MediatR.IPipelineBehavior<,>), typeof(FacilityOS.API.Common.Behaviors.ValidationBehavior<,>));
+builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+{
+    var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
+
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .AddInterceptors(interceptor);
+});
+
+// 3. MediatR con ValidationBehavior
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
 // 4. Servicios de la aplicacion
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHealthChecks();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IResourceAuthorizationService, ResourceAuthorizationService>();
 
 // 5. Carga de configuraciones tipadas
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
-var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? Array.Empty<string>();
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 var rateLimitConfig = builder.Configuration.GetSection("RateLimiting");
 int permitLimit = rateLimitConfig.GetValue<int>("PermitLimit", 100);
 int windowMinutes = rateLimitConfig.GetValue<int>("WindowMinutes", 1);
 
-// Validacion de startup - falla rapido si falta una variable critica
 if (string.IsNullOrWhiteSpace(jwtSettings.Key))
     throw new InvalidOperationException("Jwt:Key is not configured. Set it via user-secrets (dev) or environment variables (prod).");
 
 if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("DefaultConnection")))
     throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
 
-// Validación ambiente-specific
 if (builder.Environment.IsProduction())
 {
     if (string.IsNullOrWhiteSpace(jwtSettings.Issuer))
@@ -124,11 +135,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Contexto HTTP y Servicios de Contexto/Autorización
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddScoped<IResourceAuthorizationService, ResourceAuthorizationService>();
-
 // Políticas de Autorización
 builder.Services.AddAuthorization(options =>
 {
@@ -155,6 +161,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // 10. Pipeline HTTP
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -164,30 +172,15 @@ if (app.Environment.IsDevelopment())
         options.EnablePersistAuthorization();
     });
 }
+
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapHealthChecks("/health");
 app.MapControllers();
-
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-
-    try
-    {
-        await DbInitializer.SeedAsync(context, config, logger);
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred during database initialization.");
-        throw;
-    }
-}
 
 app.Run();
