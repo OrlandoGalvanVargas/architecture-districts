@@ -1,6 +1,7 @@
 ﻿using FacilityOS.API.Common;
 using FacilityOS.API.Data;
 using FacilityOS.API.Models;
+using FacilityOS.API.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace FacilityOS.API.Services;
@@ -20,11 +21,9 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
     {
         if (_currentUser.IsAdmin) return true;
 
-        if (_currentUser.IsDistrictAdmin)
+        if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
         {
-            return await _context.Schools
-                .AsNoTracking()
-                .AnyAsync(s => s.Id == schoolId && s.DistrictId == _currentUser.EntityId, cancellationToken);
+            return await SchoolBelongsToDistrictAsync(schoolId, _currentUser.EntityId.Value, cancellationToken);
         }
 
         if (_currentUser.IsSchoolAdmin)
@@ -39,17 +38,20 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
     {
         if (_currentUser.IsAdmin) return true;
 
-        if (_currentUser.IsDistrictAdmin)
+        if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
         {
-            return await _context.Schools
-                .AsNoTracking()
-                .AnyAsync(s => s.Id == schoolId && s.DistrictId == _currentUser.EntityId, cancellationToken);
+            return await SchoolBelongsToDistrictAsync(schoolId, _currentUser.EntityId.Value, cancellationToken);
+        }
+
+        if (_currentUser.IsSchoolAdmin)
+        {
+            return _currentUser.EntityId == schoolId;
         }
 
         return false;
     }
 
-    public bool CanCreateSchoolInDistrict(int targetDistrictId)
+    public async Task<bool> CanCreateSchoolInDistrictAsync(int targetDistrictId, CancellationToken cancellationToken = default)
     {
         if (_currentUser.IsAdmin) return true;
 
@@ -58,7 +60,7 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
             return _currentUser.EntityId == targetDistrictId;
         }
 
-        return false;
+        return await Task.FromResult(false);
     }
 
     public async Task<bool> CanAccessDistrictAsync(int districtId, CancellationToken cancellationToken = default)
@@ -70,52 +72,53 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
             return _currentUser.EntityId == districtId;
         }
 
-        if (_currentUser.IsSchoolAdmin)
+        if (_currentUser.IsSchoolAdmin && _currentUser.EntityId.HasValue)
         {
             return await _context.Schools
                 .AsNoTracking()
-                .AnyAsync(s => s.Id == _currentUser.EntityId && s.DistrictId == districtId, cancellationToken);
+                .AnyAsync(s => s.Id == _currentUser.EntityId.Value && s.DistrictId == districtId, cancellationToken);
         }
 
         return false;
     }
 
-    public async Task<bool> CanCreateUserRoleAsync( string targetRole, UserEntityType targetEntityType, int? targetEntityId, CancellationToken cancellationToken = default)
+    public async Task<bool> CanCreateUserRoleAsync(
+        string targetRole,
+        UserEntityType targetEntityType,
+        int? targetEntityId,
+        CancellationToken cancellationToken = default)
     {
-        if (_currentUser.IsAdmin)
-            return true;
+        if (_currentUser.IsAdmin) return true;
 
-        if (_currentUser.IsDistrictAdmin)
+        if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
         {
-            if (targetRole == AppRoles.Admin)
+            if (targetRole == AppConstants.Roles.Admin)
                 return false;
 
-            if (targetEntityType == UserEntityType.District)
+            if (targetRole == AppConstants.Roles.SchoolAdmin || targetRole == "User")
             {
-                return targetEntityId == _currentUser.EntityId;
+                if (targetEntityType == UserEntityType.School && targetEntityId.HasValue)
+                {
+                    return await SchoolBelongsToDistrictAsync(targetEntityId.Value, _currentUser.EntityId.Value, cancellationToken);
+                }
             }
 
-            if (targetEntityType == UserEntityType.School)
+            if (targetRole == AppConstants.Roles.DistrictAdmin) // Usando tus constantes AppRoles de forma consistente
             {
-                if (!targetEntityId.HasValue)
-                    return false;
-
-                return await _context.Schools
-                    .AsNoTracking()
-                    .AnyAsync(s => s.Id == targetEntityId.Value && s.DistrictId == _currentUser.EntityId, cancellationToken);
+                return targetEntityType == UserEntityType.District && targetEntityId == _currentUser.EntityId;
             }
 
             return false;
         }
 
-        if (_currentUser.IsSchoolAdmin)
+        if (_currentUser.IsSchoolAdmin && _currentUser.EntityId.HasValue)
         {
-            if (targetRole == AppRoles.Admin || targetRole == AppRoles.DistrictAdmin || targetRole == AppRoles.SchoolAdmin)
-                return false;
-
-            if (targetEntityType == UserEntityType.School)
+            if (targetRole == AppConstants.Roles.SchoolAdmin || targetRole == "User")
             {
-                return targetEntityId == _currentUser.EntityId;
+                if (targetEntityType == UserEntityType.School)
+                {
+                    return targetEntityId == _currentUser.EntityId;
+                }
             }
 
             return false;
@@ -124,7 +127,10 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
         return false;
     }
 
-    public async Task<bool> ValidateEntityExistsAsync(UserEntityType entityType, int? entityId, CancellationToken cancellationToken = default)
+    public async Task<bool> ValidateEntityExistsAsync(
+        UserEntityType entityType,
+        int? entityId,
+        CancellationToken cancellationToken = default)
     {
         if (entityType == UserEntityType.Global)
             return true;
@@ -152,31 +158,36 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
     public async Task<bool> CanManageUserAsync(User targetUser, CancellationToken cancellationToken = default)
     {
         if (_currentUser.IsAdmin) return true;
+        if (targetUser.Role == AppConstants.Roles.Admin) return false;
+        if (targetUser.EntityType == UserEntityType.Global) return false;
 
-        if (targetUser.Role == AppRoles.Admin) return false;
-
-        if (_currentUser.IsDistrictAdmin)
+        if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
         {
             if (targetUser.EntityType == UserEntityType.District && targetUser.EntityId == _currentUser.EntityId)
                 return true;
 
             if (targetUser.EntityType == UserEntityType.School && targetUser.EntityId.HasValue)
             {
-                return await _context.Schools
-                    .AsNoTracking()
-                    .AnyAsync(s => s.Id == targetUser.EntityId.Value && s.DistrictId == _currentUser.EntityId, cancellationToken);
+                return await SchoolBelongsToDistrictAsync(targetUser.EntityId.Value, _currentUser.EntityId.Value, cancellationToken);
             }
         }
 
-        if (_currentUser.IsSchoolAdmin)
+        if (_currentUser.IsSchoolAdmin && _currentUser.EntityId.HasValue)
         {
-            if (targetUser.Role == AppRoles.SchoolAdmin || targetUser.Role == AppRoles.DistrictAdmin)
-                return false;
-
-            if (targetUser.EntityType == UserEntityType.School && targetUser.EntityId == _currentUser.EntityId)
-                return true;
+            if (targetUser.Role == AppConstants.Roles.SchoolAdmin || targetUser.Role == "User")
+            {
+                if (targetUser.EntityType == UserEntityType.School && targetUser.EntityId == _currentUser.EntityId)
+                    return true;
+            }
         }
 
         return false;
+    }
+
+    private Task<bool> SchoolBelongsToDistrictAsync(int schoolId, int districtId, CancellationToken cancellationToken)
+    {
+        return _context.Schools
+            .AsNoTracking()
+            .AnyAsync(s => s.Id == schoolId && s.DistrictId == districtId, cancellationToken);
     }
 }

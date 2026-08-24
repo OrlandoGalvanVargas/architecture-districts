@@ -10,9 +10,9 @@ public interface ICurrentUserService
     int? EntityId { get; }
     string? EntityType { get; }
 
-    bool IsAdmin => Role == AppRoles.Admin;
-    bool IsDistrictAdmin => Role == AppRoles.DistrictAdmin;
-    bool IsSchoolAdmin => Role == AppRoles.SchoolAdmin;
+    bool IsAdmin => Role == AppConstants.Roles.Admin;
+    bool IsDistrictAdmin => Role == AppConstants.Roles.DistrictAdmin;
+    bool IsSchoolAdmin => Role == AppConstants.Roles.SchoolAdmin;
 }
 
 public class CurrentUserService : ICurrentUserService
@@ -28,6 +28,6 @@ public class CurrentUserService : ICurrentUserService
 
     public int? UserId => int.TryParse(User?.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
     public string? Role => User?.FindFirstValue(ClaimTypes.Role);
-    public string? EntityType => User?.FindFirstValue(AppClaimTypes.EntityType);
-    public int? EntityId => int.TryParse(User?.FindFirstValue(AppClaimTypes.EntityId), out var id) ? id : null;
+    public string? EntityType => User?.FindFirstValue(AppConstants.Claims.EntityType);
+    public int? EntityId => int.TryParse(User?.FindFirstValue(AppConstants.Claims.EntityId), out var id) ? id : null;
 }
