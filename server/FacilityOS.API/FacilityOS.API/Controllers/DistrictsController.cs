@@ -15,20 +15,13 @@ namespace FacilityOS.API.Controllers;
 [Route("api/districts")]
 [Authorize]
 [EnableRateLimiting("global")]
-public class DistrictsController : ControllerBase
+public class DistrictsController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public DistrictsController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet]
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<List<DistrictResponse>>> GetAll()
     {
-        var result = await _mediator.Send(new GetDistrictsQuery());
+        var result = await Mediator.Send(new GetDistrictsQuery());
         return Ok(result);
     }
 
@@ -36,7 +29,7 @@ public class DistrictsController : ControllerBase
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<DistrictResponse>> GetById(int id)
     {
-        var result = await _mediator.Send(new GetDistrictByIdQuery(id));
+        var result = await Mediator.Send(new GetDistrictByIdQuery(id));
         return Ok(result);
     }
 
@@ -44,7 +37,7 @@ public class DistrictsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult<DistrictResponse>> Create([FromBody] CreateDistrictRequest request)
     {
-        var result = await _mediator.Send(new CreateDistrictCommand(request));
+        var result = await Mediator.Send(new CreateDistrictCommand(request));
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -52,7 +45,7 @@ public class DistrictsController : ControllerBase
     [Authorize(Policy = "DistrictAdminOrAbove")]
     public async Task<ActionResult<DistrictResponse>> Update(int id, [FromBody] UpdateDistrictRequest request)
     {
-        var result = await _mediator.Send(new UpdateDistrictCommand(id, request));
+        var result = await Mediator.Send(new UpdateDistrictCommand(id, request));
         return Ok(result);
     }
 
@@ -60,7 +53,7 @@ public class DistrictsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult> Delete(int id)
     {
-        await _mediator.Send(new DeleteDistrictCommand(id));
+        await Mediator.Send(new DeleteDistrictCommand(id));
         return NoContent();
     }
 }

@@ -6,7 +6,7 @@ using FacilityOS.API.Features.Users.DeleteUser;
 using FacilityOS.API.Features.Users.GetUserById;
 using FacilityOS.API.Features.Users.GetUsers;
 using FacilityOS.API.Features.Users.UpdateUser;
-using FacilityOS.API.Models;
+using FacilityOS.API.Models.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +18,8 @@ namespace FacilityOS.API.Controllers;
 [Route("api/users")]
 [Authorize]
 [EnableRateLimiting("global")]
-public class UsersController : ControllerBase
+public class UsersController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public UsersController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet]
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<PagedResult<UserResponse>>> GetUsers(
@@ -40,7 +33,7 @@ public class UsersController : ControllerBase
     {
         if (pageSize > 50) pageSize = 50;
 
-        var result = await _mediator.Send(new GetUsersQuery(
+        var result = await Mediator.Send(new GetUsersQuery(
             search, role, entityType, entityId, isActive, page, pageSize));
 
         return Ok(result);
@@ -50,7 +43,7 @@ public class UsersController : ControllerBase
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<UserResponse>> GetById(int id)
     {
-        var result = await _mediator.Send(new GetUserByIdQuery(id));
+        var result = await Mediator.Send(new GetUserByIdQuery(id));
         return Ok(result);
     }
 
@@ -58,7 +51,7 @@ public class UsersController : ControllerBase
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<UserResponse>> Create([FromBody] CreateUserRequest request)
     {
-        var result = await _mediator.Send(new CreateUserCommand(request));
+        var result = await Mediator.Send(new CreateUserCommand(request));
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -66,15 +59,15 @@ public class UsersController : ControllerBase
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<UserResponse>> Update(int id, [FromBody] UpdateUserRequest request)
     {
-        var result = await _mediator.Send(new UpdateUserCommand(id, request));
+        var result = await Mediator.Send(new UpdateUserCommand(id, request));
         return Ok(result);
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = "SchoolAdminOrAbove")]
+    [Authorize(Policy = "DistrictAdminOrAbove")]
     public async Task<ActionResult> Delete(int id)
     {
-        await _mediator.Send(new DeleteUserCommand(id));
+        await Mediator.Send(new DeleteUserCommand(id));
         return NoContent();
     }
 }

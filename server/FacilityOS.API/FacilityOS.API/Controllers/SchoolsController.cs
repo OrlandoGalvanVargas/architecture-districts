@@ -15,15 +15,8 @@ namespace FacilityOS.API.Controllers;
 [Route("api/schools")]
 [Authorize]
 [EnableRateLimiting("global")]
-public class SchoolsController : ControllerBase
+public class SchoolsController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public SchoolsController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet]
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<PagedResult<SchoolResponse>>> GetSchools(
@@ -37,7 +30,7 @@ public class SchoolsController : ControllerBase
     {
         if (pageSize > 50) pageSize = 50;
 
-        var result = await _mediator.Send(new GetSchoolsQuery(
+        var result = await Mediator.Send(new GetSchoolsQuery(
             districtId, search, level, type, isActive, page, pageSize));
         return Ok(result);
     }
@@ -46,7 +39,7 @@ public class SchoolsController : ControllerBase
     [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<SchoolResponse>> GetById(int id)
     {
-        var result = await _mediator.Send(new GetSchoolByIdQuery(id));
+        var result = await Mediator.Send(new GetSchoolByIdQuery(id));
         return Ok(result);
     }
 
@@ -54,15 +47,15 @@ public class SchoolsController : ControllerBase
     [Authorize(Policy = "DistrictAdminOrAbove")]
     public async Task<ActionResult<SchoolResponse>> Create([FromBody] CreateSchoolRequest request)
     {
-        var result = await _mediator.Send(new CreateSchoolCommand(request));
+        var result = await Mediator.Send(new CreateSchoolCommand(request));
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpPut("{id}")]
-    [Authorize(Policy = "DistrictAdminOrAbove")]
+    [Authorize(Policy = "SchoolAdminOrAbove")]
     public async Task<ActionResult<SchoolResponse>> Update(int id, [FromBody] UpdateSchoolRequest request)
     {
-        var result = await _mediator.Send(new UpdateSchoolCommand(id, request));
+        var result = await Mediator.Send(new UpdateSchoolCommand(id, request));
         return Ok(result);
     }
 
@@ -70,7 +63,7 @@ public class SchoolsController : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     public async Task<ActionResult> Delete(int id)
     {
-        await _mediator.Send(new DeleteSchoolCommand(id));
+        await Mediator.Send(new DeleteSchoolCommand(id));
         return NoContent();
     }
 }
