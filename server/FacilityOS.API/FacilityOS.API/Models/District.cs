@@ -1,40 +1,39 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FacilityOS.API.Models.Base;
 
 namespace FacilityOS.API.Models;
 
-public class District
+public class District : BaseEntity
 {
-    public int Id { get; set; }
+    public string Name { get; private set; } = string.Empty;
+    public string Code { get; private set; } = string.Empty;
+    public string State { get; private set; } = string.Empty;
+    public string City { get; private set; } = string.Empty;
+    public string ZipCode { get; private set; } = string.Empty;
+    public string Address { get; private set; } = string.Empty;
+    public string? Description { get; private set; }
+    public ICollection<School> Schools { get; private set; } = new List<School>();
 
-    [Required]
-    [MaxLength(200)]
-    public string Name { get; set; } = string.Empty;
+    private District() { } // Para EF Core
 
-    [Required]
-    [MaxLength(50)]
-    public string Code { get; set; } = string.Empty;
+    public District(string name, string code, string state, string city, string zipCode, string address, string? description = null)
+    {
+        Name = name;
+        Code = code;
+        State = state;
+        City = city;
+        ZipCode = zipCode;
+        Address = address;
+        Description = description;
+    }
 
-    [Required]
-    [MaxLength(2)]
-    public string State { get; set; } = string.Empty;
-
-    [Required]
-    [MaxLength(100)]
-    public string City { get; set; } = string.Empty;
-
-    [Required]
-    [MaxLength(10)]
-    public string ZipCode { get; set; } = string.Empty;
-
-    [Required]
-    [MaxLength(500)]
-    public string Address { get; set; } = string.Empty;
-
-    [MaxLength(1000)]
-    public string? Description { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
-
-    public ICollection<School> Schools { get; set; } = new List<School>();
+    public void Update(string name, string code, string state, string city, string zipCode, string address, string? description = null)
+    {
+        Name = name;
+        Code = code;
+        State = state;
+        City = city;
+        ZipCode = zipCode;
+        Address = address;
+        Description = description;
+    }
 }

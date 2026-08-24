@@ -1,34 +1,47 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FacilityOS.API.Models.Base;
+using FacilityOS.API.Models.Enums;
 
 namespace FacilityOS.API.Models;
 
-public class User
+public class User : AuditableEntity
 {
-    public int Id { get; set; }
+    public string Name { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string PasswordHash { get; private set; } = string.Empty;
+    public string Role { get; private set; } = "User";
+    public int? EntityId { get; private set; }
+    public UserEntityType EntityType { get; private set; } = UserEntityType.Global;
+    public ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
 
-    [Required]
-    [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    private User() { }
 
-    [Required]
-    [EmailAddress]
-    [MaxLength(100)]
-    public string Email { get; set; } = string.Empty;
+    public User(string name, string email, string passwordHash, string role = "User")
+    {
+        Name = name;
+        Email = email;
+        PasswordHash = passwordHash;
+        Role = role;
+    }
 
-    [Required]
-    public string PasswordHash { get; set; } = string.Empty;
+    public void Update(string name, string email)
+    {
+        Name = name;
+        Email = email;
+    }
 
-    [MaxLength(50)]
-    public string Role { get; set; } = "User";
+    public void UpdatePassword(string passwordHash)
+    {
+        PasswordHash = passwordHash;
+    }
 
-    public int? EntityId { get; set; }
-    public UserEntityType EntityType { get; set; } = UserEntityType.Global;
+    public void AssignToEntity(int? entityId, UserEntityType entityType)
+    {
+        EntityId = entityId;
+        EntityType = entityType;
+    }
 
-    public bool IsActive { get; set; } = true;
-    public bool IsDeleted { get; set; } = false;
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; }
-
-    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public void UpdateRole(string role)
+    {
+        Role = role;
+    }
 }
