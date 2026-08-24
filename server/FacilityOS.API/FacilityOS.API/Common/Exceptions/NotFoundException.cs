@@ -1,11 +1,10 @@
-﻿namespace FacilityOS.API.Common.Exceptions
-{
-    public class NotFoundException : Exception
-    {
-        public NotFoundException(string name, object key)
-            : base($"El recurso '{name}' con ID ({key}) no fue encontrado.") { }
+﻿namespace FacilityOS.API.Common.Exceptions;
 
-        public NotFoundException(string message)
-            : base(message) { }
-    }
+public class NotFoundException : Exception
+{
+    public NotFoundException(string name, object key)
+        : base($"Resource '{name}' with ID ({key}) was not found.") { }
+
+    public NotFoundException(string message)
+        : base(message) { }
 }

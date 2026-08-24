@@ -1,8 +1,7 @@
-﻿namespace FacilityOS.API.Common.Exceptions
+﻿namespace FacilityOS.API.Common.Exceptions;
+
+public class ForbiddenException : Exception
 {
-    public class ForbiddenException : Exception
-    {
-        public ForbiddenException(string message = "You do not have permission to access this resource.")
-            : base(message) { }
-    }
+    public ForbiddenException(string message = "You do not have permission to access this resource.")
+        : base(message) { }
 }
