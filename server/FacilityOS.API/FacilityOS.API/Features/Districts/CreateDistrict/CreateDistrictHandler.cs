@@ -1,4 +1,5 @@
 ﻿using FacilityOS.API.Common.Exceptions;
+using FacilityOS.API.Common.Mapping;
 using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Districts;
 using FacilityOS.API.Models;
@@ -24,42 +25,21 @@ public class CreateDistrictHandler : IRequestHandler<CreateDistrictCommand, Dist
         if (!_currentUser.IsAdmin)
             throw new ForbiddenException("Only global administrators can create new districts.");
 
+        // Accedemos a las propiedades a través de command.Request
         var req = command.Request;
 
         var exists = await _context.Districts
-            .AnyAsync(d => d.Code == req.Code, cancellationToken);
+            .AnyAsync(d => d.Code.ToLower() == req.Code.ToLower().Trim(), cancellationToken);
 
         if (exists)
-            throw new InvalidOperationException($"A district with code '{req.Code}' already exists.");
+            throw new ConflictException($"A district with code '{req.Code}' already exists.");
 
-        var district = new District
-        {
-            Name = req.Name,
-            Code = req.Code,
-            State = req.State,
-            City = req.City,
-            ZipCode = req.ZipCode,
-            Address = req.Address,
-            Description = req.Description,
-            CreatedAt = DateTime.UtcNow
-        };
+        // CREACIÓN DDD: Tu mapper manual convierte el request inmutable en la entidad rica
+        var district = req.ToEntity();
 
         _context.Districts.Add(district);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return new DistrictResponse
-        {
-            Id = district.Id,
-            Name = district.Name,
-            Code = district.Code,
-            State = district.State,
-            City = district.City,
-            ZipCode = district.ZipCode,
-            Address = district.Address,
-            Description = district.Description,
-            SchoolCount = 0,
-            CreatedAt = district.CreatedAt,
-            UpdatedAt = district.UpdatedAt
-        };
+        return district.ToResponse();
     }
 }

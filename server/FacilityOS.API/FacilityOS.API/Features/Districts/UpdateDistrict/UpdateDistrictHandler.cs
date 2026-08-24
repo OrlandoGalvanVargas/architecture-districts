@@ -1,4 +1,5 @@
 ﻿using FacilityOS.API.Common.Exceptions;
+using FacilityOS.API.Common.Mapping;
 using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Districts;
 using FacilityOS.API.Models;
@@ -21,47 +22,44 @@ public class UpdateDistrictHandler : IRequestHandler<UpdateDistrictCommand, Dist
 
     public async Task<DistrictResponse> Handle(UpdateDistrictCommand command, CancellationToken cancellationToken)
     {
-        var district = await _context.Districts.FirstOrDefaultAsync(d => d.Id == command.Id, cancellationToken);
+        // 1. Multi-tenancy: Validar acceso usando el command.Id
+        var canAccess = await _authService.CanAccessDistrictAsync(command.Id, cancellationToken);
+        if (!canAccess)
+            throw new ForbiddenException("You do not have permission to modify this district.");
+
+        // 2. Extraemos el request para mayor comodidad de lectura
+        var req = command.Request;
+
+        // 3. Recuperar la entidad viva con sus escuelas para el conteo automático del mapper
+        var district = await _context.Districts
+            .Include(d => d.Schools)
+            .FirstOrDefaultAsync(d => d.Id == command.Id, cancellationToken);
 
         if (district is null)
             throw new NotFoundException(nameof(District), command.Id);
 
-        var canAccess = await _authService.CanAccessDistrictAsync(command.Id, cancellationToken);
-        if (!canAccess)
-            throw new ForbiddenException("You do not have permission to modify this district.");
-            
-        var req = command.Request;
+        // 4. Validar duplicados de código
+        var codeTaken = await _context.Districts
+            .AnyAsync(d => d.Code.ToLower() == req.Code.ToLower().Trim() && d.Id != command.Id, cancellationToken);
 
-        var codeTaken = await _context.Districts.AnyAsync(d => d.Code == req.Code && d.Id != command.Id, cancellationToken);
         if (codeTaken)
-            throw new InvalidOperationException($"A district with the code '{req.Code}' already exists.");
+            throw new ConflictException($"A district with the code '{req.Code}' already exists.");
 
-        district.Name = req.Name;
-        district.Code = req.Code;
-        district.State = req.State;
-        district.City = req.City;
-        district.ZipCode = req.ZipCode;
-        district.Address = req.Address;
-        district.Description = req.Description;
-        district.UpdatedAt = DateTime.UtcNow;
+        // 5. MUTACIÓN DDD: Invocamos el método encapsulado de la clase de dominio
+        district.Update(
+            req.Name.Trim(),
+            req.Code.ToUpper().Trim(),
+            req.State.ToUpper().Trim(),
+            req.City.Trim(),
+            req.ZipCode.Trim(),
+            req.Address.Trim(),
+            req.Description?.Trim()
+        );
 
+        // 6. Guardar cambios. El interceptor inyecta el UpdatedAt automáticamente
         await _context.SaveChangesAsync(cancellationToken);
 
-        var schoolCount = await _context.Schools.CountAsync(s => s.DistrictId == command.Id, cancellationToken);
-
-        return new DistrictResponse
-        {
-            Id = district.Id,
-            Name = district.Name,
-            Code = district.Code,
-            State = district.State,
-            City = district.City,
-            ZipCode = district.ZipCode,
-            Address = district.Address,
-            Description = district.Description,
-            SchoolCount = schoolCount,
-            CreatedAt = district.CreatedAt,
-            UpdatedAt = district.UpdatedAt
-        };
+        // 7. Retornar respuesta usando el mapper manual ToResponse()
+        return district.ToResponse();
     }
 }

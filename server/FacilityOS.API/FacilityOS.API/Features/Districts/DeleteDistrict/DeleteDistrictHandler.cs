@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FacilityOS.API.Features.Districts.DeleteDistrict;
 
-public class DeleteDistrictHandler : IRequestHandler<DeleteDistrictCommand, bool>
+public class DeleteDistrictHandler : IRequestHandler<DeleteDistrictCommand>
 {
     private readonly ApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
@@ -18,23 +18,35 @@ public class DeleteDistrictHandler : IRequestHandler<DeleteDistrictCommand, bool
         _currentUser = currentUser;
     }
 
-    public async Task<bool> Handle(DeleteDistrictCommand command, CancellationToken cancellationToken)
+    public async Task Handle(DeleteDistrictCommand command, CancellationToken cancellationToken)
     {
+        // A. Validación de Seguridad de Rol Global
         if (!_currentUser.IsAdmin)
             throw new ForbiddenException("Only global administrators can delete districts.");
 
-        var district = await _context.Districts.FirstOrDefaultAsync(d => d.Id == command.Id, cancellationToken);
+        // B. Recuperar la entidad viva de la base de datos (Aplica el filtro IsDeleted automáticamente)
+        var district = await _context.Districts
+            .FirstOrDefaultAsync(d => d.Id == command.Id, cancellationToken);
 
         if (district is null)
             throw new NotFoundException(nameof(District), command.Id);
 
-        var hasSchools = await _context.Schools.AnyAsync(s => s.DistrictId == command.Id, cancellationToken);
-        if (hasSchools)
-            throw new ConflictException("Cannot delete a district that contains active schools. Reassign or delete schools first.");
+        // C. BLINDAJE DE INFRAESTRUCTURA: Validar escuelas asociadas (Activas y en Soft Delete)
+        // Usamos .IgnoreQueryFilters() para que SQL Server busque TODO el universo físico de registros.
+        // Esto evita que salte la restricción DeleteBehavior.Restrict de la base de datos de forma descontrolada.
+        var hasSchools = await _context.Schools
+            .IgnoreQueryFilters()
+            .AnyAsync(s => s.DistrictId == command.Id, cancellationToken);
 
+        if (hasSchools)
+        {
+            throw new ConflictException("Cannot delete a district that contains schools (active or archived). Reassign or purge schools first.");
+        }
+
+        // D. Ejecutar la remoción física de la base de datos
         _context.Districts.Remove(district);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return true;
+        // Cero retornos manuales. ¡MediatR maneja la tarea completada sola!
     }
 }
