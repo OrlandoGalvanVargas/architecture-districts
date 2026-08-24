@@ -2,4 +2,4 @@
 
 namespace FacilityOS.API.Features.Users.DeleteUser;
 
-public record DeleteUserCommand(int Id) : IRequest<bool>;
+public record DeleteUserCommand(int Id) : IRequest;

@@ -1,7 +1,7 @@
 ﻿
 using FacilityOS.API.DTOs.Users;
 using FacilityOS.API.Features.Schools.GetSchools;
-using FacilityOS.API.Models;
+using FacilityOS.API.Models.Enums;
 using MediatR;
 
 namespace FacilityOS.API.Features.Users.GetUsers;
