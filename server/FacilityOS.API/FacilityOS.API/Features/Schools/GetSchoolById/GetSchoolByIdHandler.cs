@@ -1,4 +1,5 @@
 ﻿using FacilityOS.API.Common.Exceptions;
+using FacilityOS.API.Common.Mapping; // Importamos tus mappers manuales con proyección
 using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Schools;
 using FacilityOS.API.Models;
@@ -21,37 +22,24 @@ public class GetSchoolByIdHandler : IRequestHandler<GetSchoolByIdQuery, SchoolRe
 
     public async Task<SchoolResponse> Handle(GetSchoolByIdQuery request, CancellationToken cancellationToken)
     {
-        var school = await _context.Schools
+        // 1. Buscamos y proyectamos la escuela directo en base de datos en un solo paso eficiente.
+        // El query filter global de Soft Delete (IsDeleted == false) actúa de forma automática aquí.
+        var schoolResponse = await _context.Schools
             .AsNoTracking()
-            .Include(s => s.District)
-            .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
+            .Where(s => s.Id == request.Id)
+            .ProjectToResponse() // <- Reutilización de tu mapeo manual nativo
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (school is null)
+        // 2. Si no existe en la base de datos (o fue borrada por soft delete), disparamos un 404 inmediato
+        if (schoolResponse is null)
             throw new NotFoundException(nameof(School), request.Id);
 
+        // 3. Si existe, validamos si el usuario actual tiene permisos jerárquicos/contextuales para verla
         var canAccess = await _authService.CanAccessSchoolAsync(request.Id, cancellationToken);
         if (!canAccess)
             throw new ForbiddenException("You do not have permission to view this school.");
 
-        return new SchoolResponse
-        {
-            Id = school.Id,
-            Name = school.Name,
-            SchoolCode = school.SchoolCode,
-            Level = school.Level.ToString(),
-            Type = school.Type.ToString(),
-            Address = school.Address,
-            City = school.City,
-            State = school.State,
-            ZipCode = school.ZipCode,
-            Phone = school.Phone,
-            ContactEmail = school.ContactEmail,
-            StudentCapacity = school.StudentCapacity,
-            IsActive = school.IsActive,
-            DistrictId = school.DistrictId,
-            DistrictName = school.District.Name,
-            CreatedAt = school.CreatedAt,
-            UpdatedAt = school.UpdatedAt,
-        };
+        // 4. Retornamos la respuesta limpia y estandarizada
+        return schoolResponse;
     }
 }
