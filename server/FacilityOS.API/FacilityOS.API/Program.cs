@@ -5,7 +5,6 @@ using FacilityOS.API.Data;
 using FacilityOS.API.Data.Interceptors;
 using FacilityOS.API.Services;
 using FacilityOS.API.Settings;
-using FacilityOS.API.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -66,6 +65,8 @@ builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IResourceAuthorizationService, ResourceAuthorizationService>();
+
+builder.Services.AddHostedService<TokenCleanupWorker>();
 
 // 5. Carga de configuraciones tipadas
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
@@ -139,13 +140,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole(AppRoles.Admin));
+        policy.RequireRole(AppConstants.Roles.Admin));
 
     options.AddPolicy("DistrictAdminOrAbove", policy =>
-        policy.RequireRole(AppRoles.Admin, AppRoles.DistrictAdmin));
+        policy.RequireRole(AppConstants.Roles.Admin, AppConstants.Roles.DistrictAdmin));
 
     options.AddPolicy("SchoolAdminOrAbove", policy =>
-        policy.RequireRole(AppRoles.Admin, AppRoles.DistrictAdmin, AppRoles.SchoolAdmin));
+        policy.RequireRole(AppConstants.Roles.Admin, AppConstants.Roles.DistrictAdmin, AppConstants.Roles.SchoolAdmin));
 });
 
 // 9. CORS
