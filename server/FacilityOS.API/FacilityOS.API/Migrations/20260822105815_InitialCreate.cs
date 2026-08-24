@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace FacilityOS.API.Migrations
 {
     /// <inheritdoc />
@@ -26,7 +24,6 @@ namespace FacilityOS.API.Migrations
                     ZipCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    SchoolCount = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -44,13 +41,51 @@ namespace FacilityOS.API.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "User"),
+                    EntityId = table.Column<int>(type: "int", nullable: true),
+                    EntityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Schools",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    SchoolCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Level = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    State = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
+                    ZipCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    ContactEmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    StudentCapacity = table.Column<int>(type: "int", nullable: false),
+                    DistrictId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schools", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Schools_Districts_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "Districts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,10 +96,10 @@ namespace FacilityOS.API.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     IsRevoked = table.Column<bool>(type: "bit", nullable: false),
-                    IsExpired = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -76,20 +111,6 @@ namespace FacilityOS.API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.InsertData(
-                table: "Districts",
-                columns: new[] { "Id", "Address", "City", "Code", "CreatedAt", "Description", "Name", "SchoolCount", "State", "UpdatedAt", "ZipCode" },
-                values: new object[,]
-                {
-                    { 1, "333 S Beaudry Ave", "Los Angeles", "LAUSD-001", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Largest school district in California", "Los Angeles Unified School District", 0, "CA", null, "90012" },
-                    { 2, "4100 Normal St", "San Diego", "SDUSD-002", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Second largest district in San Diego County", "San Diego Unified School District", 0, "CA", null, "92101" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "CreatedAt", "Email", "Name", "PasswordHash", "Role", "UpdatedAt" },
-                values: new object[] { 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@livefree.com", "Admin user", "$2a$11$mC3I0b.rD21E1NfFfKxWeO7B76MhW6o7wsh.D7M6G59RBy5H67.2i", "Admin", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Districts_Code",
@@ -109,6 +130,17 @@ namespace FacilityOS.API.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Schools_DistrictId",
+                table: "Schools",
+                column: "DistrictId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Schools_SchoolCode",
+                table: "Schools",
+                column: "SchoolCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
@@ -119,13 +151,16 @@ namespace FacilityOS.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Districts");
-
-            migrationBuilder.DropTable(
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
+                name: "Schools");
+
+            migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Districts");
         }
     }
 }

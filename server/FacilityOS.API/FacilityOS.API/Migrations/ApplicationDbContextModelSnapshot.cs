@@ -77,33 +77,7 @@ namespace FacilityOS.API.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Districts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Address = "333 S Beaudry Ave",
-                            City = "Los Angeles",
-                            Code = "LAUSD-001",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Largest school district in California",
-                            Name = "Los Angeles Unified School District",
-                            State = "CA",
-                            ZipCode = "90012"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Address = "4100 Normal St",
-                            City = "San Diego",
-                            Code = "SDUSD-002",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Second largest district in San Diego County",
-                            Name = "San Diego Unified School District",
-                            State = "CA",
-                            ZipCode = "92101"
-                        });
+                    b.ToTable("Districts", (string)null);
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.RefreshToken", b =>
@@ -129,6 +103,9 @@ namespace FacilityOS.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -139,7 +116,7 @@ namespace FacilityOS.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.School", b =>
@@ -165,12 +142,17 @@ namespace FacilityOS.API.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<int>("DistrictId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Level")
@@ -218,7 +200,7 @@ namespace FacilityOS.API.Migrations
                     b.HasIndex("SchoolCode")
                         .IsUnique();
 
-                    b.ToTable("Schools");
+                    b.ToTable("Schools", (string)null);
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.User", b =>
@@ -263,8 +245,10 @@ namespace FacilityOS.API.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("User");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -274,7 +258,7 @@ namespace FacilityOS.API.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.RefreshToken", b =>
@@ -282,8 +266,7 @@ namespace FacilityOS.API.Migrations
                     b.HasOne("FacilityOS.API.Models.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FacilityOS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260626214602_InitialCreate")]
+    [Migration("20260822105815_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -62,9 +62,6 @@ namespace FacilityOS.API.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("SchoolCount")
-                        .HasColumnType("int");
-
                     b.Property<string>("State")
                         .IsRequired()
                         .HasMaxLength(2)
@@ -83,35 +80,7 @@ namespace FacilityOS.API.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Districts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Address = "333 S Beaudry Ave",
-                            City = "Los Angeles",
-                            Code = "LAUSD-001",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Largest school district in California",
-                            Name = "Los Angeles Unified School District",
-                            SchoolCount = 0,
-                            State = "CA",
-                            ZipCode = "90012"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Address = "4100 Normal St",
-                            City = "San Diego",
-                            Code = "SDUSD-002",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Second largest district in San Diego County",
-                            Name = "San Diego Unified School District",
-                            SchoolCount = 0,
-                            State = "CA",
-                            ZipCode = "92101"
-                        });
+                    b.ToTable("Districts", (string)null);
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.RefreshToken", b =>
@@ -130,15 +99,15 @@ namespace FacilityOS.API.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsExpired")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsRevoked")
                         .HasColumnType("bit");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -150,7 +119,91 @@ namespace FacilityOS.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
+                });
+
+            modelBuilder.Entity("FacilityOS.API.Models.School", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ContactEmail")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("DistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SchoolCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
+                    b.Property<int>("StudentCapacity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("SchoolCode")
+                        .IsUnique();
+
+                    b.ToTable("Schools", (string)null);
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.User", b =>
@@ -171,6 +224,19 @@ namespace FacilityOS.API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -182,8 +248,10 @@ namespace FacilityOS.API.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("User");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -193,18 +261,7 @@ namespace FacilityOS.API.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin@livefree.com",
-                            Name = "Admin user",
-                            PasswordHash = "$2a$11$mC3I0b.rD21E1NfFfKxWeO7B76MhW6o7wsh.D7M6G59RBy5H67.2i",
-                            Role = "Admin"
-                        });
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.RefreshToken", b =>
@@ -212,10 +269,25 @@ namespace FacilityOS.API.Migrations
                     b.HasOne("FacilityOS.API.Models.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FacilityOS.API.Models.School", b =>
+                {
+                    b.HasOne("FacilityOS.API.Models.District", "District")
+                        .WithMany("Schools")
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("District");
+                });
+
+            modelBuilder.Entity("FacilityOS.API.Models.District", b =>
+                {
+                    b.Navigation("Schools");
                 });
 
             modelBuilder.Entity("FacilityOS.API.Models.User", b =>
