@@ -1,6 +1,6 @@
-﻿using FacilityOS.API.DTOs.Auth;
+﻿using FacilityOS.API.DTOs.Users;
 using MediatR;
 
 namespace FacilityOS.API.Features.Auth.Me;
 
-public record MeQuery(int UserId) : IRequest<UserDto>;
+public record MeQuery : IRequest<UserResponse>;

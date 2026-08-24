@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FacilityOS.API.Features.Auth.Logout;
 
-public class LogoutHandler : IRequestHandler<LogoutCommand, bool>
+public class LogoutHandler : IRequestHandler<LogoutCommand>
 {
     private readonly ApplicationDbContext _context;
 
@@ -13,16 +13,22 @@ public class LogoutHandler : IRequestHandler<LogoutCommand, bool>
         _context = context;
     }
 
-    public async Task<bool> Handle(LogoutCommand command, CancellationToken cancellationToken)
+    public async Task Handle(LogoutCommand command, CancellationToken cancellationToken)
     {
-        var token = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == command.RefreshToken, cancellationToken);
+            var utcNow = DateTime.UtcNow;
 
-        if (token is null)
-            return false;
+            var token = await _context.RefreshTokens
+                .FirstOrDefaultAsync(t => 
+                    t.Token == command.RefreshToken && 
+                    !t.IsRevoked &&                      
+                    t.ExpiresAt > utcNow,                
+                    cancellationToken);
 
-        token.IsRevoked = true;
-        await _context.SaveChangesAsync(cancellationToken);
+        if (token is not null)
+        {
+            token.Revoke();
+            await _context.SaveChangesAsync(cancellationToken);
+        }
 
-        return true;
     }
 }

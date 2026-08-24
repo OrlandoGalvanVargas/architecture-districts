@@ -1,5 +1,8 @@
-﻿using FacilityOS.API.Data;
+﻿using FacilityOS.API.Common.Exceptions;
+using FacilityOS.API.Common.Mapping;
+using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Auth;
+using FacilityOS.API.Models;
 using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +13,16 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
 {
     private readonly ApplicationDbContext _context;
     private readonly IAuthService _authService;
+    private readonly IConfiguration _configuration;
 
-    public LoginHandler(ApplicationDbContext context, IAuthService authService)
+    public LoginHandler(
+        ApplicationDbContext context, 
+        IAuthService authService,
+        IConfiguration configuration)
     {
         _context = context;
         _authService = authService;
+        _configuration = configuration;
     }
 
     public async Task<LoginResponse> Handle(LoginCommand command, CancellationToken cancellationToken)
@@ -22,37 +30,30 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
         var req = command.Request;
 
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email.ToLower() == req.Email.ToLower().Trim() && !u.IsDeleted, cancellationToken);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == req.Email.ToLower().Trim(), cancellationToken);
 
+        // Usar el query filter de Soft Delete automáticamente
         if (user is null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Invalid email or password, or account is disabled.");
 
         var accessToken = _authService.GenerateAccessToken(user);
         var refreshTokenValue = _authService.GenerateRefreshToken();
+        
+        // Obtener expiración del refresh token desde configuración
+        var refreshTokenDays = _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays", 7);
+        
+        // Usar constructor en lugar de setters
+        var refreshToken = new Models.RefreshToken(
+            refreshTokenValue,
+            DateTime.UtcNow.AddDays(refreshTokenDays),
+            user.Id
+        );
 
-        _context.RefreshTokens.Add(new Models.RefreshToken
-        {
-            Token = refreshTokenValue,
-            UserId = user.Id,
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
-            CreatedAt = DateTime.UtcNow
-        });
-
+        _context.RefreshTokens.Add(refreshToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return new LoginResponse
-        {
-            AccessToken = accessToken,
-            RefreshToken = refreshTokenValue,
-            User = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Name = user.Name,
-                Role = user.Role,
-                EntityId = user.EntityId,
-                EntityType = user.EntityType.ToString()
-            }
-        };
+        // Usar el mapping centralizado
+        return user.ToLoginResponse(accessToken, refreshTokenValue);
     }
 }
