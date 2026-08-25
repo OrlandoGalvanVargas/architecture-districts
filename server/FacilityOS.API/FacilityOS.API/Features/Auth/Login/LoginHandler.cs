@@ -1,8 +1,6 @@
-﻿using FacilityOS.API.Common.Exceptions;
-using FacilityOS.API.Common.Mapping;
+﻿using FacilityOS.API.Common.Mapping;
 using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Auth;
-using FacilityOS.API.Models;
 using FacilityOS.API.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -33,17 +31,14 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email.ToLower() == req.Email.ToLower().Trim(), cancellationToken);
 
-        // Usar el query filter de Soft Delete automáticamente
         if (user is null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(req.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Invalid email or password, or account is disabled.");
 
         var accessToken = _authService.GenerateAccessToken(user);
         var refreshTokenValue = _authService.GenerateRefreshToken();
         
-        // Obtener expiración del refresh token desde configuración
         var refreshTokenDays = _configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays", 7);
         
-        // Usar constructor en lugar de setters
         var refreshToken = new Models.RefreshToken(
             refreshTokenValue,
             DateTime.UtcNow.AddDays(refreshTokenDays),
@@ -53,7 +48,6 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
         _context.RefreshTokens.Add(refreshToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        // Usar el mapping centralizado
         return user.ToLoginResponse(accessToken, refreshTokenValue);
     }
 }
