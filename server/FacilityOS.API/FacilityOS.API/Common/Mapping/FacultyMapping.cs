@@ -75,7 +75,7 @@ public static class FacultyMapping
         if (request.DistrictId.HasValue)
             faculty.AssignToDistrict(request.DistrictId.Value);
         else if (request.SchoolId.HasValue)
-            faculty.AssignToSchool(request.SchoolId.Value)
+            faculty.AssignToSchool(request.SchoolId.Value);
 
         return faculty;
     }
