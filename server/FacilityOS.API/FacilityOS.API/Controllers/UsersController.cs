@@ -1,6 +1,5 @@
-﻿using FacilityOS.API.DTOs.Schools;
+﻿using FacilityOS.API.Common;
 using FacilityOS.API.DTOs.Users;
-using FacilityOS.API.Features.Schools.GetSchools;
 using FacilityOS.API.Features.Users.CreateUser;
 using FacilityOS.API.Features.Users.DeleteUser;
 using FacilityOS.API.Features.Users.GetUserById;

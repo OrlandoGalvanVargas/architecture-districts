@@ -4,10 +4,8 @@ using FacilityOS.API.Features.Auth.Login;
 using FacilityOS.API.Features.Auth.Logout;
 using FacilityOS.API.Features.Auth.Me;
 using FacilityOS.API.Features.Auth.RefreshToken;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FacilityOS.API.Controllers;
 

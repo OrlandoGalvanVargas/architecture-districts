@@ -4,7 +4,6 @@ using FacilityOS.API.Features.Districts.DeleteDistrict;
 using FacilityOS.API.Features.Districts.GetDistrictById;
 using FacilityOS.API.Features.Districts.GetDistricts;
 using FacilityOS.API.Features.Districts.UpdateDistrict;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

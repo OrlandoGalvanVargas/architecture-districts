@@ -1,10 +1,10 @@
-﻿using FacilityOS.API.DTOs.Schools;
+﻿using FacilityOS.API.Common;
+using FacilityOS.API.DTOs.Schools;
 using FacilityOS.API.Features.Schools.CreateSchool;
 using FacilityOS.API.Features.Schools.DeleteSchool;
 using FacilityOS.API.Features.Schools.GetSchoolById;
 using FacilityOS.API.Features.Schools.GetSchools;
 using FacilityOS.API.Features.Schools.UpdateSchool;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
