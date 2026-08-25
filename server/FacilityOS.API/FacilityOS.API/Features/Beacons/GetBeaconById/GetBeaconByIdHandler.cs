@@ -23,7 +23,7 @@ public class GetBeaconByIdHandler : IRequestHandler<GetBeaconByIdQuery, BeaconRe
     }
 
     public async Task<BeaconResponse> Handle(GetBeaconByIdQuery request, CancellationToken cancellationToken)
-    {.
+    {
         var beaconResponse = await _context.Beacons
             .AsNoTracking()
             .Where(b => b.Id == request.Id)
