@@ -40,6 +40,8 @@ public record SchoolResponse
     public bool IsActive { get; init; }
     public int DistrictId { get; init; }
     public string DistrictName { get; init; } = string.Empty;
+    public int BeaconCount { get; init; } 
+    public int FacultyCount { get; init; } 
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
 }

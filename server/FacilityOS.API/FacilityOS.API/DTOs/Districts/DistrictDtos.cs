@@ -24,6 +24,8 @@ public record DistrictResponse
     public string Address { get; init; } = string.Empty;
     public string? Description { get; init; }
     public int SchoolCount { get; init; }
+    public int BeaconCount { get; init; } 
+    public int FacultyCount { get; init; } 
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
 }
