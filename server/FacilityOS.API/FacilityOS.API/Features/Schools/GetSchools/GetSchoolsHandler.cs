@@ -1,4 +1,5 @@
-﻿using FacilityOS.API.Common.Mapping; // Importamos tus mappers manuales con proyección IQueryable
+﻿using FacilityOS.API.Common;
+using FacilityOS.API.Common.Mapping; 
 using FacilityOS.API.Data;
 using FacilityOS.API.DTOs.Schools;
 using FacilityOS.API.Models.Enums;
@@ -21,10 +22,8 @@ public class GetSchoolsHandler : IRequestHandler<GetSchoolsQuery, PagedResult<Sc
 
     public async Task<PagedResult<SchoolResponse>> Handle(GetSchoolsQuery request, CancellationToken cancellationToken)
     {
-        // 1. Iniciamos la consulta limpia sin tracking para lectura rápida en disco (Filtro Soft Delete actúa solo)
         var query = _context.Schools.AsNoTracking().AsQueryable();
 
-        // 2. CAPA DE SEGURIDAD (Multi-Tenancy): Restringir el universo de datos según el rol del usuario conectado
         if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
         {
             query = query.Where(s => s.DistrictId == _currentUser.EntityId.Value);
@@ -34,7 +33,6 @@ public class GetSchoolsHandler : IRequestHandler<GetSchoolsQuery, PagedResult<Sc
             query = query.Where(s => s.Id == _currentUser.EntityId.Value);
         }
 
-        // 3. CAPA DE FILTROS DINÁMICOS: Filtros aplicados explícitamente por el cliente en el frontend
         if (request.DistrictId.HasValue)
         {
             query = query.Where(s => s.DistrictId == request.DistrictId.Value);
@@ -62,18 +60,15 @@ public class GetSchoolsHandler : IRequestHandler<GetSchoolsQuery, PagedResult<Sc
             query = query.Where(s => s.IsActive == request.IsActive.Value);
         }
 
-        // 4. Conteo total optimizado en base de datos antes de paginar
         var totalCount = await query.CountAsync(cancellationToken);
 
-        // 5. Ordenación, Paginación, Proyección SQL Eficiente y Materialización
         var items = await query
             .OrderBy(s => s.Name)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
-            .ProjectToResponse() // <- Eliminado Include y Select manual. Mapeo a nivel SQLServer instantáneo.
+            .ProjectToResponse() 
             .ToListAsync(cancellationToken);
 
-        // 6. Retorno del contrato unificado
         return new PagedResult<SchoolResponse>
         {
             Items = items,
