@@ -35,8 +35,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
 
-        // OPTIMIZADO: Se eliminó el bloque HasMany de aquí para centralizarlo en RefreshTokenConfiguration
-
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

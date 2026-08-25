@@ -20,13 +20,11 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
 
-        // SOLUCIÓN AL WARNING: Mapeo explícito de la relación configurada como Opcional
-        // Esto cambia el INNER JOIN por un LEFT JOIN y blinda tu auditoría
         builder.HasOne(x => x.User)
             .WithMany(x => x.RefreshTokens)
             .HasForeignKey(x => x.UserId)
-            .IsRequired(false) // <- La clave de la solución
-            .OnDelete(DeleteBehavior.Cascade); // Mantiene la eliminación en cascada si se borra físicamente al usuario
+            .IsRequired(false) 
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Ignore(x => x.IsExpired);
         builder.Ignore(x => x.IsActive);
