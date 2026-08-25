@@ -103,7 +103,7 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
                 }
             }
 
-            if (targetRole == AppConstants.Roles.DistrictAdmin) // Usando tus constantes AppRoles de forma consistente
+            if (targetRole == AppConstants.Roles.DistrictAdmin)
             {
                 return targetEntityType == UserEntityType.District && targetEntityId == _currentUser.EntityId;
             }
@@ -179,6 +179,109 @@ public class ResourceAuthorizationService : IResourceAuthorizationService
                 if (targetUser.EntityType == UserEntityType.School && targetUser.EntityId == _currentUser.EntityId)
                     return true;
             }
+        }
+
+        return false;
+    }
+
+    public async Task<bool> CanAccessBeaconAsync(int beaconId, CancellationToken cancellationToken = default)
+    {
+        if (_currentUser.IsAdmin) return true;
+
+        var beaconInfo = await _context.Beacons
+            .AsNoTracking()
+            .Where(b => b.Id == beaconId)
+            .Select(b => new
+            {
+                b.DistrictId,
+                b.SchoolId,
+                b.FacultyId,
+                FacultyDistrictId = b.Faculty != null ? b.Faculty.DistrictId : null,
+                FacultySchoolId = b.Faculty != null ? b.Faculty.SchoolId : null
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (beaconInfo is null) return false;
+
+        if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
+        {
+            var currentDistrictId = _currentUser.EntityId.Value;
+
+            if (beaconInfo.DistrictId == currentDistrictId || beaconInfo.FacultyDistrictId == currentDistrictId)
+                return true;
+
+            if (beaconInfo.SchoolId.HasValue)
+                return await SchoolBelongsToDistrictAsync(beaconInfo.SchoolId.Value, currentDistrictId, cancellationToken);
+
+            if (beaconInfo.FacultySchoolId.HasValue)
+                return await SchoolBelongsToDistrictAsync(beaconInfo.FacultySchoolId.Value, currentDistrictId, cancellationToken);
+        }
+
+        if (_currentUser.IsSchoolAdmin && _currentUser.EntityId.HasValue)
+        {
+            var currentSchoolId = _currentUser.EntityId.Value;
+
+            return beaconInfo.SchoolId == currentSchoolId || beaconInfo.FacultySchoolId == currentSchoolId;
+        }
+
+        return false;
+    }
+
+    public async Task<bool> CanAccessFacultyAsync(int facultyId, CancellationToken cancellationToken = default)
+    {
+        if (_currentUser.IsAdmin) return true;
+
+        var faculty = await _context.Faculties
+            .AsNoTracking()
+            .FirstOrDefaultAsync(f => f.Id == facultyId, cancellationToken);
+
+        if (faculty is null) return false;
+
+        if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
+        {
+            if (faculty.DistrictId == _currentUser.EntityId) return true;
+
+            if (faculty.SchoolId.HasValue)
+                return await SchoolBelongsToDistrictAsync(faculty.SchoolId.Value, _currentUser.EntityId.Value, cancellationToken);
+        }
+
+        if (_currentUser.IsSchoolAdmin && _currentUser.EntityId.HasValue)
+        {
+            return faculty.SchoolId == _currentUser.EntityId;
+        }
+
+        return false;
+    }
+
+    public async Task<bool> CanManageFacultyAsync(int facultyId, CancellationToken cancellationToken = default)
+    {
+        return await CanAccessFacultyAsync(facultyId, cancellationToken);
+    }
+
+    public async Task<bool> CanAssignBeaconToFacultyAsync(int beaconId, CancellationToken cancellationToken = default)
+    {
+        if (_currentUser.IsAdmin) return true;
+
+        var beacon = await _context.Beacons
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == beaconId, cancellationToken);
+
+        if (beacon is null) return false;
+
+        if (beacon.Status == BeaconStatus.Inactive || beacon.Status == BeaconStatus.Maintenance)
+            return false;
+
+        if (_currentUser.IsDistrictAdmin && _currentUser.EntityId.HasValue)
+        {
+            if (beacon.DistrictId == _currentUser.EntityId) return true;
+
+            if (beacon.SchoolId.HasValue)
+                return await SchoolBelongsToDistrictAsync(beacon.SchoolId.Value, _currentUser.EntityId.Value, cancellationToken);
+        }
+
+        if (_currentUser.IsSchoolAdmin && _currentUser.EntityId.HasValue)
+        {
+            return beacon.SchoolId == _currentUser.EntityId;
         }
 
         return false;

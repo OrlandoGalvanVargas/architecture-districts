@@ -1,8 +1,5 @@
 ﻿using FacilityOS.API.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace FacilityOS.API.Services;
 
@@ -21,13 +18,13 @@ public class TokenCleanupWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("🚀 Token Cleanup Background Service has started.");
+        _logger.LogInformation("Token Cleanup Background Service has started.");
 
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                _logger.LogInformation("🧹 Starting scheduled refresh token purge...");
+                _logger.LogInformation("Starting scheduled refresh token purge...");
 
                 using (var scope = _serviceProvider.CreateScope())
                 {
@@ -39,15 +36,15 @@ public class TokenCleanupWorker : BackgroundService
                         .Where(rt => rt.IsRevoked || rt.ExpiresAt < utcNow)
                         .ExecuteDeleteAsync(stoppingToken);
 
-                    _logger.LogInformation("✅ Purge completed successfully. Removed {Count} dead refresh tokens from database.", deletedRows);
+                    _logger.LogInformation("Purge completed successfully. Removed {Count} dead refresh tokens from database.", deletedRows);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ An error occurred while purging expired refresh tokens.");
+                _logger.LogError(ex, "An error occurred while purging expired refresh tokens.");
             }
 
-            _logger.LogInformation("💤 Token Cleanup Service is going to sleep for 24 hours.");
+            _logger.LogInformation("Token Cleanup Service is going to sleep for 24 hours.");
             await Task.Delay(_executionInterval, stoppingToken);
         }
     }

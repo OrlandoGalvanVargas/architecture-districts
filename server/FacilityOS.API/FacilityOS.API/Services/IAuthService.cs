@@ -7,7 +7,6 @@ public interface IAuthService
 {
     string GenerateAccessToken(User user);
     string GenerateRefreshToken();
-
-    Task<ClaimsPrincipal?> GetPrincipalFromTokenAsync(string token);
-    bool IsTokenExpired(string token);
+    //Task<ClaimsPrincipal?> GetPrincipalFromTokenAsync(string token);
+    //bool IsTokenExpired(string token);
 }
