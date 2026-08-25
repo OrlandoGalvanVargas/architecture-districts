@@ -1,5 +1,4 @@
-﻿// Data/ApplicationDbContext.cs
-using FacilityOS.API.Models;
+﻿using FacilityOS.API.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -15,6 +14,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<School> Schools { get; set; }
+    public DbSet<Beacon> Beacons { get; set; }      
+    public DbSet<Faculty> Faculties { get; set; }    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
