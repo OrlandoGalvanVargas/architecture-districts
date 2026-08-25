@@ -2,8 +2,8 @@
 
 public enum BeaconType
 {
-    Pendant = 1,      // Colgante
-    Wristband = 2,    // Pulsera
-    Fixed = 3,        // Fijo en pared
-    Mobile = 4        // Móvil
+    Pendant = 1,     
+    Wristband = 2, 
+    Fixed = 3,        
+    Mobile = 4    
 }
