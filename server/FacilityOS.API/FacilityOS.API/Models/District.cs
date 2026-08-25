@@ -12,8 +12,10 @@ public class District : BaseEntity
     public string Address { get; private set; } = string.Empty;
     public string? Description { get; private set; }
     public ICollection<School> Schools { get; private set; } = new List<School>();
+    public ICollection<Beacon> Beacons { get; private set; } = new List<Beacon>();  
+    public ICollection<Faculty> Faculties { get; private set; } = new List<Faculty>();
 
-    private District() { } // Para EF Core
+    private District() { }
 
     public District(string name, string code, string state, string city, string zipCode, string address, string? description = null)
     {

@@ -18,6 +18,8 @@ public class School : AuditableEntity
     public int StudentCapacity { get; private set; }
     public int DistrictId { get; private set; }
     public District District { get; private set; } = null!;
+    public ICollection<Beacon> Beacons { get; private set; } = new List<Beacon>();    
+    public ICollection<Faculty> Faculties { get; private set; } = new List<Faculty>();  
 
     private School() { } 
 
