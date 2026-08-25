@@ -11,12 +11,6 @@ public abstract class AuditableEntity : BaseEntity
         IsActive = false;
     }
 
-    public void Restore()
-    {
-        IsDeleted = false;
-        IsActive = true;
-    }
-
     public void Activate() => IsActive = true;
     public void Deactivate() => IsActive = false;
 }
