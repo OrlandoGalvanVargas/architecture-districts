@@ -1,9 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace FacilityOS.API.Common.Exceptions;
 
@@ -95,7 +93,6 @@ public class ExceptionHandlingMiddleware
 
         var problemDetails = new ProblemDetails
         {
-            //Type = $"https://ietf.org.{((int)statusCode == 500 ? "6.1" : "5." + ((int)statusCode % 100))}",
             Type = statusCode switch
             {
                 HttpStatusCode.NotFound => "https://tools.ietf.org/html/rfc7231#section-6.5.4",
