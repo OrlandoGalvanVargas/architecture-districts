@@ -24,6 +24,8 @@ public static class SchoolMapping
             IsActive = school.IsActive,
             DistrictId = school.DistrictId,
             DistrictName = school.District?.Name ?? string.Empty,
+            BeaconCount = school.Beacons?.Count ?? 0,    
+            FacultyCount = school.Faculties?.Count ?? 0,  
             CreatedAt = school.CreatedAt,
             UpdatedAt = school.UpdatedAt
         };
@@ -48,6 +50,8 @@ public static class SchoolMapping
             IsActive = s.IsActive,
             DistrictId = s.DistrictId,
             DistrictName = s.District.Name,
+            BeaconCount = s.Beacons.Count(),   
+            FacultyCount = s.Faculties.Count(),  
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt
         });
@@ -69,30 +73,5 @@ public static class SchoolMapping
             request.Phone,
             request.ContactEmail
         );
-    }
-
-    public static void UpdateFromRequest(this School school, UpdateSchoolRequest request)
-    {
-        school.Update(
-            request.Name,
-            request.SchoolCode,
-            request.Level,
-            request.Type,
-            request.Address,
-            request.City,
-            request.State,
-            request.ZipCode,
-            request.StudentCapacity,
-            request.Phone,
-            request.ContactEmail
-        );
-
-        if (request.IsActive != school.IsActive)
-        {
-            if (request.IsActive)
-                school.Activate();
-            else
-                school.Deactivate();
-        }
     }
 }

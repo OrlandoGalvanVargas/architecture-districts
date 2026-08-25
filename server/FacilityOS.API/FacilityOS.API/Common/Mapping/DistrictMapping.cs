@@ -18,6 +18,8 @@ public static class DistrictMapping
             Address = district.Address,
             Description = district.Description,
             SchoolCount = district.Schools?.Count ?? 0,
+            BeaconCount = district.Beacons?.Count ?? 0,     
+            FacultyCount = district.Faculties?.Count ?? 0,  
             CreatedAt = district.CreatedAt,
             UpdatedAt = district.UpdatedAt
         };
@@ -36,6 +38,8 @@ public static class DistrictMapping
             Address = d.Address,
             Description = d.Description,
             SchoolCount = d.Schools.Count(),
+            BeaconCount = d.Beacons.Count(),     
+            FacultyCount = d.Faculties.Count(),
             CreatedAt = d.CreatedAt,
             UpdatedAt = d.UpdatedAt
         });
@@ -53,19 +57,4 @@ public static class DistrictMapping
             request.Description
         );
     }
-
-    public static void UpdateFromRequest(this District district, UpdateDistrictRequest request)
-    {
-        district.Update(
-            request.Name,
-            request.Code,
-            request.State,
-            request.City,
-            request.ZipCode,
-            request.Address,
-            request.Description
-        );
-    }
-
-
 }

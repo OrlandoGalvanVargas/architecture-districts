@@ -50,20 +50,4 @@ public static class UserMapping
 
         return user;
     }
-
-    public static void UpdateFromRequest(this User user, UpdateUserRequest request)
-    {
-        user.Update(request.Name, request.Email);
-        user.UpdateRole(request.Role);
-        user.AssignToEntity(request.EntityId, request.EntityType);
-
-        if (request.IsActive != user.IsActive)
-        {
-            if (request.IsActive)
-                user.Activate();
-            else
-                user.Deactivate();
-        }
-    }
-
 }

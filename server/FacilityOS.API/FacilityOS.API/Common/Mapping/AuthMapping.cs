@@ -1,6 +1,4 @@
 ﻿using FacilityOS.API.DTOs.Auth;
-using FacilityOS.API.DTOs.Users;
-using FacilityOS.API.Common.Mapping;
 using FacilityOS.API.Models;
 
 namespace FacilityOS.API.Common.Mapping;
@@ -15,10 +13,5 @@ public static class AuthMapping
             RefreshToken = refreshToken,
             User = user.ToResponse()
         };
-    }
-
-    public static RefreshToken ToEntity(this string token, int userId, DateTime expiresAt)
-    {
-        return new RefreshToken(token, expiresAt, userId);
     }
 }
