@@ -1,4 +1,4 @@
-# Logs
+# 1. Logs & Diagnostics
 logs
 *.log
 npm-debug.log*
@@ -6,19 +6,52 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.performance-log
 
-node_modules
-dist
-dist-ssr
+# 2. Dependencies & Build Artifacts
+node_modules/
+.pnpm-store/
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+
+# 3. Environment & Secret Files (CRITICAL)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.local
 
-# Editor directories and files
+# 4. Testing & Coverage Tools
+coverage/
+.nyc_output/
+cypress/screenshots/
+cypress/videos/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# 5. Tooling & Context Generator Outputs
+repomix-output*.xml
+*.stats.json
+*.html-report.html
+
+# 6. IDEs, Editors & OS Metadata
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+desktop.ini
