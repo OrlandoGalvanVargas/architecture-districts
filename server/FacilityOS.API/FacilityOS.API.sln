@@ -1,11 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36429.23
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11828.311
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacilityOS.API", "FacilityOS.API\FacilityOS.API.csproj", "{23504CED-0CF5-42F9-8F44-E87F4EBF2B58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacilityOS.API.Tests", "FacilityOS.API.Tests\FacilityOS.API.Tests.csproj", "{64C3EC91-A32D-4B4E-9D67-E4E4F8A377EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacilityOS.Domain", "FacilityOS.Domain\FacilityOS.Domain.csproj", "{D109537F-D86B-49CD-9F24-3CC0A409E709}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacilityOS.Application", "FacilityOS.Application\FacilityOS.Application.csproj", "{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementos de la solución", "Elementos de la solución", "{7A0A6B84-DC57-43B3-813D-EA560F1BD96F}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		docker-compose.local.yml = docker-compose.local.yml
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +52,30 @@ Global
 		{64C3EC91-A32D-4B4E-9D67-E4E4F8A377EA}.Release|x64.Build.0 = Release|Any CPU
 		{64C3EC91-A32D-4B4E-9D67-E4E4F8A377EA}.Release|x86.ActiveCfg = Release|Any CPU
 		{64C3EC91-A32D-4B4E-9D67-E4E4F8A377EA}.Release|x86.Build.0 = Release|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Debug|x64.Build.0 = Debug|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Debug|x86.Build.0 = Debug|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Release|x64.ActiveCfg = Release|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Release|x64.Build.0 = Release|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Release|x86.ActiveCfg = Release|Any CPU
+		{D109537F-D86B-49CD-9F24-3CC0A409E709}.Release|x86.Build.0 = Release|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Debug|x64.Build.0 = Debug|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Debug|x86.Build.0 = Debug|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Release|x64.ActiveCfg = Release|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Release|x64.Build.0 = Release|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Release|x86.ActiveCfg = Release|Any CPU
+		{3C7A2F4A-33E3-4DB5-98C6-6EC1A11C7BFF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

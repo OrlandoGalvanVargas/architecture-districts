@@ -1,20 +1,28 @@
-## Visual Studio temporary files
 .vs/
-
-## Build results
-bin/
-obj/
-
-## User-specific files
-*.user
+.idea/
 *.suo
+*.user
 *.userosscache
 *.sln.docstates
+*.openedPackagestamps
+AppPackages/
+BundleArtifacts/
 
-## OS generated files
-.DS_Store
-Thumbs.db
+bin/
+obj/
+x64/
+x86/
+[Bb]uild/
+Release/
+Debug/
 
-# Environment / production settings (should not be committed)
+repomix-output.xml
+
 appsettings.Production.json
 .env
+.env.*
+usersecrets.json
+
+.DS_Store
+Thumbs.db
+desktop.ini

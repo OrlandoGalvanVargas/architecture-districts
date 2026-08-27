@@ -1,0 +1,25 @@
+services:
+  facilityos-api:
+    container_name: facilityos-api-local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080" 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=FacilityOSDB;User Id=sa;Password=Darmixista5;TrustServerCertificate=True;
+      
+      - Jwt__Key=MySuperSecretKey0q2374q287asdfjasdf
+      - Jwt__Issuer=FacilityOSAPI
+      - Jwt__Audience=FacilityClient
+      - Jwt__AccessTokenExpirationMinutes=15
+      - Jwt__RefreshTokenExpirationDays=7
+      
+      - Cors__AllowedOrigins__0=http://localhost:3000
+      - Cors__AllowedOrigins__1=http://localhost:5000
+      - RateLimiting__PermitLimit=100
+      - RateLimiting__WindowMinutes=1
+      - BCrypt__WorkFactor=12
+    restart: always
