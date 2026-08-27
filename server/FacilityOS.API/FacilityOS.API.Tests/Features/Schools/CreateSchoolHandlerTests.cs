@@ -1,7 +1,4 @@
 ﻿using FacilityOS.API.Data;
-using FacilityOS.API.DTOs.Schools;
-using FacilityOS.API.Features.Schools.CreateSchool;
-using FacilityOS.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FacilityOS.API.Tests.Features.Schools

@@ -1,13 +1,6 @@
 ﻿using FacilityOS.API.Data;
-using FacilityOS.API.DTOs.Auth;
-using FacilityOS.API.Features.Auth.Login;
-using FacilityOS.API.Models;
-using FacilityOS.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FacilityOS.API.Tests.Features.Auth
 {

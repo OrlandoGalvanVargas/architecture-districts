@@ -1,10 +1,5 @@
 ﻿using FacilityOS.API.Data;
-using FacilityOS.API.Features.Schools.GetSchools;
-using FacilityOS.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FacilityOS.API.Tests.Features.Schools
 {

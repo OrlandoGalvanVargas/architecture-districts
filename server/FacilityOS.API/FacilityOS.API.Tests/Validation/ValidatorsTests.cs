@@ -1,8 +1,3 @@
-using FacilityOS.API.DTOs.Auth;
-using FacilityOS.API.DTOs.Schools;
-using FacilityOS.API.Models;
-using FacilityOS.API.Validators;
-
 namespace FacilityOS.API.Tests.Validation
 {
     public class ValidatorsTests
