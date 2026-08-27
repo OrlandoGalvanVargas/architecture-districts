@@ -1,11 +1,11 @@
-﻿using FacilityOS.API.Common;
-using FacilityOS.API.DTOs.Beacons;
-using FacilityOS.API.Features.Beacons.CreateBeacon;
-using FacilityOS.API.Features.Beacons.DeleteBeacon;
-using FacilityOS.API.Features.Beacons.GetBeaconById;
-using FacilityOS.API.Features.Beacons.GetBeacons;
-using FacilityOS.API.Features.Beacons.UpdateBeacon;
-using FacilityOS.API.Models.Enums;
+﻿using FacilityOS.Application.Common;
+using FacilityOS.Application.DTOs.Beacons;
+using FacilityOS.Application.Features.Beacons.CreateBeacon;
+using FacilityOS.Application.Features.Beacons.DeleteBeacon;
+using FacilityOS.Application.Features.Beacons.GetBeaconById;
+using FacilityOS.Application.Features.Beacons.GetBeacons;
+using FacilityOS.Application.Features.Beacons.UpdateBeacon;
+using FacilityOS.Domain.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -28,7 +28,7 @@ public class BeaconsController : ApiControllerBase
         [FromQuery] bool? isAssigned,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
-        CancellationToken cancellationToken = default) 
+        CancellationToken cancellationToken = default)
     {
         if (pageSize > 50) pageSize = 50;
 

@@ -1,7 +1,8 @@
-﻿using FacilityOS.API.Common;
-using FacilityOS.API.Data;
-using FacilityOS.API.Models;
-using FacilityOS.API.Models.Enums;
+﻿using FacilityOS.API.Data;
+using FacilityOS.Application.Common;
+using FacilityOS.Application.Services;
+using FacilityOS.Domain.Models;
+using FacilityOS.Domain.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace FacilityOS.API.Services;

@@ -1,19 +1,20 @@
-﻿using System.Security.Claims;
+﻿using FacilityOS.Application.Common;
+using FacilityOS.Application.Common.Settings;
+using FacilityOS.Application.Services;
+using FacilityOS.Domain.Models;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using FacilityOS.API.Common;
-using FacilityOS.API.Models;
-using FacilityOS.API.Settings;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.IdentityModel.JsonWebTokens; 
 
 namespace FacilityOS.API.Services;
 
 public class AuthService : IAuthService
 {
     private readonly JwtSettings _jwtSettings;
-    private readonly JsonWebTokenHandler _tokenHandler; 
+    private readonly JsonWebTokenHandler _tokenHandler;
 
     public AuthService(IOptions<JwtSettings> jwtSettings)
     {
@@ -59,45 +60,4 @@ public class AuthService : IAuthService
         rng.GetBytes(randomBytes);
         return Convert.ToBase64String(randomBytes);
     }
-
-    //public async Task<ClaimsPrincipal?> GetPrincipalFromTokenAsync(string token)
-    //{
-    //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-
-    //    try
-    //    {
-    //        var validationResult = await _tokenHandler.ValidateTokenAsync(token, new TokenValidationParameters
-    //        {
-    //            ValidateIssuer = true,
-    //            ValidateAudience = true,
-    //            ValidateLifetime = false,
-    //            ValidateIssuerSigningKey = true,
-    //            ValidIssuer = _jwtSettings.Issuer,
-    //            ValidAudience = _jwtSettings.Audience,
-    //            IssuerSigningKey = key,
-    //            ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 }
-    //        });
-
-    //        if (!validationResult.IsValid) return null;
-
-    //        return new ClaimsPrincipal(validationResult.ClaimsIdentity);
-    //    }
-    //    catch
-    //    {
-    //        return null;
-    //    }
-    //}
-
-    //public bool IsTokenExpired(string token)
-    //{
-    //    try
-    //    {
-    //        var jwt = _tokenHandler.ReadJsonWebToken(token);
-    //        return jwt.ValidTo < DateTime.UtcNow;
-    //    }
-    //    catch
-    //    {
-    //        return true;
-    //    }
-    //}
 }

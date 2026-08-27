@@ -1,7 +1,8 @@
-﻿using System.Net;
-using System.Text.Json;
+﻿using FacilityOS.Application.Common.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Text.Json;
 
 namespace FacilityOS.API.Common.Exceptions;
 

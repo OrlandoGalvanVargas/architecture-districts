@@ -1,4 +1,4 @@
-﻿using FacilityOS.API.Models;
+﻿using FacilityOS.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +20,8 @@ public class SchoolConfiguration : IEntityTypeConfiguration<School>
             .IsRequired();
 
         builder.HasIndex(x => x.SchoolCode)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(x => x.Level)
             .HasConversion<string>()
@@ -56,6 +57,8 @@ public class SchoolConfiguration : IEntityTypeConfiguration<School>
             .WithMany(x => x.Schools)
             .HasForeignKey(x => x.DistrictId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => x.DistrictId);
 
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");

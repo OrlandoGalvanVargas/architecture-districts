@@ -1,9 +1,9 @@
-﻿using FacilityOS.API.DTOs.Districts;
-using FacilityOS.API.Features.Districts.CreateDistrict;
-using FacilityOS.API.Features.Districts.DeleteDistrict;
-using FacilityOS.API.Features.Districts.GetDistrictById;
-using FacilityOS.API.Features.Districts.GetDistricts;
-using FacilityOS.API.Features.Districts.UpdateDistrict;
+﻿using FacilityOS.Application.DTOs.Districts;
+using FacilityOS.Application.Features.Districts.CreateDistrict;
+using FacilityOS.Application.Features.Districts.DeleteDistrict;
+using FacilityOS.Application.Features.Districts.GetDistrictById;
+using FacilityOS.Application.Features.Districts.GetDistricts;
+using FacilityOS.Application.Features.Districts.UpdateDistrict;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

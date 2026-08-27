@@ -1,4 +1,4 @@
-﻿using FacilityOS.API.Models;
+﻿using FacilityOS.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +20,8 @@ public class BeaconConfiguration : IEntityTypeConfiguration<Beacon>
             .IsRequired();
 
         builder.HasIndex(x => x.SerialNumber)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0");
 
         builder.Property(x => x.Type)
             .HasConversion<string>()

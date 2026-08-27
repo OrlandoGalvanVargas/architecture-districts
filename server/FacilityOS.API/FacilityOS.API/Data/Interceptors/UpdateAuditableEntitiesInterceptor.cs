@@ -1,4 +1,4 @@
-﻿using FacilityOS.API.Models.Base;
+﻿using FacilityOS.Domain.Models.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 

@@ -1,19 +1,8 @@
-﻿using System.Security.Claims;
-using FacilityOS.API.Common;
+﻿using FacilityOS.Application.Common;
+using FacilityOS.Application.Services;
+using System.Security.Claims;
 
 namespace FacilityOS.API.Services;
-
-public interface ICurrentUserService
-{
-    int? UserId { get; }
-    string? Role { get; }
-    int? EntityId { get; }
-    string? EntityType { get; }
-
-    bool IsAdmin => Role == AppConstants.Roles.Admin;
-    bool IsDistrictAdmin => Role == AppConstants.Roles.DistrictAdmin;
-    bool IsSchoolAdmin => Role == AppConstants.Roles.SchoolAdmin;
-}
 
 public class CurrentUserService : ICurrentUserService
 {

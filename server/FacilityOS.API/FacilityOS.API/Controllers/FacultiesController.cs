@@ -1,10 +1,10 @@
-﻿using FacilityOS.API.Common;
-using FacilityOS.API.DTOs.Faculties;
-using FacilityOS.API.Features.Faculties.CreateFaculty;
-using FacilityOS.API.Features.Faculties.DeleteFaculty;
-using FacilityOS.API.Features.Faculties.GetFaculties;
-using FacilityOS.API.Features.Faculties.GetFacultyById;
-using FacilityOS.API.Features.Faculties.UpdateFaculty;
+﻿using FacilityOS.Application.Common;
+using FacilityOS.Application.DTOs.Faculties;
+using FacilityOS.Application.Features.Faculties.CreateFaculty;
+using FacilityOS.Application.Features.Faculties.DeleteFaculty;
+using FacilityOS.Application.Features.Faculties.GetFaculties;
+using FacilityOS.Application.Features.Faculties.GetFacultyById;
+using FacilityOS.Application.Features.Faculties.UpdateFaculty;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -26,7 +26,7 @@ public class FacultiesController : ApiControllerBase
         [FromQuery] bool? hasBeacon,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
-        CancellationToken cancellationToken = default) 
+        CancellationToken cancellationToken = default)
     {
         if (pageSize > 50) pageSize = 50;
 

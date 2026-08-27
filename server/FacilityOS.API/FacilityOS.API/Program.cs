@@ -1,29 +1,33 @@
-using FacilityOS.API.Common;
-using FacilityOS.API.Common.Behaviors;
 using FacilityOS.API.Common.Exceptions;
 using FacilityOS.API.Data;
 using FacilityOS.API.Data.Interceptors;
 using FacilityOS.API.Services;
-using FacilityOS.API.Settings;
+using FacilityOS.Application.Common;
+using FacilityOS.Application.Common.Behaviors;
+using FacilityOS.Application.Common.Settings;
+using FacilityOS.Application.Services;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using System.Reflection;
+using Serilog;
 using System.Text;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Servicios base
-builder.Services.AddControllers();
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
 
-builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Host.UseSerilog();
+
+
+// 1. SERVICIOS BASE & VALIDACIÓN 
+builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -41,43 +45,64 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// 2. Base de datos
+
+// 2. PERSISTENCIA RESILIENTE & ALTO RENDIMIENTO
 builder.Services.AddSingleton<UpdateAuditableEntitiesInterceptor>();
 
-builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+// Corrección de registro de DbContextPool
+builder.Services.AddDbContextPool<ApplicationDbContext>((sp, options) =>
 {
     var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .AddInterceptors(interceptor);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    })
+    .AddInterceptors(interceptor);
 });
 
-// 3. MediatR con ValidationBehavior
+builder.Services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+
+// 3. MEDIATR CON COMPORTAMIENTOS ABIERTOS
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+    cfg.RegisterServicesFromAssembly(typeof(ValidationBehavior<,>).Assembly);
     cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
-// 4. Servicios de la aplicacion
+builder.Services.AddValidatorsFromAssembly(typeof(ValidationBehavior<,>).Assembly);
+
+
+// 4. SERVICIOS DE LA APLICACIÓN Y JOBS EN SEGUNDO PLANO
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddHealthChecks();
+
+builder.Services.AddHealthChecks()
+    .AddSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection")!,
+        name: "sqlserver",
+        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
+        tags: new[] { "db", "data" });
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IResourceAuthorizationService, ResourceAuthorizationService>();
-
 builder.Services.AddHostedService<TokenCleanupWorker>();
 
-// 5. Carga de configuraciones tipadas
+// 5. CARGA Y VALIDACIÓN DE CONFIGURACIONES
+builder.Services.Configure<BCryptSettings>(builder.Configuration.GetSection(BCryptSettings.SectionName));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 var rateLimitConfig = builder.Configuration.GetSection("RateLimiting");
 int permitLimit = rateLimitConfig.GetValue<int>("PermitLimit", 100);
 int windowMinutes = rateLimitConfig.GetValue<int>("WindowMinutes", 1);
 
-if (string.IsNullOrWhiteSpace(jwtSettings.Key))
-    throw new InvalidOperationException("Jwt:Key is not configured. Set it via user-secrets (dev) or environment variables (prod).");
+if (string.IsNullOrWhiteSpace(jwtSettings.Key) || jwtSettings.Key.Length < 32)
+    throw new InvalidOperationException("Jwt:Key is not configured or is too short (min 32 characters for HMAC-SHA256).");
 
 if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("DefaultConnection")))
     throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
@@ -85,27 +110,19 @@ if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Default
 if (builder.Environment.IsProduction())
 {
     if (string.IsNullOrWhiteSpace(jwtSettings.Issuer))
-        throw new InvalidOperationException("Jwt:Issuer is required in Production. Set via environment variables.");
-    
+        throw new InvalidOperationException("Jwt:Issuer is required in Production.");
+
     if (string.IsNullOrWhiteSpace(jwtSettings.Audience))
-        throw new InvalidOperationException("Jwt:Audience is required in Production. Set via environment variables.");
-    
+        throw new InvalidOperationException("Jwt:Audience is required in Production.");
+
     if (corsOrigins.Length == 0)
         throw new InvalidOperationException("Cors:AllowedOrigins is required in Production.");
-    
+
     if (permitLimit <= 0)
         throw new InvalidOperationException("RateLimiting:PermitLimit must be greater than 0 in Production.");
 }
-else if (builder.Environment.IsDevelopment())
-{
-    if (string.IsNullOrWhiteSpace(jwtSettings.Issuer))
-        Console.WriteLine("⚠️  WARNING (DEV): Jwt:Issuer is empty. Set via user-secrets for proper JWT generation.");
-    
-    if (string.IsNullOrWhiteSpace(jwtSettings.Audience))
-        Console.WriteLine("⚠️  WARNING (DEV): Jwt:Audience is empty. Set via user-secrets for proper JWT generation.");
-}
 
-// 7. Rate Limiting
+// 6. RATE LIMITING
 builder.Services.AddRateLimiter(options =>
 {
     options.AddPolicy("global", httpContext =>
@@ -119,7 +136,7 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 
-// 8. Autenticación JWT
+// 7. SEGURIDAD: AUTENTICACIÓN JWT 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -131,12 +148,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSettings.Issuer,
             ValidAudience = jwtSettings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings.Key)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+            ClockSkew = TimeSpan.FromMinutes(5)
         };
     });
 
-// Políticas de Autorización
+// 8. POLÍTICAS DE AUTORIZACIÓN JERÁRQUICA
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy =>
@@ -149,7 +166,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole(AppConstants.Roles.Admin, AppConstants.Roles.DistrictAdmin, AppConstants.Roles.SchoolAdmin));
 });
 
-// 9. CORS
+// 9. C.O.R.S RESTRICTIVO
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -161,8 +178,31 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// 10. Pipeline HTTP
+// APLICACIÓN AUTOMÁTICA DE MIGRACIONES EN PRODUCCIÓN (CI/CD)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            Log.Information("New pending database migrations detected. Applying changes to SQL Server...");
+            context.Database.Migrate();
+            Log.Information("Database migrations applied successfully.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "An error occurred while migrating the database during startup sequence.");
+        throw;
+    }
+}
+
+// 10. MIDDLEWARES
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseSecurityHeaders();
 
 if (app.Environment.IsDevelopment())
 {
@@ -177,11 +217,22 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 app.MapControllers();
 
-app.Run();
+try
+{
+    Log.Information("Starting FacilityOS API Host...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

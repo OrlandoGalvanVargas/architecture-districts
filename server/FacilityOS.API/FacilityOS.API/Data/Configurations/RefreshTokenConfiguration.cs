@@ -1,4 +1,4 @@
-﻿using FacilityOS.API.Models;
+﻿using FacilityOS.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,7 +23,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.HasOne(x => x.User)
             .WithMany(x => x.RefreshTokens)
             .HasForeignKey(x => x.UserId)
-            .IsRequired(false) 
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Ignore(x => x.IsExpired);
