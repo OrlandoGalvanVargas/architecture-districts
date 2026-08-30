@@ -1,11 +1,13 @@
-import { NotificationProvider } from "./contexts/Notification";
-import { AppRouter } from "./router/AppRouter";
+// src/App.jsx
+
+import { AppRouter } from "@/router/AppRouter";
+import { ErrorBoundary } from "./components/common/ErrorBoundary/ErrorBoundary";
 
 function App() {
   return (
-    <NotificationProvider>
+    <ErrorBoundary>
       <AppRouter />
-    </NotificationProvider>
+    </ErrorBoundary>
   );
 }
 
