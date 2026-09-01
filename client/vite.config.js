@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig(({ mode }) => {
-  // Carga las variables del archivo .env
   const env = loadEnv(mode, process.cwd(), "");
 
   return {
@@ -22,7 +21,7 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_API_URL || "http://localhost:5000",
           changeOrigin: true,
           secure: false,
-          cookieDomainRewrite: "localhost", // Asegura que la cookie se guarde
+          cookieDomainRewrite: "localhost",
         },
       },
     },
