@@ -1,23 +1,25 @@
 import axios from "axios";
-import { tokenManager } from "../utils/tokenManager";
+import { tokenManager } from "@/utils/tokenManager";
+import { handleApiError } from "@/utils/errorHandler";
 
 export const apiClient = axios.create({
-  baseURL: "https://localhost:7206/api",
-  timeout: 5000,
+  baseURL: import.meta.env.PROD ? import.meta.env.VITE_API_URL : "/api",
+  timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 30000,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use(
   (config) => {
     const token = tokenManager.getAccessToken();
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error)
 );
 
 let isRefreshing = false;
@@ -31,22 +33,19 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-
   failedQueue = [];
 };
 
 apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/login") &&
-      !originalRequest.url.includes("/auth/refresh")
+      !originalRequest.url?.includes("/auth/login") &&
+      !originalRequest.url?.includes("/auth/refresh")
     ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -56,47 +55,35 @@ apiClient.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return apiClient(originalRequest);
           })
-          .catch((error) => {
-            return Promise.reject(error);
-          });
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = tokenManager.getRefreshToken();
-
-      if (!refreshToken) {
-        tokenManager.clearTokens();
-        window.location.href = "/auth/login";
-        return Promise.reject(error);
-      }
-
       try {
-        const response = await apiClient.post(
-          `${originalRequest.baseURL}/auth/refresh`,
-          {
-            refreshToken,
-          },
-        );
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-        tokenManager.setToken(accessToken, newRefreshToken);
+        const response = await apiClient.post("/auth/refresh");
+        const { accessToken, user } = response.data;
 
+        tokenManager.setSession(accessToken, user);
         processQueue(null, accessToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        tokenManager.clearTokens();
-        window.location.href = "/auth/login";
-        return Promise.reject(refreshError);
+        tokenManager.clearSession();
+
+        if (window.location.pathname !== "/auth/login") {
+          window.location.href = "/auth/login";
+        }
+
+        return Promise.reject(handleApiError(refreshError, "tokenExpired"));
       } finally {
         isRefreshing = false;
       }
     }
 
-    const errorMessage = error.response?.message || "An error occurred";
-    return Promise.reject(errorMessage);
-  },
+    return Promise.reject(handleApiError(error));
+  }
 );
