@@ -1,25 +1,15 @@
 const KEYS = {
-  ACCESS_TOKEN: "auth-token",
-  REFRESH_TOKEN: "refresh-token",
+  ACCESS_TOKEN: "access_token",
   USER: "user",
 };
 
 export const tokenManager = {
-  setToken: (accessToken, refreshToken) => {
+  setAccessToken: (accessToken) => {
     localStorage.setItem(KEYS.ACCESS_TOKEN, accessToken);
-    localStorage.setItem(KEYS.REFRESH_TOKEN, refreshToken);
   },
 
   getAccessToken: () => {
     return localStorage.getItem(KEYS.ACCESS_TOKEN);
-  },
-
-  getRefreshToken: () => {
-    return localStorage.getItem(KEYS.REFRESH_TOKEN);
-  },
-
-  setAccessToken: (accessToken) => {
-    localStorage.setItem(KEYS.ACCESS_TOKEN, accessToken);
   },
 
   setUser: (user) => {
@@ -31,9 +21,15 @@ export const tokenManager = {
     return user ? JSON.parse(user) : null;
   },
 
-  clearTokens: () => {
+  setSession: (accessToken, user) => {
+    localStorage.setItem(KEYS.ACCESS_TOKEN, accessToken);
+    if (user) {
+      localStorage.setItem(KEYS.USER, JSON.stringify(user));
+    }
+  },
+
+  clearSession: () => {
     localStorage.removeItem(KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(KEYS.REFRESH_TOKEN);
     localStorage.removeItem(KEYS.USER);
   },
 
