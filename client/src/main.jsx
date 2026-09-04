@@ -9,15 +9,23 @@ import { themeConfig } from "@/config/theme";
 import App from "./App";
 import "./index.css";
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <ConfigProvider theme={themeConfig}>
-      <QueryClientProvider client={queryClient}>
-        <NotificationProvider>
-          <App />
-        </NotificationProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </ConfigProvider>
-  </StrictMode>
-);
+async function enableMocking() {
+  if (import.meta.env.VITE_ENABLE_MOCK !== "true") return;
+  const { worker } = await import("./mocks/browser");
+  await worker.start({ onUnhandledRequest: "bypass" });
+}
+
+enableMocking().then(() => {
+  createRoot(document.getElementById("root")).render(
+    <StrictMode>
+      <ConfigProvider theme={themeConfig}>
+        <QueryClientProvider client={queryClient}>
+          <NotificationProvider>
+            <App />
+          </NotificationProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ConfigProvider>
+    </StrictMode>
+  );
+});
