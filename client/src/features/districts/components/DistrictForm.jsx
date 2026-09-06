@@ -1,6 +1,21 @@
-import { Form, Input, Button, Select, Row, Col, Space } from "antd";
+import { Form, Input, Button, Select, Row, Col, Space, Divider } from "antd";
+import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import { logger } from "@/services/logger.service";
 
 const { TextArea } = Input;
+
+const US_STATES = [
+  { value: "CA", label: "California" },
+  { value: "TX", label: "Texas" },
+  { value: "NY", label: "New York" },
+  { value: "FL", label: "Florida" },
+  { value: "AZ", label: "Arizona" },
+  { value: "NV", label: "Nevada" },
+  { value: "WA", label: "Washington" },
+  { value: "OR", label: "Oregon" },
+  { value: "CO", label: "Colorado" },
+  { value: "IL", label: "Illinois" },
+];
 
 export const DistrictForm = ({
   initialValues = null,
@@ -13,9 +28,11 @@ export const DistrictForm = ({
   const handleSubmit = async (values) => {
     try {
       await onSubmit(values);
-      form.resetFields();
+      if (!initialValues) {
+        form.resetFields();
+      }
     } catch (error) {
-      console.log(error);
+      logger.warn("District form submission failed", error);
     }
   };
 
@@ -25,7 +42,12 @@ export const DistrictForm = ({
       layout="vertical"
       initialValues={initialValues}
       onFinish={handleSubmit}
+      disabled={loading}
     >
+      <Divider orientation="left" orientationMargin={0} style={{ marginTop: 0 }}>
+        Basic Information
+      </Divider>
+
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item
@@ -34,9 +56,10 @@ export const DistrictForm = ({
             rules={[
               { required: true, message: "Please enter district name" },
               { min: 3, message: "Name must be at least 3 characters" },
+              { max: 200, message: "Name must not exceed 200 characters" },
             ]}
           >
-            <Input placeholder="Enter district name" disabled={loading} />
+            <Input placeholder="Enter district name" />
           </Form.Item>
         </Col>
 
@@ -44,18 +67,29 @@ export const DistrictForm = ({
           <Form.Item
             label="District Code"
             name="code"
+            tooltip="Use uppercase letters, numbers, and hyphens only"
             rules={[
               { required: true, message: "Please enter district code" },
+              { max: 50, message: "Code must not exceed 50 characters" },
               {
                 pattern: /^[A-Z0-9-]+$/,
                 message: "Only uppercase letters, numbers, and hyphens",
               },
             ]}
           >
-            <Input placeholder="e.g., DIST-001" disabled={loading} />
+            <Input
+              placeholder="e.g., DIST-001"
+              onChange={(e) => {
+                e.target.value = e.target.value.toUpperCase();
+              }}
+            />
           </Form.Item>
         </Col>
       </Row>
+
+      <Divider orientation="left" orientationMargin={0}>
+        Location
+      </Divider>
 
       <Row gutter={16}>
         <Col xs={24} md={8}>
@@ -64,12 +98,12 @@ export const DistrictForm = ({
             name="state"
             rules={[{ required: true, message: "Please select state" }]}
           >
-            <Select placeholder="Select state" disabled={loading}>
-              <Select value="CA">California</Select>
-              <Select value="TX">Texas</Select>
-              <Select value="NY">New York</Select>
-              <Select value="FL">Florida</Select>
-            </Select>
+            <Select
+              placeholder="Select state"
+              showSearch
+              optionFilterProp="label"
+              options={US_STATES}
+            />
           </Form.Item>
         </Col>
 
@@ -77,9 +111,12 @@ export const DistrictForm = ({
           <Form.Item
             label="City"
             name="city"
-            rules={[{ required: true, message: "Please enter city" }]}
+            rules={[
+              { required: true, message: "Please enter city" },
+              { max: 100, message: "City must not exceed 100 characters" },
+            ]}
           >
-            <Input placeholder="Enter city" disabled={loading} />
+            <Input placeholder="Enter city" />
           </Form.Item>
         </Col>
 
@@ -92,7 +129,7 @@ export const DistrictForm = ({
               { pattern: /^\d{5}$/, message: "ZIP must be 5 digits" },
             ]}
           >
-            <Input placeholder="12345" disabled={loading} />
+            <Input placeholder="12345" maxLength={5} />
           </Form.Item>
         </Col>
       </Row>
@@ -100,25 +137,36 @@ export const DistrictForm = ({
       <Form.Item
         label="Address"
         name="address"
-        rules={[{ required: true, message: "Please enter address" }]}
+        rules={[
+          { required: true, message: "Please enter address" },
+          { max: 500, message: "Address must not exceed 500 characters" },
+        ]}
       >
-        <Input placeholder="Street address" disabled={loading} />
+        <Input placeholder="Street address" />
       </Form.Item>
 
-      <Form.Item label="Description" name="description">
-        <TextArea
-          rows={4}
-          placeholder="Optional description"
-          disabled={loading}
-        />
+      <Divider orientation="left" orientationMargin={0}>
+        Additional Details
+      </Divider>
+
+      <Form.Item
+        label="Description"
+        name="description"
+        rules={[{ max: 1000, message: "Description must not exceed 1000 characters" }]}
+      >
+        <TextArea rows={4} placeholder="Optional description" showCount maxLength={1000} />
       </Form.Item>
 
-      <Form.Item>
+      <Form.Item className="form-actions">
         <Space>
-          <Button type="primary" htmlType="submit" loading={loading}>
+          <Button type="primary" htmlType="submit" loading={loading} icon={<SaveOutlined />}>
             {initialValues ? "Update District" : "Create District"}
           </Button>
-          {onCancel && <Button onClick={onCancel}>Cancel</Button>}
+          {onCancel && (
+            <Button onClick={onCancel} icon={<CloseOutlined />} disabled={loading}>
+              Cancel
+            </Button>
+          )}
         </Space>
       </Form.Item>
     </Form>
