@@ -1,0 +1,5 @@
+.table-card {
+  border: 1px solid;
+  box-shadow: var(--fos-shadow-sm);
+  overflow: hidden;
+}
