@@ -5,3 +5,20 @@
   min-height: 200px;
   width: 100%;
 }
+
+.loading-spinner--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  min-height: 100vh;
+}
+
+.loading-spinner--overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+}
+
+.loading-spinner__content {
+  padding: 50px;
+}
