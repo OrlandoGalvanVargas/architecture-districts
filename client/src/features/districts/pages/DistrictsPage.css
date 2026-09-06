@@ -1,0 +1,19 @@
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar-search {
+  flex: 1 1 280px;
+  max-width: 400px;
+}
+
+@media (max-width: 480px) {
+  .toolbar-search {
+    max-width: none;
+  }
+}

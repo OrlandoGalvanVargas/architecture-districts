@@ -1,21 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { DistrictListPage } from "./pages/DistrictsPage";
+import { DistrictsPage } from "./pages/DistrictsPage";
 import { DistrictCreatePage } from "./pages/DistrictCreatePage";
 import { DistrictDetailPage } from "./pages/DistrictDetailPage";
 import { DistrictEditPage } from "./pages/DistrictEditPage";
-import { ROUTES_CONFIG } from "@/router/routes";
+import { ROUTES } from "@/router/routes.config";
 
 export const DistrictView = () => {
-  const routes = ROUTES_CONFIG.districts.children;
-
   return (
     <Routes>
-      <Route index element={<DistrictListPage />} />
-      <Route path={routes.create.pattern} element={<DistrictCreatePage />} />
-      <Route path={routes.detail.pattern} element={<DistrictDetailPage />} />
-      <Route path={routes.edit.pattern} element={<DistrictEditPage />} />
-
-      <Route path="*" element={<Navigate to="/districts" replace />} />
+      <Route index element={<DistrictsPage />} />
+      <Route path="create" element={<DistrictCreatePage />} />
+      <Route path=":id" element={<DistrictDetailPage />} />
+      <Route path=":id/edit" element={<DistrictEditPage />} />
+      <Route path="*" element={<Navigate to={ROUTES.DISTRICTS.LIST} replace />} />
     </Routes>
   );
 };
