@@ -1,0 +1,14 @@
+.toolbar {
+  margin-bottom: 16px;
+}
+
+.toolbar-search {
+  width: 300px;
+  max-width: 100%;
+}
+
+@media (max-width: 480px) {
+  .toolbar-search {
+    width: 100%;
+  }
+}
