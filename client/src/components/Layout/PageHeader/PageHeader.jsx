@@ -1,23 +1,45 @@
-import { Breadcrumb } from "antd";
+import { Breadcrumb, Typography, theme } from "antd";
 import { Link } from "react-router-dom";
+import { HomeOutlined } from "@ant-design/icons";
 import "./PageHeader.css";
 
-export const PageHeader = ({ title, breadcrumbs = [] }) => {
-  const breadcrumbItems = breadcrumbs.map((crumb, index) => {
-    const isLast = index === breadcrumbs.length - 1;
+const { Title } = Typography;
 
-    return {
-      title: isLast ? crumb.label : <Link to={crumb.path}>{crumb.label}</Link>,
-    };
-  });
+export const PageHeader = ({ title, subtitle = null, breadcrumbs = [], extra = null }) => {
+  const { token } = theme.useToken();
+
+  const breadcrumbItems = [
+    {
+      title: (
+        <Link to="/">
+          <HomeOutlined />
+        </Link>
+      ),
+    },
+    ...breadcrumbs.map((crumb, index) => {
+      const isLast = index === breadcrumbs.length - 1;
+      return { title: isLast ? crumb.label : <Link to={crumb.path}>{crumb.label}</Link> };
+    }),
+  ];
 
   return (
-    <div className="page-header">
+    <div
+      className="page-header"
+      style={{ backgroundColor: token.colorBgContainer, borderColor: token.colorBorderSecondary }}
+    >
       <div className="page-header-content">
         <div className="page-header-main">
           <Breadcrumb items={breadcrumbItems} />
-          <h1 className="page-title">{title}</h1>
+          <Title level={2} className="page-title" style={{ color: token.colorText }}>
+            {title}
+          </Title>
+          {subtitle && (
+            <p className="page-subtitle" style={{ color: token.colorTextSecondary }}>
+              {subtitle}
+            </p>
+          )}
         </div>
+        {extra && <div className="page-header-extra">{extra}</div>}
       </div>
     </div>
   );
