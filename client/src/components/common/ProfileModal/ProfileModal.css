@@ -1,0 +1,28 @@
+.profile-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.profile-modal-identity {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-modal-name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.profile-modal-email {
+  font-size: 13px;
+  color: var(--fos-color-text-tertiary);
+}
+
+.profile-modal-role {
+  border: none;
+  flex-shrink: 0;
+}

@@ -2,8 +2,18 @@
   margin: 20px 0;
 }
 
-.error-details {
+.error-message--compact {
+  margin: 8px 0;
+}
+
+.error-message__text {
+  margin-bottom: 8px;
+}
+
+.error-message__details {
+  padding: 12px;
   font-size: 12px;
-  color: #666;
-  margin-top: 4px;
+  max-height: 300px;
+  overflow: auto;
+  margin-top: 8px;
 }

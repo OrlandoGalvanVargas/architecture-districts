@@ -1,37 +1,67 @@
-import { Alert, Button } from "antd";
+import { Alert, Button, Space, theme } from "antd";
+import { useState } from "react";
 import "./ErrorMessage.css";
 
-export const ErrorMessage = ({
-  error,
-  onRetry = null,
-  showDetails = false,
-}) => {
+export const ErrorMessage = ({ error, onRetry = null, showDetails = false, compact = false }) => {
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const { token } = theme.useToken();
+
   if (!error) return null;
 
   const getMessage = () => {
     if (typeof error === "string") return error;
-    return error.message || "An error occurred";
+    return error.friendlyMessage || error.message || "An error occurred";
+  };
+
+  const getStatus = () => {
+    if (typeof error === "object" && error.status) {
+      return error.status;
+    }
+    return null;
   };
 
   return (
-    <div className="error-message">
+    <div className={`error-message ${compact ? "error-message--compact" : ""}`}>
       <Alert
-        title="Error"
+        type="error"
+        showIcon
+        message={getStatus() ? `Error ${getStatus()}` : "Error"}
         description={
           <div>
-            <p>{getMessage()}</p>
-            {showDetails && error.status && (
-              <p className="error-details">Status: {error.status}</p>
-            )}
-            {onRetry && (
-              <Button type="primary" onClick={onRetry} style={{ marginTop: 8 }}>
-                Retry
+            <p className="error-message__text">{getMessage()}</p>
+
+            {showDetails && error.details && (
+              <Button
+                type="link"
+                size="small"
+                onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+              >
+                {showTechnicalDetails ? "Hide Details" : "Show Details"}
               </Button>
+            )}
+
+            {showTechnicalDetails && (
+              <pre
+                className="error-message__details"
+                style={{
+                  backgroundColor: token.colorFillTertiary,
+                  color: token.colorText,
+                  borderRadius: token.borderRadius,
+                }}
+              >
+                {JSON.stringify(error.details, null, 2)}
+              </pre>
+            )}
+
+            {onRetry && (
+              <Space style={{ marginTop: 12 }}>
+                <Button type="primary" size="small" onClick={onRetry}>
+                  Retry
+                </Button>
+              </Space>
             )}
           </div>
         }
-        type="error"
-        showIcon
       />
     </div>
   );
