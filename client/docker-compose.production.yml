@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   facilityos-frontend:
     container_name: facilityos-frontend-prod
