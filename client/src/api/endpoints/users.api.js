@@ -1,24 +1,28 @@
-import { apiClient } from "../client";
+import { apiClient } from "@/api/client";
 
-const ENDPOINT = "/schools";
+const ENDPOINT = "/users";
 
-export const schoolsApi = {
+export const usersApi = {
   getAll: async (params = {}) => {
     const response = await apiClient.get(ENDPOINT, { params });
     return response.data;
   },
+
   getById: async (id) => {
     const response = await apiClient.get(`${ENDPOINT}/${id}`);
     return response.data;
   },
-  create: async (data) => {
-    const response = await apiClient.post(ENDPOINT, data);
+
+  create: async (userData) => {
+    const response = await apiClient.post(ENDPOINT, userData);
     return response.data;
   },
-  update: async (id, data) => {
-    const response = await apiClient.put(`${ENDPOINT}/${id}`, data);
+
+  update: async (id, userData) => {
+    const response = await apiClient.put(`${ENDPOINT}/${id}`, userData);
     return response.data;
   },
+
   delete: async (id) => {
     await apiClient.delete(`${ENDPOINT}/${id}`);
   },
