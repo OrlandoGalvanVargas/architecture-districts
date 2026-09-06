@@ -56,3 +56,6 @@ repomix-output*.xml
 Thumbs.db
 ehthumbs.db
 desktop.ini
+.git
+*.log
+node_modules
