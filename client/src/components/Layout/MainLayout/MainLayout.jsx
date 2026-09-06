@@ -1,55 +1,115 @@
-import { Layout, Menu, Dropdown, Button } from "antd";
+import {
+  Layout,
+  Menu,
+  Dropdown,
+  Button,
+  Avatar,
+  Space,
+  Alert,
+  Switch,
+  Tooltip,
+  Drawer,
+  Grid,
+  theme,
+} from "antd";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
   BankOutlined,
   ApiOutlined,
   TeamOutlined,
   BookOutlined,
-  LogoutOutlined,
   UserOutlined,
+  LogoutOutlined,
+  SunOutlined,
+  MoonOutlined,
+  DashboardOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
+import { useMemo, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { ROUTES } from "@/router/routes.config";
+import { useUIStore } from "@/store/ui.store";
+import { usePermission } from "@/hooks/usePermission";
+import { PERMISSIONS } from "@/utils/permissions";
+import { ProfileModal } from "@/components/common/ProfileModal/ProfileModal";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog/ConfirmDialog";
+import { ErrorMessage } from "@/components/common/ErrorMessage/ErrorMessage";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary/ErrorBoundary";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import logo from "@/assets/logo-facilityos.png";
 import "./MainLayout.css";
-import { useAuth } from "../../../contexts/AuthContext";
 
 const { Header, Content, Sider } = Layout;
+const { useBreakpoint } = Grid;
 
 export const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = theme.useToken();
   const { user, logout } = useAuth();
+  const { sidebarCollapsed, toggleSidebar } = useUIStore();
+  const themeMode = useUIStore((state) => state.theme);
+  const setTheme = useUIStore((state) => state.setTheme);
+  const { can } = usePermission();
+  const isOnline = useOnlineStatus();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
-  const menuItems = [
-    {
-      key: "/districts",
-      icon: <BankOutlined />,
-      label: "Districts",
-      onClick: () => navigate("/districts"),
-    },
-    {
-      key: "/schools",
-      icon: <BookOutlined />,
-      label: "Schools",
-      onClick: () => navigate("/schools"),
-    },
-    {
-      key: "/beacons",
-      icon: <ApiOutlined />,
-      label: "Beacons",
-      onClick: () => navigate("/beacons"),
-    },
-    {
-      key: "/faculty",
-      icon: <TeamOutlined />,
-      label: "Faculty",
-      onClick: () => navigate("/faculty"),
-    },
-  ];
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const selectedKey = "/" + location.pathname.split("/")[1];
+  const menuItems = useMemo(() => {
+    const items = [{ key: ROUTES.HOME, icon: <DashboardOutlined />, label: "Home" }];
+
+    if (can(PERMISSIONS.DISTRICTS.VIEW_LIST)) {
+      items.push({ key: ROUTES.DISTRICTS.LIST, icon: <BankOutlined />, label: "Districts" });
+    }
+    if (can(PERMISSIONS.SCHOOLS.VIEW_LIST)) {
+      items.push({ key: ROUTES.SCHOOLS.LIST, icon: <BookOutlined />, label: "Schools" });
+    }
+    if (can(PERMISSIONS.USERS.VIEW_LIST)) {
+      items.push({ key: ROUTES.USERS.LIST, icon: <UserOutlined />, label: "Users" });
+    }
+    if (can(PERMISSIONS.BEACONS.VIEW_LIST)) {
+      items.push({ key: ROUTES.BEACONS.LIST, icon: <ApiOutlined />, label: "Beacons" });
+    }
+    if (can(PERMISSIONS.FACULTIES.VIEW_LIST)) {
+      items.push({ key: ROUTES.FACULTIES.LIST, icon: <TeamOutlined />, label: "Faculties" });
+    }
+
+    return items;
+  }, [can]);
+
+  const selectedKey = useMemo(() => {
+    const path = location.pathname;
+    const match = Object.values(ROUTES).find((routes) => {
+      if (typeof routes === "object" && routes.LIST) {
+        return path.startsWith(routes.LIST);
+      }
+      return false;
+    });
+    return match?.LIST || ROUTES.HOME;
+  }, [location.pathname]);
+
+  const handleMenuClick = ({ key }) => {
+    setMobileMenuOpen(false);
+    navigate(key);
+  };
 
   const handleLogout = async () => {
     await logout();
-    navigate("/auth/login");
+    navigate(ROUTES.AUTH.LOGIN);
+  };
+
+  const handleTriggerClick = () => {
+    if (isMobile) {
+      setMobileMenuOpen(true);
+    } else {
+      toggleSidebar();
+    }
   };
 
   const userMenuItems = [
@@ -57,48 +117,163 @@ export const MainLayout = () => {
       key: "profile",
       icon: <UserOutlined />,
       label: "Profile",
-      onClick: () => console.log("Go to profile"),
+      onClick: () => setProfileOpen(true),
     },
+    { type: "divider" },
     {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Logout",
-      onClick: handleLogout,
+      onClick: () => setLogoutConfirmOpen(true),
       danger: true,
     },
   ];
 
+  const getUserDisplayName = () => user?.name || user?.email || "User";
+  const getUserInitial = () => getUserDisplayName().charAt(0).toUpperCase();
+
   return (
     <Layout className="main-layout">
-      <Header className="main-header" style={{ backgroundColor: "#003380" }}>
-        <div className="logo" onClick={() => navigate("/")}>
-          FacilityOS
+      <Header className="main-header">
+        <div
+          className={`brand-zone ${sidebarCollapsed && !isMobile ? "brand-zone--collapsed" : ""}`}
+          onClick={() => {
+            setMobileMenuOpen(false);
+            navigate(ROUTES.HOME);
+          }}
+        >
+          <img src={logo} alt="FacilityOS" className="brand-logo" />
+          {(!sidebarCollapsed || isMobile) && <span className="brand-name">FacilityOS</span>}
         </div>
-        <div style={{ marginLeft: "auto" }}>
+
+        <Button
+          type="text"
+          className="collapse-trigger"
+          icon={
+            isMobile ? (
+              <MenuOutlined />
+            ) : sidebarCollapsed ? (
+              <MenuUnfoldOutlined />
+            ) : (
+              <MenuFoldOutlined />
+            )
+          }
+          onClick={handleTriggerClick}
+        />
+
+        <div className="header-actions">
+          <Tooltip title={themeMode === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
+            <Switch
+              checked={themeMode === "dark"}
+              onChange={(checked) => setTheme(checked ? "dark" : "light")}
+              checkedChildren={<MoonOutlined />}
+              unCheckedChildren={<SunOutlined />}
+            />
+          </Tooltip>
+
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <Button type="text" style={{ color: "#fff" }}>
-              <UserOutlined /> {user?.name || user?.email}
+            <Button type="text" className="user-button">
+              <Space>
+                <Avatar size="small" style={{ backgroundColor: token.colorPrimary, color: "#fff" }}>
+                  {getUserInitial()}
+                </Avatar>
+                <span className="user-name">{getUserDisplayName()}</span>
+              </Space>
             </Button>
           </Dropdown>
         </div>
       </Header>
+
       <Layout>
-        <Sider width={200} className="site-sider">
-          <Menu
-            mode="inline"
-            selectedKeys={[selectedKey]}
-            items={menuItems}
-            style={{ height: "100%", borderRight: 0 }}
-          />
-        </Sider>
-        <Layout style={{ padding: "0 24px 24px" }}>
+        {!isMobile && (
+          <Sider
+            width={248}
+            collapsedWidth={80}
+            collapsed={sidebarCollapsed}
+            trigger={null}
+            theme="dark"
+            className="site-sider"
+          >
+            <Menu
+              mode="inline"
+              theme="dark"
+              selectedKeys={[selectedKey]}
+              items={menuItems}
+              onClick={handleMenuClick}
+              className="site-menu"
+            />
+          </Sider>
+        )}
+
+        <Layout
+          className={`main-content-layout ${
+            !isMobile && sidebarCollapsed ? "main-content-layout--collapsed" : ""
+          } ${isMobile ? "main-content-layout--mobile" : ""}`}
+        >
           <Content className="main-content">
             <div className="content-wrapper">
-              <Outlet />
+              {!isOnline && (
+                <Alert
+                  type="warning"
+                  banner
+                  message="You are currently offline. Some features may be unavailable."
+                  style={{ marginBottom: 16 }}
+                />
+              )}
+              <ErrorBoundary
+                fallback={
+                  <ErrorMessage
+                    error={{ message: "This page failed to load. Please try again." }}
+                    onRetry={() => window.location.reload()}
+                  />
+                }
+              >
+                <Outlet />
+              </ErrorBoundary>
             </div>
           </Content>
         </Layout>
       </Layout>
+
+      <Drawer
+        placement="left"
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        closable={false}
+        width={260}
+        className="mobile-nav-drawer"
+        styles={{ body: { padding: 0 } }}
+      >
+        <div className="mobile-drawer-brand">
+          <img src={logo} alt="FacilityOS" className="brand-logo" />
+          <span className="brand-name">FacilityOS</span>
+        </div>
+        <Menu
+          mode="inline"
+          theme="dark"
+          selectedKeys={[selectedKey]}
+          items={menuItems}
+          onClick={handleMenuClick}
+          className="site-menu"
+        />
+      </Drawer>
+
+      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
+
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        title="Confirm Logout"
+        description="Are you sure you want to log out?"
+        confirmText="Logout"
+        cancelText="Cancel"
+        danger
+        loading={false}
+        onConfirm={() => {
+          setLogoutConfirmOpen(false);
+          handleLogout();
+        }}
+        onCancel={() => setLogoutConfirmOpen(false)}
+      />
     </Layout>
   );
 };
