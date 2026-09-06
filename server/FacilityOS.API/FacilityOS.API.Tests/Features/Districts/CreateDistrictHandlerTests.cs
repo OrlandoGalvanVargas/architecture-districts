@@ -8,7 +8,7 @@ namespace FacilityOS.API.Tests.Features.Districts
         private static ApplicationDbContext CreateInMemoryContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString()) // BD nueva y aislada por test
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()) 
                 .Options;
 
             return new ApplicationDbContext(options);
@@ -17,9 +17,9 @@ namespace FacilityOS.API.Tests.Features.Districts
         [Fact]
         public async Task Handle_ValidRequest_CreatesDistrictSuccessfully()
         {
-            // Arrange
+            
             using var context = CreateInMemoryContext();
-            var handler = new CreateDistrictHandler(context);
+            var handler = new CreateDistrictHandler(context, TestDoubles.AdminUser());
 
             var request = new CreateDistrictRequest
             {
@@ -32,10 +32,10 @@ namespace FacilityOS.API.Tests.Features.Districts
                 Description = "A test district"
             };
 
-            // Act
+            
             var result = await handler.Handle(new CreateDistrictCommand(request), CancellationToken.None);
 
-            // Assert
+            
             Assert.NotNull(result);
             Assert.Equal("Test District", result.Name);
             Assert.Equal("TEST001", result.Code);
@@ -46,35 +46,27 @@ namespace FacilityOS.API.Tests.Features.Districts
         }
 
         [Fact]
-        public async Task Handle_DuplicateCode_ThrowsInvalidOperationException()
+        public async Task Handle_DuplicateCode_ThrowsConflictException()
         {
-            // Arrange
+            
             using var context = CreateInMemoryContext();
-            context.Districts.Add(new District
-            {
-                Name = "Existing District",
-                Code = "DUPLICATE001",
-                State = "CA",
-                City = "San Diego",
-                ZipCode = "92101",
-                Address = "456 Elm St"
-            });
+            context.Districts.Add(new District("Existing District", "DUPLICATE001", "CA", "San Diego", "92101", "456 Elm St"));
             await context.SaveChangesAsync();
 
-            var handler = new CreateDistrictHandler(context);
+            var handler = new CreateDistrictHandler(context, TestDoubles.AdminUser());
 
             var request = new CreateDistrictRequest
             {
                 Name = "New District",
-                Code = "DUPLICATE001", // mismo código
+                Code = "DUPLICATE001", 
                 State = "NY",
                 City = "New York",
                 ZipCode = "10001",
                 Address = "789 Oak St"
             };
 
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(
+            
+            await Assert.ThrowsAsync<ConflictException>(
                 () => handler.Handle(new CreateDistrictCommand(request), CancellationToken.None));
         }
     }

@@ -1,3 +1,9 @@
+using FacilityOS.Application.DTOs.Auth;
+using FacilityOS.Application.DTOs.Schools;
+using FacilityOS.Application.Features.Auth.Validators;
+using FacilityOS.Application.Features.Schools.Validators;
+using FacilityOS.Domain.Models.Enums;
+
 namespace FacilityOS.API.Tests.Validation
 {
     public class ValidatorsTests

@@ -1,4 +1,5 @@
 ﻿using FacilityOS.API.Data;
+using FacilityOS.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FacilityOS.API.Tests.Features.Schools
@@ -15,15 +16,7 @@ namespace FacilityOS.API.Tests.Features.Schools
 
         private static async Task<District> SeedDistrict(ApplicationDbContext context)
         {
-            var district = new District
-            {
-                Name = "Test District",
-                Code = "TD001",
-                State = "CA",
-                City = "Los Angeles",
-                ZipCode = "90012",
-                Address = "123 Main St"
-            };
+            var district = new District("Test District", "TD001", "CA", "Los Angeles", "90012", "123 Main St");
             context.Districts.Add(district);
             await context.SaveChangesAsync();
             return district;
@@ -32,10 +25,10 @@ namespace FacilityOS.API.Tests.Features.Schools
         [Fact]
         public async Task Handle_ValidRequest_CreatesSchoolSuccessfully()
         {
-            // Arrange
+            
             using var context = CreateInMemoryContext();
             var district = await SeedDistrict(context);
-            var handler = new CreateSchoolHandler(context);
+            var handler = new CreateSchoolHandler(context, TestDoubles.AllowAllResources());
 
             var request = new CreateSchoolRequest
             {
@@ -51,25 +44,25 @@ namespace FacilityOS.API.Tests.Features.Schools
                 DistrictId = district.Id
             };
 
-            // Act
+            
             var result = await handler.Handle(new CreateSchoolCommand(request), CancellationToken.None);
 
-            // Assert
+            
             Assert.NotNull(result);
             Assert.Equal("Lincoln Elementary", result.Name);
             Assert.Equal("LNE001", result.SchoolCode);
-            Assert.Equal("Elementary", result.Level);
+            Assert.Equal(SchoolLevel.Elementary, result.Level);
             Assert.Equal(district.Id, result.DistrictId);
             Assert.True(result.IsActive);
             Assert.True(result.Id > 0);
         }
 
         [Fact]
-        public async Task Handle_InvalidDistrictId_ThrowsInvalidOperationException()
+        public async Task Handle_InvalidDistrictId_ThrowsNotFoundException()
         {
-            // Arrange
+            
             using var context = CreateInMemoryContext();
-            var handler = new CreateSchoolHandler(context);
+            var handler = new CreateSchoolHandler(context, TestDoubles.AllowAllResources());
 
             var request = new CreateSchoolRequest
             {
@@ -82,37 +75,27 @@ namespace FacilityOS.API.Tests.Features.Schools
                 State = "CA",
                 ZipCode = "90013",
                 StudentCapacity = 500,
-                DistrictId = 999 // no existe
+                DistrictId = 999 
             };
 
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(
+            
+            await Assert.ThrowsAsync<NotFoundException>(
                 () => handler.Handle(new CreateSchoolCommand(request), CancellationToken.None));
         }
 
         [Fact]
-        public async Task Handle_DuplicateSchoolCode_ThrowsInvalidOperationException()
+        public async Task Handle_DuplicateSchoolCode_ThrowsConflictException()
         {
-            // Arrange
+            
             using var context = CreateInMemoryContext();
             var district = await SeedDistrict(context);
 
-            context.Schools.Add(new School
-            {
-                Name = "Existing School",
-                SchoolCode = "DUPLICATE001",
-                Level = SchoolLevel.High,
-                Type = SchoolType.Public,
-                Address = "789 Oak St",
-                City = "Los Angeles",
-                State = "CA",
-                ZipCode = "90014",
-                StudentCapacity = 800,
-                DistrictId = district.Id
-            });
+            context.Schools.Add(new School(
+                "Existing School", "DUPLICATE001", SchoolLevel.High, SchoolType.Public,
+                "789 Oak St", "Los Angeles", "CA", "90014", district.Id, 800));
             await context.SaveChangesAsync();
 
-            var handler = new CreateSchoolHandler(context);
+            var handler = new CreateSchoolHandler(context, TestDoubles.AllowAllResources());
 
             var request = new CreateSchoolRequest
             {
@@ -128,8 +111,8 @@ namespace FacilityOS.API.Tests.Features.Schools
                 DistrictId = district.Id
             };
 
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(
+            
+            await Assert.ThrowsAsync<ConflictException>(
                 () => handler.Handle(new CreateSchoolCommand(request), CancellationToken.None));
         }
     }

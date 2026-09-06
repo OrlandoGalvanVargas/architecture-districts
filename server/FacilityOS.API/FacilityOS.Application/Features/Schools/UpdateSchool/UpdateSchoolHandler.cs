@@ -76,9 +76,7 @@ public class UpdateSchoolHandler : IRequestHandler<UpdateSchoolCommand, SchoolRe
         }
 
         if (school.DistrictId != req.DistrictId)
-        {
-            school.Update(req.Name, req.SchoolCode, req.Level, req.Type, req.Address, req.City, req.State, req.ZipCode, req.StudentCapacity, req.Phone, req.ContactEmail);
-        }
+            school.MoveToDistrict(req.DistrictId);
 
         await _context.SaveChangesAsync(cancellationToken);
 

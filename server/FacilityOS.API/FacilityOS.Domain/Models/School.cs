@@ -57,4 +57,6 @@ public class School : AuditableEntity
         Phone = phone;
         ContactEmail = contactEmail;
     }
+
+    public void MoveToDistrict(int districtId) => DistrictId = districtId;
 }
