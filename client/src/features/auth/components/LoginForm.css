@@ -1,0 +1,38 @@
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  border: none;
+  box-shadow: var(--fos-shadow-lg);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.login-header {
+  margin-bottom: 28px;
+}
+
+.login-title {
+  margin: 0 0 4px !important;
+  font-weight: 700 !important;
+}
+
+.login-error {
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+.login-submit {
+  margin-bottom: 0;
+  margin-top: 8px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

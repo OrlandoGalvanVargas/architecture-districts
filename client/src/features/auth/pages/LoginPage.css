@@ -1,0 +1,144 @@
+.login-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+.login-brand-panel {
+  position: relative;
+  flex: 1 1 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: var(--fos-gradient-brand);
+  overflow: hidden;
+}
+
+.login-brand-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.6;
+}
+
+.login-brand-panel::after {
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  right: -180px;
+  bottom: -180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 168, 204, 0.35) 0%, transparent 70%);
+  filter: blur(10px);
+}
+
+.login-brand-content {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+}
+
+.login-brand-logo {
+  height: 88px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.login-brand-title {
+  color: #fff !important;
+  margin: 0 0 12px !important;
+  font-weight: 700 !important;
+}
+
+.login-brand-tagline {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 15px !important;
+  margin-bottom: 32px !important;
+}
+
+.login-brand-highlights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-brand-highlights li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+}
+
+.login-brand-highlight-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #00c2ea;
+  flex-shrink: 0;
+}
+
+.login-form-panel {
+  flex: 1 1 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 24px;
+}
+
+.login-form-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.login-mobile-brand {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.login-mobile-brand img {
+  height: 40px;
+  width: auto;
+}
+
+.login-mobile-brand span {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--fos-brand-navy, #0b3b60);
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+}
+
+@media (max-width: 900px) {
+  .login-brand-panel {
+    display: none;
+  }
+
+  .login-form-panel {
+    flex: 1 1 100%;
+  }
+
+  .login-mobile-brand {
+    display: flex;
+  }
+}
