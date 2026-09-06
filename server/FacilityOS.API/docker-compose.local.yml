@@ -1,13 +1,13 @@
 services:
   facilityos-api:
-    container_name: facilityos-api-local
+    container_name: facilityos-api-prod
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "5000:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal;Database=FacilityOSDB;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
       - Jwt__Key=${JWT_KEY}
       - Jwt__Issuer=FacilityOSAPI
@@ -20,3 +20,9 @@ services:
       - RateLimiting__WindowMinutes=1
       - BCrypt__WorkFactor=12
     restart: always
+    networks:
+      - facilityos-network
+
+networks:
+  facilityos-network:
+    external: true
