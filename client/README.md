@@ -1,6 +1,15 @@
 # FacilityOS Frontend
 
-Frontend moderno basado en React para **FacilityOS**, una plataforma empresarial para la gestión de instalaciones educativas: distritos, escuelas, usuarios, beacons y miembros del cuerpo docente. La aplicación sigue una arquitectura orientada a funcionalidades (feature-oriented), se integra sin problemas con la API de FacilityOS e incluye caché sin conexión y un modo simulado (mock) para pruebas locales.
+![React](https://img.shields.io/badge/React-19-149ECA?style=flat-square)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat-square)
+![Ant Design](https://img.shields.io/badge/Ant_Design-6-0B3B60?style=flat-square)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?style=flat-square)
+![Zustand](https://img.shields.io/badge/Zustand-5-443E38?style=flat-square)
+![React Router](https://img.shields.io/badge/React_Router-7-CA4245?style=flat-square)
+![Vitest](https://img.shields.io/badge/Vitest-Testing-6E9F18?style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-Nginx-2496ED?style=flat-square)
+
+Frontend moderno basado en React para **FacilityOS**, una plataforma empresarial para la gestión de instalaciones educativas: distritos, escuelas, usuarios, beacons y miembros del cuerpo docente. La aplicación sigue una arquitectura orientada a funcionalidades (feature-oriented), se integra sin problemas con la API de FacilityOS e incluye caché sin conexión, un sistema de theming centralizado con soporte de modo oscuro, y un modo simulado (mock) para pruebas locales.
 
 ---
 
@@ -24,7 +33,7 @@ Frontend moderno basado en React para **FacilityOS**, una plataforma empresarial
   - [Caché Sin Conexión](#caché-sin-conexión)
   - [Modo Simulado (Mock)](#modo-simulado-mock)
 - [Roles y Permisos de Usuario](#roles-y-permisos-de-usuario)
-- [UI/UX](#uiux)
+- [Sistema de Diseño y Theming](#sistema-de-diseño-y-theming)
 - [Pruebas](#pruebas)
 - [Calidad de Código](#calidad-de-código)
 - [Despliegue](#despliegue)
@@ -36,7 +45,7 @@ Frontend moderno basado en React para **FacilityOS**, una plataforma empresarial
 
 - **React 19** con **Vite 7**
 - **JavaScript (JSX)**
-- **Ant Design 6** – Librería de componentes UI
+- **Ant Design 6** – Librería de componentes UI, con modo CSS Variables (`cssVar`) habilitado
 - **TanStack Query 5** – Gestión y caché del estado del servidor
 - **Zustand 5** – Gestión del estado del cliente
 - **React Router 7** – Enrutamiento
@@ -54,51 +63,58 @@ Frontend moderno basado en React para **FacilityOS**, una plataforma empresarial
 ```text
 client/
 ├── public/                     # Assets estáticos y service worker
-│   └── mockServiceWorker.js # Service worker MSW personalizado
+│   └── mockServiceWorker.js    # Service worker MSW personalizado
 ├── src/
 │   ├── api/                    # Cliente de API y definiciones de endpoints
 │   │   ├── client.js           # Instancia de Axios con interceptores
 │   │   ├── endpoints/          # Funciones de API por módulo
 │   │   └── queryKeys.js        # Claves de TanStack Query
-│   ├── assets/                 # Imágenes, fuentes, etc.
+│   ├── assets/                 # Imágenes, fuentes, logo de marca
 │   ├── components/             # Componentes UI reutilizables
-│   │   ├── common/             # ConfirmDialog, EmptyState, LoadingSpinner, ErrorMessage, ErrorBoundary, QueryStateHandler, DistrictSelect, SchoolSelect, BeaconSelect, ProfileModal
-│   │   └── Layout/             # MainLayout, PageHeader
-│   ├── config/                 # Configuraciones globales
-│   │   ├── queryClient.js      # Configuración de TanStack Query + persistencia
-│   │   └── theme.js            # Tokens de tema de Ant Design
-│   ├── contexts/               # Contextos de React
-│   │   ├── AuthContext.jsx     # Estado y métodos de autenticación
-│   │   └── Notification.jsx    # Proveedor de notificaciones/toast
-│   ├── features/               # Módulos de funcionalidades (auth, districts, schools, users, beacons, faculties)
+│   │   ├── common/              # ConfirmDialog, EmptyState, TableCard, LoadingSpinner,
+│   │   │                        # ErrorMessage, ErrorBoundary, QueryStateHandler,
+│   │   │                        # DistrictSelect, SchoolSelect, BeaconSelect, ProfileModal
+│   │   └── Layout/               # MainLayout, PageHeader
+│   ├── config/                  # Configuraciones globales
+│   │   ├── queryClient.js       # Configuración de TanStack Query + persistencia
+│   │   └── theme/                # Sistema de theming centralizado (ver Sistema de Diseño)
+│   │       ├── palette.js        # Paleta de marca cruda (colores base del logo)
+│   │       ├── tokens.js         # Tokens semánticos de antd (light/dark + Component Tokens)
+│   │       └── index.js          # buildThemeConfig(mode) — algoritmo + cssVar + tokens
+│   ├── constants/                # Constantes compartidas entre módulos (p. ej. usStates.js)
+│   ├── contexts/                 # Contextos de React
+│   │   ├── AuthContext.jsx       # Estado y métodos de autenticación
+│   │   └── Notification.jsx      # Proveedor de notificaciones/toast
+│   ├── features/                 # Módulos de funcionalidades (auth, districts, schools, users, beacons, faculties)
 │   │   ├── auth/
 │   │   ├── districts/
 │   │   ├── schools/
 │   │   ├── users/
 │   │   ├── beacons/
 │   │   └── faculties/
-│   │       ├── components/     # Componentes específicos de la funcionalidad
-│   │       ├── hooks/          # Hooks de TanStack Query para esa funcionalidad
-│   │       ├── pages/          # Componentes de página
-│   │       └── View.jsx        # Definiciones de rutas anidadas
-│   ├── hooks/                  # Hooks personalizados compartidos (usePermission, useAppNavigation, useOnlineStatus)
-│   ├── mocks/                  # Configuración de Mock Service Worker y datos semilla
-│   ├── pages/                  # Páginas globales (Home, Forbidden, NotFound, ServerError)
-│   ├── router/                 # Configuración de rutas y ProtectedRoute
-│   ├── services/               # Servicio de logging
-│   ├── store/                  # Stores de Zustand (ui.store)
-│   ├── test/                   # Configuración y utilidades de pruebas
-│   ├── utils/                  # Helpers (tokenManager, errorHandler, permissions, etc.)
+│   │       ├── components/       # Componentes específicos de la funcionalidad
+│   │       ├── hooks/            # Hooks de TanStack Query para esa funcionalidad
+│   │       ├── pages/            # Componentes de página
+│   │       └── View.jsx          # Definiciones de rutas anidadas
+│   ├── hooks/                    # Hooks personalizados compartidos (usePermission, useAppNavigation, useOnlineStatus)
+│   ├── mocks/                     # Configuración de Mock Service Worker y datos semilla
+│   ├── pages/                     # Páginas globales (Home, Forbidden, NotFound, ServerError)
+│   ├── router/                    # Configuración de rutas y ProtectedRoute
+│   ├── services/                  # Servicio de logging
+│   ├── store/                     # Stores de Zustand (ui.store)
+│   ├── test/                      # Configuración y utilidades de pruebas
+│   ├── utils/                     # Helpers (tokenManager, errorHandler, permissions, etc.)
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
-├── .env.example                # Ejemplo de variables de entorno
+├── .env.example                 # Ejemplo de variables de entorno
 ├── Dockerfile
 ├── nginx.conf
 ├── docker-compose.production.yml
 ├── package.json
 └── vite.config.js
 ```
+
 ---
 
 ## Funcionalidades
@@ -109,10 +125,10 @@ client/
 - **Usuarios** – CRUD completo con restricciones dinámicas de rol y entidad.
 - **Beacons** – CRUD completo con filtros por tipo/estado y asignación opcional a distrito/escuela/facultad.
 - **Facultades** – CRUD completo con asignación a distrito o escuela, beacon opcional y restricciones de rol.
-- **Dashboard** – Página de inicio profesional con tarjetas de módulos según los permisos del usuario.
+- **Dashboard** – Página de inicio con hero de marca, accesos rápidos por módulo según los permisos del usuario.
 - **Caché Sin Conexión** – Persistencia de la caché de consultas en IndexedDB, mostrando datos en caché cuando no hay conexión.
 - **Modo Simulado (Mock)** – Ejecuta toda la aplicación sin un backend usando Mock Service Worker y datos locales.
-- **Modo Oscuro** – Alternancia entre temas claro y oscuro.
+- **Modo Oscuro** – Alternancia entre temas claro y oscuro con paleta de marca propia (ver [Sistema de Diseño y Theming](#sistema-de-diseño-y-theming)).
 
 ---
 
@@ -190,21 +206,21 @@ El paquete de producción quedará en la carpeta `dist/`.
 ### Enrutamiento
 
 - Enrutamiento basado en funcionalidades usando `<Routes>` anidados en el `View.jsx` de cada módulo.
-- Carga diferida (lazy loading) mediante `React.lazy` y `Suspense`.
+- Carga diferida (lazy loading) mediante `React.lazy` y `Suspense`, con un helper `lazyImport` que resuelve named exports (el proyecto no usa `export default` en ningún componente).
 - `ProtectedRoute` envuelve las rutas privadas, verificando autenticación y permisos.
 
 ### Manejo de Errores
 
-- `ErrorBoundary` global captura errores en tiempo de ejecución y muestra una página de respaldo.
+- `ErrorBoundary` global captura errores en tiempo de ejecución y muestra una página de respaldo (`ServerErrorPage`).
 - El componente `ErrorMessage` muestra errores de la API con opción de reintento y detalles técnicos.
-- El contexto `Notification` provee notificaciones tipo toast.
+- El contexto `Notification` provee notificaciones tipo toast (`message`) y notificaciones persistentes (`notification`), ambas theme-aware por heredar los tokens de antd sin estilos manuales.
 - `logger.service` centraliza el logging con habilitación según el entorno.
 
 ### Caché Sin Conexión
 
 - Persistencia de TanStack Query usando `@tanstack/react-query-persist-client` con un adaptador de IndexedDB (`idb-keyval`).
 - El hook `useOnlineStatus` detecta cambios en la conexión de red.
-- El componente `QueryStateHandler` muestra datos en caché con una advertencia cuando no hay conexión, en lugar de un error grave.
+- El componente `QueryStateHandler` muestra datos en caché con una advertencia cuando no hay conexión, en lugar de un error grave — nunca se descarta la data cacheada mientras exista.
 
 ### Modo Simulado (Mock)
 
@@ -222,20 +238,36 @@ El paquete de producción quedará en la carpeta `dist/`.
 | CRUD de Distritos   | Todo  | Solo lectura   | Solo lectura|
 | CRUD de Escuelas    | Todo  | Propio distrito| Propia escuela |
 | CRUD de Usuarios    | Todo  | Propio distrito| Propia escuela |
-| CRUD de Beacons     | Todo  | Solo lectura   | Solo lectura|
+| Beacons             | CRUD completo | Lectura (su distrito) | Lectura (su escuela) |
 | CRUD de Facultades  | Todo  | Propio distrito| Propia escuela |
 
-La jerarquía y el alcance de los roles se aplican tanto en el backend como en la interfaz del frontend.
+La jerarquía y el alcance de los roles se aplican tanto en el backend como en la interfaz del frontend — el backend es siempre la autoridad final; el frontend solo oculta/deshabilita acciones para efectos de UX.
 
 ---
 
-## UI/UX
+## Sistema de Diseño y Theming
 
-- Componentes de Ant Design con tokens de tema personalizados.
-- Diseño responsivo con sidebar colapsable.
-- Alternancia entre tema oscuro y claro.
-- Componentes reutilizables: `ConfirmDialog`, `EmptyState`, `LoadingSpinner`, `ErrorMessage`, `QueryStateHandler`.
-- Tarjetas de módulos en el dashboard principal para navegación rápida.
+La aplicación centraliza por completo sus colores, tipografía y espaciados en un único módulo (`src/config/theme/`), evitando que cada componente defina estilos propios de forma dispersa.
+
+### Arquitectura de tokens
+
+- **`palette.js`** — única fuente de verdad de los colores crudos de marca, extraídos del logo de FacilityOS (cian `#00A8CC`, navy `#0B3B60`), más la escala de neutrales.
+- **`tokens.js`** — traduce la paleta a Design Tokens y Component Tokens de Ant Design, en dos variantes completas (`lightTokens` / `darkTokens`): colores semánticos (`colorPrimary`, `colorBgLayout`, `colorText`, etc.) y tokens específicos por componente (`Layout`, `Menu`, `Button`, `Card`, `Table`, `Input`).
+- **`index.js`** — expone `buildThemeConfig(mode)`, que combina los tokens con el algoritmo de antd correspondiente (`defaultAlgorithm` / `darkAlgorithm`) y activa el modo `cssVar` de Ant Design 6.
+
+### Modo oscuro
+
+- El estado del tema vive en `ui.store` (Zustand) y se persiste en `localStorage`.
+- `ConfigProvider` en `main.jsx` reconstruye el theme completo cada vez que el modo cambia, vía `buildThemeConfig(theme)`.
+- **Patrón oficial para aplicar color dentro de componentes**: `theme.useToken()` de antd, no variables CSS adivinadas. En este proyecto se comprobó empíricamente que Ant Design 6 no expone sus tokens como variables CSS con un nombre predecible en este build, así que todo color dinámico (fondos, texto, bordes que dependen del tema) se aplica vía `const { token } = theme.useToken()` dentro del componente React, nunca vía `var(--algo)` adivinado en CSS puro.
+- Las únicas variables CSS mantenidas a mano (`--fos-*` en `index.css`) cubren exclusivamente lo que antd no gestiona: dimensiones de layout, sombras propias y el gradiente de marca — sincronizadas manualmente con `palette.js`.
+
+### Componentes compartidos de UI
+
+- **`TableCard`** — envoltorio visual estándar para toda tabla de listado (Districts, Schools, y sucesivamente Users/Beacons/Faculties), con fondo, borde y radio de esquina tomados de los tokens activos.
+- **`EmptyState`** — conectado globalmente vía la prop `renderEmpty` de `ConfigProvider`, por lo que **toda** tabla vacía de la aplicación lo usa automáticamente, sin necesidad de importarlo manualmente en cada feature.
+- Tablas de listado con soporte de scroll horizontal y, según el criterio definido por módulo, columnas que se adaptan por breakpoint (`responsive`) para priorizar los campos más identificatorios en pantallas pequeñas.
+- Formularios organizados en secciones temáticas mediante `Divider` (Información básica / Ubicación / Asignación), en vez de listas largas de campos sin agrupar.
 
 ---
 
