@@ -1,73 +1,39 @@
 import { useNavigate } from "react-router-dom";
 import { useCallback, useMemo } from "react";
-import { RoutePaths } from "../router/RoutePaths";
+import { ROUTES } from "@/router/routes.config";
 
 export const useAppNavigation = () => {
   const navigate = useNavigate();
 
+  const goTo = useCallback((path) => navigate(path), [navigate]);
   const goBack = useCallback(() => navigate(-1), [navigate]);
-  const goHome = useCallback(() => navigate(RoutePaths.home()), [navigate]);
+  const goHome = useCallback(() => navigate(ROUTES.HOME), [navigate]);
 
-  const goToDistricts = useCallback(
-    () => navigate(RoutePaths.districts.list()),
-    [navigate],
-  );
-  const goToDistrictDetail = useCallback(
-    (id) => navigate(RoutePaths.districts.detail(id)),
-    [navigate],
-  );
-  const goToDistrictEdit = useCallback(
-    (id) => navigate(RoutePaths.districts.edit(id)),
-    [navigate],
-  );
-  const goToDistrictCreate = useCallback(
-    () => navigate(RoutePaths.districts.create()),
-    [navigate],
+  const createModuleNavigation = useCallback(
+    (moduleRoutes) => ({
+      list: () => navigate(moduleRoutes.LIST),
+      create: () => navigate(moduleRoutes.CREATE),
+      detail: (id) => navigate(moduleRoutes.DETAIL(id)),
+      edit: (id) => navigate(moduleRoutes.EDIT(id)),
+    }),
+    [navigate]
   );
 
-  const goToSchools = useCallback(
-    () => navigate(RoutePaths.schools.list()),
-    [navigate],
-  );
-  const goToSchoolCreate = useCallback(
-    () => navigate(RoutePaths.schools.create()),
-    [navigate],
-  );
-  const goToSchoolDetail = useCallback(
-    (id) => navigate(RoutePaths.schools.detail(id)),
-    [navigate],
-  );
-  const goToSchoolEdit = useCallback(
-    (id) => navigate(RoutePaths.schools.edit(id)),
-    [navigate],
-  );
-
-  return useMemo(
+  const navigation = useMemo(
     () => ({
       navigate,
+      goTo,
       goBack,
       goHome,
-      goToDistricts,
-      goToDistrictDetail,
-      goToDistrictEdit,
-      goToDistrictCreate,
-      goToSchools,
-      goToSchoolCreate,
-      goToSchoolDetail,
-      goToSchoolEdit,
+
+      districts: createModuleNavigation(ROUTES.DISTRICTS),
+      schools: createModuleNavigation(ROUTES.SCHOOLS),
+      users: createModuleNavigation(ROUTES.USERS),
+      beacons: createModuleNavigation(ROUTES.BEACONS),
+      faculties: createModuleNavigation(ROUTES.FACULTIES),
     }),
-    [
-      navigate,
-      goBack,
-      goHome,
-      goToDistricts,
-      goToDistrictDetail,
-      goToDistrictEdit,
-      goToDistrictCreate,
-      goToSchools,
-      goToSchoolCreate,
-      goToSchoolDetail,
-      goToSchoolEdit,
-    ],
+    [navigate, goTo, goBack, goHome, createModuleNavigation]
   );
+
+  return navigation;
 };
