@@ -1,58 +1,94 @@
-import { message } from "antd";
-import { createContext, useCallback, useContext } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { notification, message } from "antd";
+import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
 
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const [notificationApi, notificationContextHolder] = notification.useNotification();
+
+  useEffect(() => {
+    notification.config({ placement: "topRight", duration: 4.5 });
+  }, []);
 
   const showSuccess = useCallback(
-    (content) => {
-      messageApi.success(content);
+    (content, duration = 3) => {
+      messageApi.success({ content, duration });
     },
-    [messageApi],
+    [messageApi]
   );
 
   const showError = useCallback(
-    (content) => {
-      messageApi.error(content);
+    (content, duration = 5) => {
+      messageApi.error({ content, duration });
     },
-    [messageApi],
+    [messageApi]
   );
 
   const showWarning = useCallback(
-    (content) => {
-      messageApi.warning(content);
+    (content, duration = 4) => {
+      messageApi.warning({ content, duration });
     },
-    [messageApi],
+    [messageApi]
   );
 
   const showInfo = useCallback(
-    (content) => {
-      messageApi.info(content);
+    (content, duration = 3) => {
+      messageApi.info({ content, duration });
     },
-    [messageApi],
+    [messageApi]
   );
 
-  const value = {
-    showSuccess,
-    showError,
-    showWarning,
-    showInfo,
-  };
+  const notifySuccess = useCallback(
+    (title, description) => {
+      notificationApi.success({ message: title, description });
+    },
+    [notificationApi]
+  );
+
+  const notifyError = useCallback(
+    (title, description) => {
+      notificationApi.error({ message: title, description });
+    },
+    [notificationApi]
+  );
+
+  const handleApiError = useCallback(
+    (error, fallbackMessage = "An error occurred") => {
+      const errorText = error?.friendlyMessage || error?.message || fallbackMessage;
+      showError(errorText);
+      return errorText;
+    },
+    [showError]
+  );
+
+  const value = useMemo(
+    () => ({
+      showSuccess,
+      showError,
+      showWarning,
+      showInfo,
+      notifySuccess,
+      notifyError,
+      handleApiError,
+    }),
+    [showSuccess, showError, showWarning, showInfo, notifySuccess, notifyError, handleApiError]
+  );
 
   return (
     <NotificationContext.Provider value={value}>
       {children}
-      {contextHolder}
+      {messageContextHolder}
+      {notificationContextHolder}
     </NotificationContext.Provider>
   );
 };
 
 export const useNotification = () => {
   const context = useContext(NotificationContext);
-  if (!context)
+  if (!context) {
     throw new Error("useNotification must be used within NotificationProvider");
-
+  }
   return context;
 };
