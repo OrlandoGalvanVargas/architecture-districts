@@ -1,17 +1,104 @@
+:root {
+  --fos-header-height: 64px;
+  --fos-sidebar-width: 248px;
+  --fos-sidebar-collapsed-width: 80px;
+  --fos-content-max-width: 1440px;
+
+  --fos-shadow-sm: 0 1px 2px rgba(11, 59, 96, 0.06);
+  --fos-shadow-md: 0 6px 16px rgba(11, 59, 96, 0.1);
+  --fos-shadow-lg: 0 12px 32px rgba(11, 59, 96, 0.16);
+
+  --fos-gradient-brand: linear-gradient(135deg, #0b3b60 0%, #082a46 100%);
+  --fos-brand-navy: #0b3b60;
+  --fos-brand-navy-deep: #082a46;
+
+  --fos-color-border: #e5e9ef;
+  --fos-color-text-tertiary: #7c8591;
+}
+
+[data-theme="dark"] {
+  --fos-brand-navy: #082a46;
+  --fos-brand-navy-deep: #071e33;
+  --fos-color-border: #3e4753;
+  --fos-color-text-tertiary: #7c8591;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
-    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+html {
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ant-layout {
-  background: #f0f2f5;
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--fos-content-max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-1 {
+  margin-top: 8px;
+}
+.mt-2 {
+  margin-top: 16px;
+}
+.mt-3 {
+  margin-top: 24px;
+}
+.mb-1 {
+  margin-bottom: 8px;
+}
+.mb-2 {
+  margin-bottom: 16px;
+}
+.mb-3 {
+  margin-bottom: 24px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--fos-color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fos-color-text-tertiary);
 }
