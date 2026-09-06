@@ -1,0 +1,13 @@
+.faculty-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.faculty-detail-name {
+  font-size: 18px;
+  font-weight: 600;
+}
